@@ -124,6 +124,7 @@ OBSIDIAN.tareas/
 ## 05. Pruebas
 - Modelo de pruebas: [[Estrategia de Testing (.NET 10)]] — DESTINO: piramide, matriz Testcontainers dual, test de aislamiento cross-tenant, ETL, E2E Playwright
 - Modelo de pruebas: [[Plan de validacion del sistema]] — ORIGEN: checklist manual del legacy por modulo
+- Modelo de pruebas: [[CREDENCIALES - Usuarios y claves]] — plan de cuentas demo Development (sin secretos reales; passwords en .env)
 - Historial de pruebas: [[00 - Registro de corridas]] — bitacora de corridas
 
 ## 06. Deploy
