@@ -16,7 +16,7 @@ Esta hoja de ruta describe el camino recomendado para construir el nuevo **ECORE
 - **Multi-tenant real:** [[Gestion de Empresas - Admin multi-tenant]]
 - **DAL dual:** [[00 - Visión MotherData]]
 - **Modelo de datos (plano del ETL):** [[Modelo Entidad-Relacion logico]]
-- **BD legacy (fuente del ETL):** `db3dev` en `sql.bitcode.com.co,44566` (cadena en scratchpad, NO en el vault)
+- **BD del sistema actual (fuente del ETL / descubrimiento):** `db3dev` (SQL Server, copia de produccion safe). Tenant a migrar = sucursal `01` = **BITCODE**. Como conectar, guardrails y por que las credenciales NO estan en este repo: [[Conexion a la BD del sistema actual (db3dev)]]
 
 **Stack destino:** .NET 10 / ASP.NET Core 10, Blazor (Server interactivo), EF Core 10, **DAL dual PostgreSQL o SQL Server**, Redis (cache de definiciones de flujo + locks), RabbitMQ + MassTransit, SignalR, Serilog, OpenTelemetry, Docker. Frontend 100% .NET (sin Node/React).
 
@@ -344,7 +344,7 @@ Se portan del legacy conservando el modelo mental (ver capas 3, 4 y las notas de
 Lo que un producto nuevo no tiene: traer los datos de `db3dev` (SQL Server legacy) al esquema destino, respetando el multi-tenant real.
 
 ### 9.1 Estrategia
-Proyecto `etl/` (consola .NET) que lee `db3dev` y escribe al destino via `IEcorexDbContext`. Se corre por tenant (`SUCURSAL`), idempotente, con log por fila y verificacion de conteos.
+Proyecto `etl/` (consola .NET) que lee `db3dev` y escribe al destino via `IEcorexDbContext`. Se corre por tenant (`SUCURSAL`), idempotente, con log por fila y verificacion de conteos. La conexion, los guardrails y las tablas ancla estan en [[Conexion a la BD del sistema actual (db3dev)]] (BD real: SQL Server 2022, ~1004 tablas, 105 tenants, 532 modulos; tenant a migrar = `01` = BITCODE).
 
 ### 9.2 Mapeo (del [[Modelo Entidad-Relacion logico]])
 

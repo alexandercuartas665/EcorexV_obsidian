@@ -117,6 +117,7 @@ OBSIDIAN.tareas/
 
 ## 04. Notas para desarrollador
 - [[Manejo de Datos - Alias, parametros, UDFs, consecutivos]] — `[dbx.GENE]`, PARAMXML, UDFs, consecutivos
+- [[Conexion a la BD del sistema actual (db3dev)]] — BD real del sistema actual (copia de produccion): tenant 01=BITCODE, 532 modulos, para descubrimiento y ETL. Credenciales FUERA del repo
 - [[Seguridad y Autenticacion multi-tenant]] — JWT+refresh, MFA PlatformAdmin, policies (ex-PermissionsManager), RLS, secretos en Key Vault
 - [[ADRs - Decisiones de arquitectura]] — 10 decisiones (DAL dual, multi-tenant real, Blazor Server, Guid v7, EAV->jsonb, bpmn-js, ETL...) con su por que
 
