@@ -1,0 +1,10 @@
+# Obsidian - estado de UI especifico del usuario
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+
+# OS / OneDrive
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp

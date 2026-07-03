@@ -1,0 +1,500 @@
+<title>NEWFRONT_adm_empresas - Administracion multi-tenant</title>
+<style>
+  :root {
+    --ink: #0F1729;
+    --paper: #FAFBFC;
+    --card: #FFFFFF;
+    --border: #E4E7EB;
+    --border-soft: #F1F3F5;
+    --muted: #6B7280;
+    --muted-2: #9CA3AF;
+    --accent: #2563EB;
+    --accent-soft: #EFF6FF;
+    --accent-ink: #1E3A8A;
+    --success: #059669;
+    --warn: #D97706;
+    --danger: #DC2626;
+    --shadow-1: 0 1px 2px rgba(15,23,41,.04);
+    --shadow-2: 0 1px 3px rgba(15,23,41,.06), 0 8px 24px rgba(15,23,41,.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Inter, system-ui, sans-serif;
+    font-size: 13.5px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--card);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .breadcrumb .sep { color: var(--muted-2); }
+  .breadcrumb .last { color: var(--ink); font-weight: 500; }
+  .mod-code {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 8px; background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 4px; font-size: 11px;
+    font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+    font-weight: 600; margin-left: 8px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--card); color: var(--ink);
+    font-size: 12.5px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .btn:hover { background: var(--border-soft); }
+  .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-ink); }
+  .btn.sm { padding: 4px 8px; font-size: 11.5px; }
+  .actions { display: flex; gap: 8px; }
+  .layout {
+    display: grid; grid-template-columns: 240px 1fr;
+    max-width: 1400px; margin: 0 auto; gap: 20px;
+    padding: 20px 24px 60px;
+  }
+  .toc {
+    position: sticky; top: 75px; align-self: start;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 6px; box-shadow: var(--shadow-1);
+  }
+  .toc-title {
+    padding: 4px 10px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--muted); font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 10px; font-size: 12.5px; color: var(--ink);
+    cursor: pointer; border-radius: 5px; text-decoration: none;
+  }
+  .toc-item:hover { background: var(--border-soft); }
+  .toc-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .toc-item .num {
+    color: var(--muted-2); font-family: ui-monospace, monospace;
+    font-size: 11px; width: 18px;
+  }
+  .content { display: flex; flex-direction: column; gap: 16px; }
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); }
+  .tab {
+    padding: 10px 18px; border: none; background: transparent;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; border-bottom: 2px solid transparent; font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .header-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px; display: grid;
+    grid-template-columns: 72px 1fr auto; gap: 20px;
+    align-items: center; box-shadow: var(--shadow-1);
+  }
+  .company-avatar {
+    width: 72px; height: 72px; border-radius: 14px;
+    background: linear-gradient(135deg, #1E3A8A, #2563EB);
+    color: white; display: flex; align-items: center;
+    justify-content: center; font-size: 30px; font-weight: 700;
+    letter-spacing: -.02em; box-shadow: 0 8px 20px rgba(37,99,235,.25);
+  }
+  .company-name { font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 6px; }
+  .company-meta {
+    display: flex; gap: 12px; align-items: center;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .company-meta .dot { width: 3px; height: 3px; background: var(--muted-2); border-radius: 50%; }
+  .company-meta code {
+    font-family: ui-monospace, monospace;
+    padding: 1px 6px; background: var(--border-soft);
+    border-radius: 4px; font-size: 11.5px;
+  }
+  .plan-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; background: #FEF3C7; color: #78350F;
+    border: 1px solid #FCD34D; border-radius: 999px;
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .kpi-val {
+    font-size: 22px; font-weight: 600; letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .kpi-val small { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .kpi-spark { margin-top: 6px; }
+  .section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow-1); overflow: hidden;
+  }
+  .section-head {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 600;
+  }
+  .section-title .badge-num {
+    padding: 1px 8px; background: var(--accent-soft);
+    color: var(--accent-ink); border-radius: 12px;
+    font-size: 11.5px; font-weight: 600;
+  }
+  .accordion {
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .accordion:last-child { border-bottom: none; }
+  .acc-head {
+    padding: 12px 20px; display: flex; justify-content: space-between;
+    align-items: center; cursor: pointer; user-select: none;
+    transition: background .08s;
+  }
+  .acc-head:hover { background: var(--border-soft); }
+  .acc-title { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; }
+  .acc-title .badge { font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 3px; background: var(--border-soft); color: var(--muted); letter-spacing: .02em; text-transform: uppercase; }
+  .acc-title .chevron { color: var(--muted-2); }
+  .acc-body {
+    padding: 0 20px 20px; display: none;
+  }
+  .accordion.open .acc-body { display: block; }
+  .accordion.open .chevron { transform: rotate(90deg); }
+  .chevron { display: inline-block; transition: transform .15s; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+  .field input, .field select {
+    padding: 7px 10px; border: 1px solid var(--border);
+    border-radius: 5px; font-size: 13px; font-family: inherit;
+    background: var(--card); outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .module-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .module-tile {
+    padding: 12px 14px; border: 1px solid var(--border);
+    border-radius: 8px; display: flex; gap: 12px; align-items: center;
+    background: var(--card); cursor: pointer;
+  }
+  .module-tile.active { border-color: var(--accent); background: var(--accent-soft); }
+  .module-tile .mtile-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--border-soft); color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .module-tile.active .mtile-icon { background: var(--accent); color: white; }
+  .mtile-body { flex: 1; }
+  .mtile-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .mtile-meta { font-size: 11.5px; color: var(--muted); }
+  .module-tile.active .mtile-meta { color: var(--accent-ink); opacity: .75; }
+  .integrations {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .integ-tile {
+    padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+    display: flex; flex-direction: column; gap: 8px; background: var(--card);
+  }
+  .integ-tile.on { border-color: var(--success); background: #F0FDF4; }
+  .integ-head { display: flex; justify-content: space-between; align-items: center; }
+  .integ-name { font-size: 13px; font-weight: 500; }
+  .switch {
+    position: relative; width: 30px; height: 18px;
+    background: var(--border); border-radius: 9px; cursor: pointer;
+    transition: background .12s;
+  }
+  .switch.on { background: var(--success); }
+  .switch::after {
+    content: ""; position: absolute;
+    top: 2px; left: 2px; width: 14px; height: 14px;
+    background: white; border-radius: 50%;
+    transition: transform .12s;
+  }
+  .switch.on::after { transform: translateX(12px); }
+  .integ-status { font-size: 11.5px; color: var(--muted); }
+  .integ-tile.on .integ-status { color: var(--success); font-weight: 500; }
+  table.grid {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  table.grid th {
+    text-align: left; padding: 10px 20px;
+    background: var(--border-soft); font-weight: 600;
+    color: var(--muted); font-size: 11.5px;
+    text-transform: uppercase; letter-spacing: .04em;
+    border-bottom: 1px solid var(--border);
+  }
+  table.grid td { padding: 10px 20px; border-bottom: 1px solid var(--border-soft); }
+  table.grid tr:last-child td { border-bottom: none; }
+  .user-cell { display: flex; align-items: center; gap: 10px; }
+  .user-cell .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 10.5px; font-weight: 600;
+    letter-spacing: .02em; text-transform: uppercase;
+  }
+  .badge.on { background: #DCFCE7; color: #14532D; }
+  .badge.off { background: #FEE2E2; color: #7F1D1D; }
+  .badge.warn { background: #FEF3C7; color: #78350F; }
+  .sparkline { display: block; width: 100%; height: 24px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } .module-grid { grid-template-columns: 1fr 1fr; } .integrations { grid-template-columns: 1fr 1fr; } .toc { position: static; } }
+</style>
+
+<div class="topbar">
+  <div class="breadcrumb">
+    <span>Home</span><span class="sep">/</span>
+    <span>Configuracion</span><span class="sep">/</span>
+    <span class="last">Administracion de empresas</span>
+    <span class="mod-code">MOD 000072</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Ver auditoria</button>
+    <button class="btn">Exportar tenant</button>
+    <button class="btn primary">+ Nueva empresa</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Secciones</div>
+    <a class="toc-item active"><span class="num">01</span>Ficha</a>
+    <a class="toc-item"><span class="num">02</span>Modulos</a>
+    <a class="toc-item"><span class="num">03</span>Actividades</a>
+    <a class="toc-item"><span class="num">04</span>Cargar datos</a>
+    <a class="toc-item"><span class="num">05</span>Copiar formularios</a>
+    <a class="toc-item"><span class="num">06</span>Datos externos</a>
+    <a class="toc-item"><span class="num">07</span>Reglas</a>
+    <a class="toc-item"><span class="num">08</span>Usuarios</a>
+    <a class="toc-item"><span class="num">09</span>Configuraciones</a>
+    <a class="toc-item"><span class="num">10</span>Integraciones</a>
+  </nav>
+
+  <div class="content">
+
+    <div class="tabs">
+      <button class="tab active">Empresa seleccionada</button>
+      <button class="tab">Todas las empresas (47)</button>
+    </div>
+
+    <div class="header-card">
+      <div class="company-avatar">S</div>
+      <div>
+        <h1 class="company-name">Soldarco S.A.S</h1>
+        <div class="company-meta">
+          <code>NIT 900123456-7</code>
+          <span class="dot"></span>
+          <span>Bogota, Colombia</span>
+          <span class="dot"></span>
+          <span>Cliente desde 2019</span>
+          <span class="dot"></span>
+          <span>4 sucursales</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <span class="plan-badge">Enterprise</span>
+        <span class="badge on">Activa</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Sucursales</div>
+        <div class="kpi-val">4 <small>de 10</small></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Usuarios activos</div>
+        <div class="kpi-val">47 <small>de 100</small></div>
+        <svg class="kpi-spark" viewBox="0 0 100 24" preserveAspectRatio="none">
+          <path d="M0,18 L10,16 L20,17 L30,14 L40,12 L50,13 L60,9 L70,10 L80,7 L90,6 L100,4" stroke="#2563EB" stroke-width="1.5" fill="none" />
+          <path d="M0,18 L10,16 L20,17 L30,14 L40,12 L50,13 L60,9 L70,10 L80,7 L90,6 L100,4 L100,24 L0,24 Z" fill="#EFF6FF" />
+        </svg>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Modulos activos</div>
+        <div class="kpi-val">12 <small>de 18</small></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Actividades ECOREX</div>
+        <div class="kpi-val">28</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Reglas activas</div>
+        <div class="kpi-val">17 <small>+ 3 pausadas</small></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">01 &middot; Ficha basica <span class="badge-num">SUCURSAL</span></div>
+        <button class="btn sm">Editar</button>
+      </div>
+      <div style="padding:20px">
+        <div class="row3">
+          <div class="field"><label>Razon social</label><input value="Soldarco S.A.S" /></div>
+          <div class="field"><label>Nombre comercial</label><input value="Soldarco" /></div>
+          <div class="field"><label>NIT</label><input value="900123456-7" /></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Tipo de tenant</label><select><option>Enterprise</option><option>Pro</option><option>Basic</option></select></div>
+          <div class="field"><label>Estado</label><select><option>Activo</option><option>Pausado</option><option>Cancelado</option></select></div>
+          <div class="field"><label>Fecha inicio</label><input value="01/02/2019" /></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Ciudad</label><select><option>Bogota</option><option>Medellin</option><option>Cali</option></select></div>
+          <div class="field"><label>Direccion</label><input value="Cra 68 #23-45, Puente Aranda" /></div>
+          <div class="field"><label>Telefono</label><input value="+57 601 234 5678" /></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">02 &middot; Modulos habilitados <span class="badge-num">12 / 18</span></div>
+        <button class="btn sm">Contratar mas</button>
+      </div>
+      <div style="padding:20px">
+        <div class="module-grid">
+          <div class="module-tile active"><div class="mtile-icon">V</div><div class="mtile-body"><div class="mtile-name">Ventas</div><div class="mtile-meta">Activo &middot; 14 usuarios</div></div></div>
+          <div class="module-tile active"><div class="mtile-icon">C</div><div class="mtile-body"><div class="mtile-name">Cobranza</div><div class="mtile-meta">Activo &middot; 6 usuarios</div></div></div>
+          <div class="module-tile active"><div class="mtile-icon">I</div><div class="mtile-body"><div class="mtile-name">Inventario</div><div class="mtile-meta">Activo &middot; 9 usuarios</div></div></div>
+          <div class="module-tile active"><div class="mtile-icon">F</div><div class="mtile-body"><div class="mtile-name">Facturacion</div><div class="mtile-meta">Activo &middot; 4 usuarios</div></div></div>
+          <div class="module-tile active"><div class="mtile-icon">T</div><div class="mtile-body"><div class="mtile-name">Tareas</div><div class="mtile-meta">Activo &middot; 12 usuarios</div></div></div>
+          <div class="module-tile active"><div class="mtile-icon">P</div><div class="mtile-body"><div class="mtile-name">Produccion</div><div class="mtile-meta">Activo &middot; 8 usuarios</div></div></div>
+          <div class="module-tile"><div class="mtile-icon">R</div><div class="mtile-body"><div class="mtile-name">RRHH</div><div class="mtile-meta">No contratado</div></div></div>
+          <div class="module-tile"><div class="mtile-icon">Q</div><div class="mtile-body"><div class="mtile-name">Calidad ISO</div><div class="mtile-meta">No contratado</div></div></div>
+          <div class="module-tile"><div class="mtile-icon">M</div><div class="mtile-body"><div class="mtile-name">Marketing</div><div class="mtile-meta">No contratado</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">08 &middot; Usuarios <span class="badge-num">47 activos</span></div>
+        <button class="btn sm">+ Invitar usuario</button>
+      </div>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Cargo</th>
+            <th>Sucursal</th>
+            <th>Ultimo login</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><div class="user-cell"><div class="avatar">AC</div><div><div style="font-weight:500">Alexander Cuartas</div><div style="font-size:11.5px;color:var(--muted)">acuartas@soldarco.co</div></div></div></td><td>CTO</td><td>Bogota</td><td>Hace 2 min</td><td><span class="badge on">Activo</span></td></tr>
+          <tr><td><div class="user-cell"><div class="avatar" style="background:#FEE2E2;color:#7F1D1D">CT</div><div><div style="font-weight:500">Camila Torres</div><div style="font-size:11.5px;color:var(--muted)">ctorres@soldarco.co</div></div></div></td><td>KAM</td><td>Bogota</td><td>Hace 12 min</td><td><span class="badge on">Activo</span></td></tr>
+          <tr><td><div class="user-cell"><div class="avatar" style="background:#FEF3C7;color:#78350F">DR</div><div><div style="font-weight:500">Diana Ramirez</div><div style="font-size:11.5px;color:var(--muted)">dramirez@soldarco.co</div></div></div></td><td>Gerente</td><td>Medellin</td><td>Hoy 09:14</td><td><span class="badge on">Activo</span></td></tr>
+          <tr><td><div class="user-cell"><div class="avatar" style="background:#ECFDF5;color:#065F46">JG</div><div><div style="font-weight:500">Juan Gomez</div><div style="font-size:11.5px;color:var(--muted)">jgomez@soldarco.co</div></div></div></td><td>Comercial</td><td>Cali</td><td>Ayer</td><td><span class="badge warn">Sin MFA</span></td></tr>
+          <tr><td><div class="user-cell"><div class="avatar" style="background:#F3E8FF;color:#6B21A8">MP</div><div><div style="font-weight:500">Maria Perez</div><div style="font-size:11.5px;color:var(--muted)">mperez@soldarco.co</div></div></div></td><td>Contadora</td><td>Bogota</td><td>Hace 3 dias</td><td><span class="badge off">Pausado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">10 &middot; Integraciones externas <span class="badge-num">3 activas</span></div>
+        <button class="btn sm">Ver PARAMXML 0202</button>
+      </div>
+      <div style="padding:20px">
+        <div class="integrations">
+          <div class="integ-tile on">
+            <div class="integ-head"><span class="integ-name">WhatsApp (Evolution)</span><span class="switch on"></span></div>
+            <div class="integ-status">Conectado &middot; +57 300 123 4567</div>
+          </div>
+          <div class="integ-tile on">
+            <div class="integ-head"><span class="integ-name">SendGrid</span><span class="switch on"></span></div>
+            <div class="integ-status">Conectado &middot; 12.4k emails / mes</div>
+          </div>
+          <div class="integ-tile on">
+            <div class="integ-head"><span class="integ-name">Azure Vision IA</span><span class="switch on"></span></div>
+            <div class="integ-status">Conectado &middot; OCR facturas</div>
+          </div>
+          <div class="integ-tile">
+            <div class="integ-head"><span class="integ-name">Slack</span><span class="switch"></span></div>
+            <div class="integ-status">Sin configurar</div>
+          </div>
+          <div class="integ-tile">
+            <div class="integ-head"><span class="integ-name">AWS S3</span><span class="switch"></span></div>
+            <div class="integ-status">Sin configurar</div>
+          </div>
+          <div class="integ-tile">
+            <div class="integ-head"><span class="integ-name">Google Search Console</span><span class="switch"></span></div>
+            <div class="integ-status">Sin configurar</div>
+          </div>
+          <div class="integ-tile">
+            <div class="integ-head"><span class="integ-name">Sigma (contable)</span><span class="switch"></span></div>
+            <div class="integ-status">Requiere licencia</div>
+          </div>
+          <div class="integ-tile">
+            <div class="integ-head"><span class="integ-name">Mail SMTP directo</span><span class="switch"></span></div>
+            <div class="integ-status">Reemplazado por SendGrid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">09 &middot; Configuraciones (SUCURSAL_PAR) <span class="badge-num">89 parametros</span></div>
+        <button class="btn sm">Ver todo</button>
+      </div>
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Valor</th>
+            <th>Descripcion</th>
+            <th>Ultima modificacion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>IVA_DEFAULT</code></td><td>19</td><td>Porcentaje IVA por defecto</td><td>Hace 3 meses &middot; Camila T.</td></tr>
+          <tr><td><code>DIAS_CARTERA</code></td><td>30</td><td>Dias credito estandar clientes</td><td>Hace 1 semana &middot; Alexander C.</td></tr>
+          <tr><td><code>MONEDA_CONTABLE</code></td><td>COP</td><td>Moneda contable principal</td><td>Hace 2 anos</td></tr>
+          <tr><td><code>ZONA_HORARIA</code></td><td>America/Bogota</td><td>TZ operacional</td><td>Hace 2 anos</td></tr>
+          <tr><td><code>ANTIOVERBOOKING</code></td><td>1</td><td>Rechazar cita duplicada por recurso</td><td>Hace 6 meses</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.toc-item').forEach(function(a){
+    a.addEventListener('click', function(){
+      document.querySelectorAll('.toc-item').forEach(function(x){x.classList.remove('active')});
+      a.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.module-tile').forEach(function(m){
+    m.addEventListener('click', function(){ m.classList.toggle('active'); });
+  });
+  document.querySelectorAll('.switch').forEach(function(s){
+    s.addEventListener('click', function(){
+      s.classList.toggle('on');
+      var tile = s.closest('.integ-tile');
+      if (tile) tile.classList.toggle('on');
+    });
+  });
+</script>

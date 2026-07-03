@@ -1,0 +1,595 @@
+<title>NEWFRONT_web_scraping - Extraccion de datos configurable</title>
+<style>
+  :root {
+    --ink: #0F1729;
+    --paper: #FAFBFC;
+    --card: #FFFFFF;
+    --border: #E4E7EB;
+    --border-soft: #F1F3F5;
+    --muted: #6B7280;
+    --muted-2: #9CA3AF;
+    --accent: #7C3AED;
+    --accent-soft: #F3E8FF;
+    --accent-ink: #4C1D95;
+    --success: #059669;
+    --warn: #D97706;
+    --danger: #DC2626;
+    --info: #2563EB;
+    --code-bg: #1E1B4B;
+    --code-ink: #E9D5FF;
+    --code-key: #F0ABFC;
+    --code-str: #86EFAC;
+    --code-fn: #FBBF24;
+    --shadow-1: 0 1px 2px rgba(15,23,41,.04);
+    --shadow-2: 0 1px 3px rgba(15,23,41,.06), 0 8px 24px rgba(15,23,41,.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Inter, system-ui, sans-serif;
+    font-size: 13.5px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--card);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .breadcrumb .sep { color: var(--muted-2); }
+  .breadcrumb .last { color: var(--ink); font-weight: 500; }
+  .mod-code {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 8px; background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 4px; font-size: 11px;
+    font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+    font-weight: 600; margin-left: 8px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--card); color: var(--ink);
+    font-size: 12.5px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .btn:hover { background: var(--border-soft); }
+  .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-ink); }
+  .btn.sm { padding: 4px 8px; font-size: 11.5px; }
+  .btn.danger { color: var(--danger); }
+  .actions { display: flex; gap: 8px; }
+  .layout {
+    display: grid; grid-template-columns: 300px 1fr;
+    max-width: 1500px; margin: 0 auto; padding: 20px 24px 60px; gap: 16px;
+  }
+  .side {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: var(--shadow-1); overflow: hidden;
+    align-self: start; position: sticky; top: 75px;
+  }
+  .side-head {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--border-soft);
+  }
+  .side-title {
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--muted);
+  }
+  .side-search { padding: 10px 12px; border-bottom: 1px solid var(--border-soft); }
+  .side-search input {
+    width: 100%; padding: 6px 10px; font-size: 12.5px;
+    border: 1px solid var(--border); border-radius: 5px;
+    font-family: inherit; outline: none;
+  }
+  .config-item {
+    padding: 10px 14px; border-bottom: 1px solid var(--border-soft);
+    cursor: pointer; display: flex; gap: 10px; align-items: center;
+  }
+  .config-item:hover { background: var(--border-soft); }
+  .config-item.active { background: var(--accent-soft); }
+  .config-item.active .ci-name { color: var(--accent-ink); font-weight: 600; }
+  .ci-icon {
+    width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--border-soft); font-size: 13px;
+    font-weight: 700;
+  }
+  .ci-icon.homecenter { background: #FEF3C7; color: #92400E; }
+  .ci-icon.linkedin { background: #DBEAFE; color: #1E40AF; }
+  .ci-icon.maps { background: #DCFCE7; color: #14532D; }
+  .ci-icon.sic { background: #F3E8FF; color: #6B21A8; }
+  .ci-icon.ccb { background: #FCE7F3; color: #9F1239; }
+  .ci-body { flex: 1; min-width: 0; }
+  .ci-name { font-size: 12.5px; color: var(--ink); font-weight: 500; margin-bottom: 2px; }
+  .ci-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .ci-meta .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+  }
+  .ci-meta .status-dot.err { background: var(--danger); }
+  .main { display: flex; flex-direction: column; gap: 16px; }
+  .hero {
+    background: linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%);
+    color: white; border-radius: 12px; padding: 22px 24px;
+    box-shadow: var(--shadow-2);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(255,255,255,.12), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(255,255,255,.08), transparent 50%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; }
+  .hero-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .hero h1 {
+    margin: 0; font-size: 22px; font-weight: 600;
+    letter-spacing: -.015em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-badge {
+    display: inline-block; padding: 2px 8px;
+    background: rgba(255,255,255,.15); color: white;
+    border-radius: 999px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .04em;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,.2);
+  }
+  .hero-url {
+    font-family: ui-monospace, "Cascadia Mono", monospace;
+    font-size: 12.5px; padding: 6px 12px;
+    background: rgba(0,0,0,.28); border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 6px; color: rgba(255,255,255,.9);
+    max-width: 100%; overflow-x: auto;
+  }
+  .hero-actions { display: flex; gap: 8px; }
+  .hero .btn { background: white; color: var(--accent-ink); border-color: transparent; }
+  .hero .btn:hover { background: rgba(255,255,255,.9); }
+  .hero .btn.ghost { background: transparent; color: white; border-color: rgba(255,255,255,.35); }
+  .hero .btn.ghost:hover { background: rgba(255,255,255,.12); }
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-top: 18px;
+  }
+  .hero-kpi {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .hero-kpi .lbl {
+    font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .05em; opacity: .8; margin-bottom: 4px;
+  }
+  .hero-kpi .val {
+    font-size: 20px; font-weight: 600;
+    letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .cols {
+    display: grid; grid-template-columns: 1fr 380px;
+    gap: 16px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow-1); overflow: hidden;
+  }
+  .card-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .num-badge {
+    padding: 1px 8px; background: var(--accent-soft);
+    color: var(--accent-ink); border-radius: 12px;
+    font-size: 11.5px; font-weight: 600;
+  }
+  .steps { padding: 12px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .step {
+    display: grid; grid-template-columns: 40px 1fr auto;
+    gap: 12px; align-items: flex-start;
+    padding: 14px 14px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--card);
+  }
+  .step.done { border-color: var(--success); }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--border-soft); color: var(--muted);
+    font-weight: 700; font-size: 13px;
+  }
+  .step.done .step-num { background: var(--success); color: white; }
+  .step-body h4 {
+    margin: 0 0 4px; font-size: 13.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step-body h4 .tag {
+    padding: 1px 6px; background: var(--border-soft);
+    color: var(--muted); border-radius: 4px;
+    font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: .04em; font-weight: 600;
+  }
+  .step-body h4 .tag.script { background: #EDE9FE; color: #4C1D95; }
+  .step-body h4 .tag.nav { background: #DBEAFE; color: #1E40AF; }
+  .step-body h4 .tag.wait { background: #FEF3C7; color: #92400E; }
+  .step-body .desc { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+  .step-body .url {
+    font-family: ui-monospace, "Cascadia Mono", monospace;
+    font-size: 11.5px; color: var(--muted);
+    background: var(--border-soft); padding: 4px 8px;
+    border-radius: 4px; display: inline-block;
+  }
+  .step .step-actions { display: flex; gap: 4px; align-self: center; }
+  .icon-btn {
+    width: 26px; height: 26px; border: none; background: transparent;
+    color: var(--muted); border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .icon-btn:hover { background: var(--border); color: var(--ink); }
+  .code-editor {
+    background: var(--code-bg); color: var(--code-ink);
+    border-radius: 6px; padding: 12px; margin-top: 8px;
+    font-family: ui-monospace, "Cascadia Mono", monospace;
+    font-size: 12px; line-height: 1.55;
+    overflow-x: auto; white-space: pre;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .code-editor .k { color: var(--code-key); }
+  .code-editor .f { color: var(--code-fn); }
+  .code-editor .s { color: var(--code-str); }
+  .code-editor .c { color: #A78BFA; opacity: .7; font-style: italic; }
+  .props-panel { display: flex; flex-direction: column; }
+  .props-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .prop { display: flex; flex-direction: column; gap: 4px; }
+  .prop label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  .prop .value { font-size: 13px; color: var(--ink); }
+  .prop .value.mono { font-family: ui-monospace, monospace; font-size: 12px; padding: 6px 8px; background: var(--border-soft); border-radius: 4px; }
+  .var-list {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 4px;
+  }
+  .var-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; background: var(--border-soft);
+    border-radius: 6px; font-size: 12px;
+  }
+  .var-name {
+    font-family: ui-monospace, monospace; font-weight: 600;
+    color: var(--ink); min-width: 70px;
+  }
+  .var-value {
+    font-family: ui-monospace, monospace; color: var(--muted); flex: 1;
+    letter-spacing: .2em;
+  }
+  .lock-icon { color: var(--warn); }
+  .exec-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .exec-table th {
+    padding: 10px 18px; text-align: left;
+    background: var(--border-soft); color: var(--muted);
+    font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: .04em; font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .exec-table td { padding: 10px 18px; border-bottom: 1px solid var(--border-soft); }
+  .exec-table tr:last-child td { border-bottom: none; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+  }
+  .status-pill.ok { background: #DCFCE7; color: #14532D; }
+  .status-pill.err { background: #FEE2E2; color: #7F1D1D; }
+  .status-pill.warn { background: #FEF3C7; color: #78350F; }
+  .status-pill .d { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .warning-strip {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 14px; background: #FEF3C7;
+    border: 1px solid #FCD34D; border-radius: 8px;
+    color: #78350F; font-size: 12.5px;
+    margin-bottom: 14px;
+  }
+  .warning-strip strong { color: #92400E; }
+  @media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2, 1fr); } .layout { grid-template-columns: 1fr; } .side { position: static; } }
+</style>
+
+<div class="topbar">
+  <div class="breadcrumb">
+    <span>Home</span><span class="sep">/</span>
+    <span>Utilidades</span><span class="sep">/</span>
+    <span class="last">Extraccion de datos</span>
+    <span class="mod-code">MOD 000730</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Historico ejecuciones</button>
+    <button class="btn">Ver bots WPF</button>
+    <button class="btn primary">+ Nueva configuracion</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <aside class="side">
+    <div class="side-head">
+      <div class="side-title">Configuraciones <span style="margin-left:4px;color:var(--muted-2)">14</span></div>
+      <button class="btn sm">Filtrar</button>
+    </div>
+    <div class="side-search"><input placeholder="Buscar..." /></div>
+    <div>
+      <div class="config-item active">
+        <div class="ci-icon homecenter">H</div>
+        <div class="ci-body">
+          <div class="ci-name">Precios competencia Homecenter</div>
+          <div class="ci-meta"><span class="status-dot"></span> Activa &middot; 3 pasos</div>
+        </div>
+      </div>
+      <div class="config-item">
+        <div class="ci-icon linkedin">L</div>
+        <div class="ci-body">
+          <div class="ci-name">LinkedIn perfiles CFO</div>
+          <div class="ci-meta"><span class="status-dot"></span> Activa &middot; 5 pasos</div>
+        </div>
+      </div>
+      <div class="config-item">
+        <div class="ci-icon maps">M</div>
+        <div class="ci-body">
+          <div class="ci-name">Google Maps salones belleza</div>
+          <div class="ci-meta"><span class="status-dot"></span> Activa &middot; 4 pasos</div>
+        </div>
+      </div>
+      <div class="config-item">
+        <div class="ci-icon sic">S</div>
+        <div class="ci-body">
+          <div class="ci-name">SIC empresas registradas</div>
+          <div class="ci-meta"><span class="status-dot err"></span> Con errores &middot; 6 pasos</div>
+        </div>
+      </div>
+      <div class="config-item">
+        <div class="ci-icon ccb">C</div>
+        <div class="ci-body">
+          <div class="ci-name">CCB matriculas mercantiles</div>
+          <div class="ci-meta"><span class="status-dot"></span> Activa &middot; 4 pasos</div>
+        </div>
+      </div>
+      <div class="config-item">
+        <div class="ci-icon homecenter" style="background:#DBEAFE;color:#1E40AF">R</div>
+        <div class="ci-body">
+          <div class="ci-name">Rappi restaurantes zona T</div>
+          <div class="ci-meta"><span class="status-dot"></span> Activa &middot; 5 pasos</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-head">
+          <div>
+            <h1><span>Precios competencia Homecenter</span> <span class="hero-badge">Analisis mercado 2026 Q3</span></h1>
+            <div class="hero-url">https://www.homecenter.com.co/pinturas-y-accesorios/</div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn ghost">Editar</button>
+            <button class="btn ghost">Duplicar</button>
+            <button class="btn">Ejecutar ahora</button>
+          </div>
+        </div>
+        <div class="kpi-row">
+          <div class="hero-kpi"><div class="lbl">Ejecuciones</div><div class="val">247</div></div>
+          <div class="hero-kpi"><div class="lbl">Exitosas 30d</div><div class="val">96.4%</div></div>
+          <div class="hero-kpi"><div class="lbl">Registros extraidos</div><div class="val">8.412</div></div>
+          <div class="hero-kpi"><div class="lbl">Ultima corrida</div><div class="val">18h</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-strip">
+      <strong>Runtime:</strong>&nbsp; el motor de ejecucion vive en el proyecto WPF <code>Doom</code> (<code>consumowebpageIV.xaml.vb</code>) usando <code>WebBrowser</code> (Trident/IE11). Esta pantalla es solo el configurador. Los scripts JavaScript que definas se inyectan con <code>InvokeScript("eval", ...)</code> en la ventana embebida del bot.
+    </div>
+
+    <div class="cols">
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Pasos de ejecucion <span class="num-badge">3</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn sm">Reordenar</button>
+            <button class="btn sm primary">+ Agregar paso</button>
+          </div>
+        </div>
+        <div class="steps">
+
+          <div class="step done">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Login con credenciales del cliente <span class="tag script">Script</span></h4>
+              <div class="desc">Inyecta usuario/clave de la variable cifrada y submite el formulario de login.</div>
+              <span class="url">POST /iniciar-sesion</span>
+              <div class="code-editor"><span class="c">// Inyecta credenciales cifradas por variable</span>
+<span class="k">document</span>.<span class="f">querySelector</span>(<span class="s">'#email'</span>).<span class="k">value</span> = <span class="s">'{{USER}}'</span>;
+<span class="k">document</span>.<span class="f">querySelector</span>(<span class="s">'#password'</span>).<span class="k">value</span> = <span class="s">'{{PASS}}'</span>;
+<span class="k">document</span>.<span class="f">querySelector</span>(<span class="s">'form.login'</span>).<span class="f">submit</span>();
+</div>
+            </div>
+            <div class="step-actions">
+              <button class="icon-btn">^</button>
+              <button class="icon-btn">v</button>
+              <button class="icon-btn">e</button>
+              <button class="icon-btn">x</button>
+            </div>
+          </div>
+
+          <div class="step done">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Navegar a categoria Pinturas <span class="tag nav">Navegar</span> <span class="tag wait">Esperar DOM</span></h4>
+              <div class="desc">Cambia la URL y espera a que el grid de productos termine de cargar (max 15s).</div>
+              <span class="url">GET /pinturas-y-accesorios/pinturas-interiores</span>
+            </div>
+            <div class="step-actions">
+              <button class="icon-btn">^</button>
+              <button class="icon-btn">v</button>
+              <button class="icon-btn">e</button>
+              <button class="icon-btn">x</button>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Extraer tabla de precios <span class="tag script">Script</span> <span class="tag" style="background:#DCFCE7;color:#14532D">Tabla</span></h4>
+              <div class="desc">Recorre <code>article.product-card</code>, extrae SKU, nombre, precio, stock y descuento. Guarda en <code>WEB_SCRAPING_R</code>.</div>
+              <div class="code-editor"><span class="k">var</span> rows = [];
+[...<span class="k">document</span>.<span class="f">querySelectorAll</span>(<span class="s">'article.product-card'</span>)].<span class="f">forEach</span>(p =&gt; {
+  rows.<span class="f">push</span>({
+    <span class="k">sku</span>: p.<span class="f">querySelector</span>(<span class="s">'.sku'</span>)?.<span class="k">textContent</span>,
+    <span class="k">nombre</span>: p.<span class="f">querySelector</span>(<span class="s">'h3'</span>)?.<span class="k">textContent</span>,
+    <span class="k">precio</span>: p.<span class="f">querySelector</span>(<span class="s">'.price'</span>)?.<span class="k">textContent</span>,
+    <span class="k">stock</span>: p.<span class="f">querySelector</span>(<span class="s">'.stock'</span>)?.<span class="k">textContent</span>
+  });
+});
+<span class="k">window</span>.__extractedData = rows;
+</div>
+            </div>
+            <div class="step-actions">
+              <button class="icon-btn">^</button>
+              <button class="icon-btn">v</button>
+              <button class="icon-btn">e</button>
+              <button class="icon-btn">x</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card props-panel">
+        <div class="card-head">
+          <div class="card-title">Cliente y variables</div>
+          <button class="btn sm">Cambiar</button>
+        </div>
+        <div class="props-body">
+          <div class="prop"><label>Cliente</label><div class="value" style="font-weight:600">Analisis mercado 2026 Q3</div></div>
+          <div class="prop"><label>Programacion</label><div class="value">Cada 6h &middot; 00:00 06:00 12:00 18:00</div></div>
+          <div class="prop"><label>Bot asignado</label><div class="value mono">bot-scraping-04 (Windows Server)</div></div>
+
+          <div class="prop">
+            <label>Variables cifradas</label>
+            <div class="var-list">
+              <div class="var-row">
+                <span class="var-name">USER</span>
+                <span class="var-value">......................</span>
+                <span class="lock-icon">L</span>
+              </div>
+              <div class="var-row">
+                <span class="var-name">PASS</span>
+                <span class="var-value">......................</span>
+                <span class="lock-icon">L</span>
+              </div>
+              <div class="var-row">
+                <span class="var-name">TOKEN</span>
+                <span class="var-value">......................</span>
+                <span class="lock-icon">L</span>
+              </div>
+              <div class="var-row" style="background:transparent;border:1px dashed var(--border);color:var(--muted);cursor:pointer;justify-content:center">
+                + Nueva variable
+              </div>
+            </div>
+          </div>
+
+          <div class="prop"><label>API resultante</label><div class="value">/v1/scraping/homecenter/pinturas</div></div>
+          <div class="prop"><label>Tabla destino</label><div class="value mono">[dbx.GENE].dbo.WEB_SCRAPING_R</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Seguimiento de ejecuciones <span class="num-badge">ultimas 6</span></div>
+        <button class="btn sm">Ver todas (247)</button>
+      </div>
+      <table class="exec-table">
+        <thead>
+          <tr>
+            <th>Ejecucion</th>
+            <th>Cuando</th>
+            <th>Duracion</th>
+            <th>Registros</th>
+            <th>Bot</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>#WS-247</code></td>
+            <td>Hoy 18:04</td>
+            <td>3m 12s</td>
+            <td style="font-variant-numeric: tabular-nums">148 productos</td>
+            <td>bot-04</td>
+            <td><span class="status-pill ok"><span class="d"></span>Exitoso</span></td>
+          </tr>
+          <tr>
+            <td><code>#WS-246</code></td>
+            <td>Hoy 12:00</td>
+            <td>3m 25s</td>
+            <td style="font-variant-numeric: tabular-nums">147 productos</td>
+            <td>bot-04</td>
+            <td><span class="status-pill ok"><span class="d"></span>Exitoso</span></td>
+          </tr>
+          <tr>
+            <td><code>#WS-245</code></td>
+            <td>Hoy 06:00</td>
+            <td>3m 18s</td>
+            <td style="font-variant-numeric: tabular-nums">146 productos</td>
+            <td>bot-04</td>
+            <td><span class="status-pill ok"><span class="d"></span>Exitoso</span></td>
+          </tr>
+          <tr>
+            <td><code>#WS-244</code></td>
+            <td>Hoy 00:00</td>
+            <td>5m 41s</td>
+            <td style="font-variant-numeric: tabular-nums">89 productos</td>
+            <td>bot-04</td>
+            <td><span class="status-pill warn"><span class="d"></span>Parcial (timeout paso 2)</span></td>
+          </tr>
+          <tr>
+            <td><code>#WS-243</code></td>
+            <td>Ayer 18:00</td>
+            <td>0m 08s</td>
+            <td style="font-variant-numeric: tabular-nums">0</td>
+            <td>bot-04</td>
+            <td><span class="status-pill err"><span class="d"></span>Login fallido (captcha)</span></td>
+          </tr>
+          <tr>
+            <td><code>#WS-242</code></td>
+            <td>Ayer 12:00</td>
+            <td>3m 04s</td>
+            <td style="font-variant-numeric: tabular-nums">146 productos</td>
+            <td>bot-04</td>
+            <td><span class="status-pill ok"><span class="d"></span>Exitoso</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.config-item').forEach(function(c){
+    c.addEventListener('click', function(){
+      document.querySelectorAll('.config-item').forEach(function(x){x.classList.remove('active')});
+      c.classList.add('active');
+    });
+  });
+</script>

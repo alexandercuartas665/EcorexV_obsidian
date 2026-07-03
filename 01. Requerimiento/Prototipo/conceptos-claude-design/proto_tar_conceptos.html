@@ -1,0 +1,791 @@
+<title>NEWFRONT_tar_conceptos - Categorias y Sub-Categorias</title>
+<style>
+  :root {
+    --ink: #0F1729;
+    --paper: #FAFBFC;
+    --card: #FFFFFF;
+    --border: #E4E7EB;
+    --border-soft: #F1F3F5;
+    --muted: #6B7280;
+    --muted-2: #9CA3AF;
+    --accent: #0D9488;
+    --accent-soft: #ECFDF5;
+    --accent-ink: #065F46;
+    --success: #059669;
+    --warn: #D97706;
+    --danger: #DC2626;
+    --info: #2563EB;
+    --shadow-1: 0 1px 2px rgba(15,23,41,.04);
+    --shadow-2: 0 1px 3px rgba(15,23,41,.06), 0 8px 24px rgba(15,23,41,.05);
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Inter, system-ui, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+  .breadcrumb .sep { color: var(--muted-2); }
+  .breadcrumb .last { color: var(--ink); font-weight: 500; }
+  .mod-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .actions { display: flex; gap: 8px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--border-soft); }
+  .btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .btn.primary:hover { background: var(--accent-ink); }
+  .btn.sm { padding: 4px 8px; font-size: 11.5px; }
+  .btn.icon {
+    padding: 4px 8px;
+    min-width: 28px;
+    justify-content: center;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+  }
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .split {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--ink);
+  }
+  .card-title .count {
+    color: var(--muted);
+    font-weight: 500;
+    margin-left: 6px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .search {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .search input {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+  .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .list-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background .08s;
+  }
+  .list-item:hover { background: var(--border-soft); }
+  .list-item.active { background: var(--accent-soft); }
+  .list-item.active .li-name { color: var(--accent-ink); font-weight: 600; }
+  .li-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .li-icon.i-teal { background: #ECFDF5; color: #065F46; }
+  .li-icon.i-blue { background: #EFF6FF; color: #1D4ED8; }
+  .li-icon.i-amber { background: #FEF3C7; color: #92400E; }
+  .li-icon.i-purple { background: #F3E8FF; color: #6B21A8; }
+  .li-icon.i-rose { background: #FCE7F3; color: #9F1239; }
+  .li-icon.i-slate { background: #F1F5F9; color: #334155; }
+  .li-body { flex: 1; min-width: 0; }
+  .li-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+  .li-meta { font-size: 11.5px; color: var(--muted); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+  .badge.on { background: #DCFCE7; color: #14532D; }
+  .badge.off { background: #FEE2E2; color: #7F1D1D; }
+  .badge.count { background: var(--border-soft); color: var(--muted); text-transform: none; letter-spacing: 0; }
+  .detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .detail-head {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .detail-title-row .li-icon { width: 44px; height: 44px; font-size: 18px; }
+  .detail-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+  .detail-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .kpi {
+    padding: 12px 14px;
+    background: var(--border-soft);
+    border-radius: 6px;
+  }
+  .kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .kpi-value {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-delta {
+    font-size: 11px;
+    margin-left: 4px;
+    color: var(--success);
+  }
+  .table-wrap { overflow-x: auto; }
+  table.grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.grid th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--border-soft);
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.grid td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: middle;
+  }
+  table.grid tr:last-child td { border-bottom: none; }
+  table.grid tr:hover td { background: var(--border-soft); }
+  .grid-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .grid-name .li-icon { width: 26px; height: 26px; font-size: 12px; }
+  .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+  .icon-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .icon-btn:hover { background: var(--border); color: var(--ink); }
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,41,.45);
+    display: none;
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border-radius: 10px;
+    max-width: 860px;
+    width: 100%;
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+  }
+  .modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-body { padding: 20px; }
+  .accordion {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .accordion.open { box-shadow: var(--shadow-1); }
+  .acc-head {
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: var(--card);
+    user-select: none;
+  }
+  .acc-head:hover { background: var(--border-soft); }
+  .acc-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .acc-title .chip {
+    font-size: 10.5px;
+    padding: 1px 6px;
+    background: var(--border-soft);
+    color: var(--muted);
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .acc-body {
+    padding: 14px;
+    background: var(--paper);
+    border-top: 1px solid var(--border-soft);
+    display: none;
+  }
+  .accordion.open .acc-body { display: block; }
+  .field-row { display: grid; grid-template-columns: 160px 1fr; gap: 12px; margin-bottom: 10px; align-items: center; }
+  .field-row label { font-size: 12.5px; color: var(--muted); }
+  .field-row input, .field-row select, .field-row textarea {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--card);
+    outline: none;
+  }
+  .field-row input:focus, .field-row select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .flag-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .flag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 12.5px;
+  }
+  .flag input[type="checkbox"] { accent-color: var(--accent); }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .chip .x {
+    color: var(--muted);
+    cursor: pointer;
+    margin-left: 2px;
+  }
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--border-soft);
+    align-items: center;
+    font-size: 12.5px;
+  }
+  .filter-bar select {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 12.5px;
+    background: var(--card);
+    font-family: inherit;
+  }
+  .stripe {
+    width: 3px;
+    background: var(--accent);
+    align-self: stretch;
+    border-radius: 2px 0 0 2px;
+  }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="topbar">
+  <div class="breadcrumb">
+    <span>Home</span>
+    <span class="sep">/</span>
+    <span>Tareas</span>
+    <span class="sep">/</span>
+    <span class="last">Categorias y Sub-Categorias</span>
+    <span class="mod-code">MOD 000270</span>
+  </div>
+  <div class="actions">
+    <button class="btn"><span>Exportar</span></button>
+    <button class="btn primary" onclick="openModal()"><span>+</span> Nueva Sub-Categoria</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active">Actividades</button>
+    <button class="tab">Detalle</button>
+  </div>
+
+  <div class="split">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Categorias <span class="count">6</span></div>
+        <button class="btn sm">+ Nueva</button>
+      </div>
+      <div class="search"><input placeholder="Buscar categoria..." /></div>
+      <div>
+        <div class="list-item active">
+          <div class="li-icon i-teal">V</div>
+          <div class="li-body">
+            <div class="li-name">Ventas <span class="badge count">8</span></div>
+            <div class="li-meta">Activo desde 2024</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-icon i-blue">C</div>
+          <div class="li-body">
+            <div class="li-name">Cobranza <span class="badge count">5</span></div>
+            <div class="li-meta">Activo</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-icon i-amber">S</div>
+          <div class="li-body">
+            <div class="li-name">Soporte tecnico <span class="badge count">12</span></div>
+            <div class="li-meta">Activo</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-icon i-purple">M</div>
+          <div class="li-body">
+            <div class="li-name">Mantenimiento vehicular <span class="badge count">6</span></div>
+            <div class="li-meta">Activo</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-icon i-slate">A</div>
+          <div class="li-body">
+            <div class="li-name">Auditoria interna <span class="badge count">3</span></div>
+            <div class="li-meta">Inactivo desde 15/03/2026</div>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="li-icon i-rose">K</div>
+          <div class="li-body">
+            <div class="li-name">Capacitacion <span class="badge count">4</span></div>
+            <div class="li-meta">Activo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card detail">
+      <div class="detail-head">
+        <div class="detail-title-row">
+          <div class="li-icon i-teal">V</div>
+          <div>
+            <h1 class="detail-title">Ventas</h1>
+            <div class="detail-sub">TIPO_TAR codigo VNT / 8 sub-categorias activas</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn sm"><span>Editar categoria</span></button>
+          <button class="btn sm"><span>Duplicar</span></button>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Sub-categorias</div>
+          <div class="kpi-value">8</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Tareas abiertas</div>
+          <div class="kpi-value">147<span class="kpi-delta">+12</span></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Flujos activos</div>
+          <div class="kpi-value">6</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Formularios</div>
+          <div class="kpi-value">4</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <span>Filtrar:</span>
+        <select><option>Todas las sedes</option><option>Bogota Norte</option><option>Bogota Sur</option></select>
+        <select><option>Estado: todos</option><option>Activo</option><option>Inactivo</option></select>
+        <select><option>Con flujo</option><option>Sin flujo</option></select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th>Sub-Categoria</th>
+              <th>Codigo</th>
+              <th>Modulo</th>
+              <th>Formulario</th>
+              <th>Cargos</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">P</div>Prospeccion inicial</div></td>
+              <td><code>VNT-001</code></td>
+              <td>Flujo prospeccion</td>
+              <td>Ficha prospecto v3</td>
+              <td>Comercial, KAM</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn" onclick="openModal()">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">C</div>Envio de cotizacion</div></td>
+              <td><code>VNT-002</code></td>
+              <td>Flujo cotizacion</td>
+              <td>Cotizacion estandar</td>
+              <td>Comercial</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">S</div>Seguimiento post-cotizacion</div></td>
+              <td><code>VNT-003</code></td>
+              <td>Flujo seguimiento</td>
+              <td>&mdash;</td>
+              <td>Comercial, KAM, Gerente</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">N</div>Cierre de negocio</div></td>
+              <td><code>VNT-004</code></td>
+              <td>Flujo cierre</td>
+              <td>Contrato + firma</td>
+              <td>KAM, Gerente</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">O</div>Onboarding cliente nuevo</div></td>
+              <td><code>VNT-005</code></td>
+              <td>Flujo onboarding</td>
+              <td>Checklist onboarding</td>
+              <td>KAM, Ops</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">R</div>Renovacion contrato</div></td>
+              <td><code>VNT-006</code></td>
+              <td>&mdash;</td>
+              <td>Renovacion 12m</td>
+              <td>KAM</td>
+              <td><span class="badge off">Inactivo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">U</div>Upsell producto</div></td>
+              <td><code>VNT-007</code></td>
+              <td>Flujo upsell</td>
+              <td>Propuesta upsell</td>
+              <td>KAM</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="grid-name"><div class="li-icon i-teal">X</div>Cross-sell servicios</div></td>
+              <td><code>VNT-008</code></td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>KAM, Comercial</td>
+              <td><span class="badge on">Activo</span></td>
+              <td><div class="row-actions"><button class="icon-btn">edit</button><button class="icon-btn">del</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="mdl">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Editar sub-categoria &mdash; Prospeccion inicial</div>
+      <button class="btn sm" onclick="closeModal()">Cerrar</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="accordion open">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Datos basicos <span class="chip">requerido</span></div>
+          <span>-</span>
+        </div>
+        <div class="acc-body">
+          <div class="field-row"><label>Codigo</label><input value="VNT-001" /></div>
+          <div class="field-row"><label>Nombre</label><input value="Prospeccion inicial" /></div>
+          <div class="field-row">
+            <label>Icono FontAwesome</label>
+            <input value="fa fa-search" />
+          </div>
+          <div class="field-row">
+            <label>Descripcion</label>
+            <textarea rows="2">Primer contacto con prospecto identificado por marketing o referido.</textarea>
+          </div>
+          <div class="field-row">
+            <label>Sedes aplicables</label>
+            <div class="chip-list">
+              <span class="chip">Bogota Norte <span class="x">x</span></span>
+              <span class="chip">Bogota Sur <span class="x">x</span></span>
+              <span class="chip">Medellin <span class="x">x</span></span>
+              <span class="chip" style="background:transparent;color:var(--muted);border:1px dashed var(--border)">+ Agregar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion open">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Flags RQ07 <span class="chip">3 activos</span></div>
+          <span>-</span>
+        </div>
+        <div class="acc-body">
+          <div class="flag-grid">
+            <label class="flag"><input type="checkbox" checked /> Inicia modulo al crear tarea</label>
+            <label class="flag"><input type="checkbox" /> Muestra boton cierre</label>
+            <label class="flag"><input type="checkbox" checked /> Panel dinamico Titulo</label>
+            <label class="flag"><input type="checkbox" checked /> Detalle auto (rellena descripcion)</label>
+            <label class="flag"><input type="checkbox" /> Cierra al finalizar flujo</label>
+            <label class="flag"><input type="checkbox" /> Requiere aprobacion supervisor</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Modulo asociado (Flujo de tareas) <span class="chip">Flujo prospeccion</span></div>
+          <span>+</span>
+        </div>
+        <div class="acc-body">
+          <div class="field-row"><label>Modulo (000291)</label><select><option>Flujo prospeccion (v3)</option><option>Flujo cotizacion</option></select></div>
+          <div class="field-row"><label>Nodo inicial</label><input value="captura_datos" /></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Formulario dinamico <span class="chip">Ficha prospecto v3</span></div>
+          <span>+</span>
+        </div>
+        <div class="acc-body">
+          <div class="field-row"><label>Formulario (000131)</label><select><option>Ficha prospecto v3</option><option>Ficha prospecto v2</option></select></div>
+          <div class="field-row"><label>Modo</label><select><option>Editable</option><option>Solo lectura</option></select></div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Permisos por cargo <span class="chip">2 cargos</span></div>
+          <span>+</span>
+        </div>
+        <div class="acc-body">
+          <div class="chip-list">
+            <span class="chip">Comercial <span class="x">x</span></span>
+            <span class="chip">KAM <span class="x">x</span></span>
+            <span class="chip" style="background:transparent;color:var(--muted);border:1px dashed var(--border)">+ Agregar cargo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="acc-head" onclick="toggleAcc(this)">
+          <div class="acc-title">Integraciones externas <span class="chip">2</span></div>
+          <span>+</span>
+        </div>
+        <div class="acc-body">
+          <div class="chip-list">
+            <span class="chip" style="background:#F3E8FF;color:#6B21A8">WhatsApp (Evolution) <span class="x">x</span></span>
+            <span class="chip" style="background:#EFF6FF;color:#1D4ED8">SendGrid <span class="x">x</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+        <button class="btn" onclick="closeModal()">Cancelar</button>
+        <button class="btn primary">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal() { document.getElementById('mdl').classList.add('open'); }
+  function closeModal() { document.getElementById('mdl').classList.remove('open'); }
+  function toggleAcc(el) {
+    el.parentElement.classList.toggle('open');
+    var sign = el.querySelector('span:last-child');
+    sign.textContent = el.parentElement.classList.contains('open') ? '-' : '+';
+  }
+  document.querySelectorAll('.list-item').forEach(function(li){
+    li.addEventListener('click', function(){
+      document.querySelectorAll('.list-item').forEach(function(x){x.classList.remove('active')});
+      li.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+    });
+  });
+</script>

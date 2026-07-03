@@ -1,0 +1,556 @@
+<title>comer_ContactLoader - Explorador de contactos scrapeados</title>
+<style>
+  :root {
+    --ink: #0F1729;
+    --paper: #FAFBFC;
+    --card: #FFFFFF;
+    --border: #E4E7EB;
+    --border-soft: #F1F3F5;
+    --muted: #6B7280;
+    --muted-2: #9CA3AF;
+    --accent: #DC2626;
+    --accent-soft: #FEE2E2;
+    --accent-ink: #7F1D1D;
+    --success: #059669;
+    --warn: #D97706;
+    --danger: #DC2626;
+    --info: #2563EB;
+    --shadow-1: 0 1px 2px rgba(15,23,41,.04);
+    --shadow-2: 0 1px 3px rgba(15,23,41,.06), 0 8px 24px rgba(15,23,41,.05);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Inter, system-ui, sans-serif;
+    font-size: 13.5px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--card);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+  .breadcrumb .sep { color: var(--muted-2); }
+  .breadcrumb .last { color: var(--ink); font-weight: 500; }
+  .mod-code {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 8px; background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 4px; font-size: 11px;
+    font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+    font-weight: 600; margin-left: 8px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--card); color: var(--ink);
+    font-size: 12.5px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .btn:hover { background: var(--border-soft); }
+  .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-ink); }
+  .btn.sm { padding: 4px 8px; font-size: 11.5px; }
+  .actions { display: flex; gap: 8px; }
+  .layout {
+    display: grid; grid-template-columns: 300px 1fr;
+    gap: 16px; padding: 16px 20px 60px;
+  }
+  .filters {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow-1); overflow: hidden;
+    align-self: start; position: sticky; top: 75px;
+  }
+  .f-head {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .f-title { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .f-section {
+    padding: 12px 16px; border-bottom: 1px solid var(--border-soft);
+  }
+  .f-section:last-child { border-bottom: none; }
+  .f-sec-title {
+    font-size: 11.5px; font-weight: 600; color: var(--ink);
+    margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .source-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+  .src-tab {
+    padding: 4px 10px; background: var(--border-soft);
+    color: var(--muted); border-radius: 999px; font-size: 12px;
+    font-weight: 500; cursor: pointer; border: 1px solid transparent;
+  }
+  .src-tab.active { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .src-tab.disabled { opacity: .35; cursor: not-allowed; }
+  .filter-row {
+    display: flex; gap: 6px; align-items: center;
+    margin-bottom: 6px; padding: 6px 8px;
+    background: var(--border-soft); border-radius: 6px;
+  }
+  .filter-row select, .filter-row input {
+    padding: 4px 6px; font-size: 11.5px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: var(--card); font-family: inherit; outline: none;
+    flex: 1; min-width: 0;
+  }
+  .filter-row .op { min-width: 46px; flex: 0 0 46px; }
+  .filter-row .conn {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; padding: 2px 6px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--muted); cursor: pointer;
+  }
+  .filter-row .conn.and { color: #1E40AF; border-color: #93C5FD; background: #EFF6FF; }
+  .filter-row .conn.or { color: #78350F; border-color: #FCD34D; background: #FEF3C7; }
+  .filter-row .conn.andnot { color: #7F1D1D; border-color: #FCA5A5; background: #FEE2E2; }
+  .filter-row .rm {
+    color: var(--muted); cursor: pointer;
+    padding: 0 4px; font-weight: 700;
+  }
+  .add-filter {
+    padding: 6px 10px; background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 6px; color: var(--muted);
+    cursor: pointer; font-size: 12px; width: 100%;
+    text-align: center; font-family: inherit;
+  }
+  .add-filter:hover { border-color: var(--accent); color: var(--accent); }
+  .preset-list { display: flex; flex-direction: column; gap: 4px; }
+  .preset {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; cursor: pointer; border-radius: 5px;
+    font-size: 12.5px;
+  }
+  .preset:hover { background: var(--border-soft); }
+  .preset.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .preset .p-count {
+    font-family: ui-monospace, monospace;
+    font-size: 11px; color: var(--muted);
+    padding: 1px 6px; background: var(--card);
+    border-radius: 12px; font-weight: 500;
+  }
+  .preset.active .p-count { background: var(--accent); color: white; }
+  .main { display: flex; flex-direction: column; gap: 14px; }
+  .toolbar {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; box-shadow: var(--shadow-1);
+  }
+  .toolbar-left { display: flex; flex-direction: column; gap: 4px; }
+  .toolbar-title { font-size: 15px; font-weight: 600; letter-spacing: -.005em; }
+  .toolbar-sub {
+    display: flex; gap: 10px; align-items: center;
+    color: var(--muted); font-size: 12.5px;
+  }
+  .toolbar-sub .dot { width: 3px; height: 3px; background: var(--muted-2); border-radius: 50%; }
+  .toolbar-sub strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tabs { display: flex; gap: 2px; padding-left: 20px; border-bottom: 1px solid var(--border); background: var(--card); border-radius: 10px 10px 0 0; margin-bottom: -14px; padding-top: 4px; }
+  .tab {
+    padding: 10px 16px; border: none; background: transparent;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .grid-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-1);
+  }
+  table.contacts {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  table.contacts th {
+    text-align: left; padding: 10px 16px;
+    background: var(--border-soft); color: var(--muted);
+    font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: .04em; font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky; top: 0;
+  }
+  table.contacts td { padding: 12px 16px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+  table.contacts tr:hover td { background: var(--border-soft); cursor: pointer; }
+  table.contacts tr:last-child td { border-bottom: none; }
+  .contact-cell {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--border-soft); color: var(--muted);
+    font-weight: 600; font-size: 13px; flex-shrink: 0;
+  }
+  .avatar.a1 { background: linear-gradient(135deg,#DC2626,#F97316); color: white; }
+  .avatar.a2 { background: linear-gradient(135deg,#2563EB,#7C3AED); color: white; }
+  .avatar.a3 { background: linear-gradient(135deg,#059669,#0D9488); color: white; }
+  .avatar.a4 { background: linear-gradient(135deg,#D97706,#EA580C); color: white; }
+  .avatar.a5 { background: linear-gradient(135deg,#7C3AED,#DB2777); color: white; }
+  .avatar.a6 { background: linear-gradient(135deg,#0891B2,#0D9488); color: white; }
+  .avatar.a7 { background: linear-gradient(135deg,#65A30D,#059669); color: white; }
+  .c-name { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+  .c-title { font-size: 11.5px; color: var(--muted); }
+  .source-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+  }
+  .source-chip.linkedin { background: #DBEAFE; color: #1E40AF; }
+  .source-chip.maps { background: #DCFCE7; color: #14532D; }
+  .stars {
+    color: var(--warn); font-size: 12px; letter-spacing: .05em;
+  }
+  .metric-cell { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; font-size: 13px; }
+  .metric-cell small { color: var(--muted); font-weight: 400; font-size: 11.5px; }
+  .row-badges { display: flex; gap: 4px; }
+  .b-mini {
+    padding: 1px 5px; border-radius: 3px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .02em;
+  }
+  .b-mini.hot { background: #FEE2E2; color: #7F1D1D; }
+  .b-mini.new { background: #DBEAFE; color: #1E40AF; }
+  .b-mini.qual { background: #DCFCE7; color: #14532D; }
+  .action-cell {
+    display: flex; gap: 4px; opacity: 0; transition: opacity .1s;
+  }
+  tr:hover .action-cell { opacity: 1; }
+  .icon-btn {
+    width: 26px; height: 26px; border: none; background: transparent;
+    color: var(--muted); border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .icon-btn:hover { background: var(--border); color: var(--ink); }
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .kpi-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .kpi-icon.k1 { background: var(--accent-soft); color: var(--accent-ink); }
+  .kpi-icon.k2 { background: #DBEAFE; color: #1E40AF; }
+  .kpi-icon.k3 { background: #DCFCE7; color: #14532D; }
+  .kpi-icon.k4 { background: #FEF3C7; color: #78350F; }
+  .kpi-body { flex: 1; min-width: 0; }
+  .kpi-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .kpi-val {
+    font-size: 20px; font-weight: 600; letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } .filters { position: static; } .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+</style>
+
+<div class="topbar">
+  <div class="breadcrumb">
+    <span>Home</span><span class="sep">/</span>
+    <span>Comercial</span><span class="sep">/</span>
+    <span class="last">Contact Loader &mdash; Lead prospects</span>
+    <span class="mod-code">MOD 000873</span>
+  </div>
+  <div class="actions">
+    <button class="btn">Ejecutar pipeline N8N</button>
+    <button class="btn">Ver Lead confirmados</button>
+    <button class="btn primary">Exportar seleccion</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <aside class="filters">
+
+    <div class="f-head">
+      <div class="f-title">Filtros</div>
+      <button class="btn sm">Limpiar</button>
+    </div>
+
+    <div class="f-section">
+      <div class="f-sec-title">Fuente</div>
+      <div class="source-tabs">
+        <span class="src-tab active">LinkedIn</span>
+        <span class="src-tab">Maps</span>
+        <span class="src-tab disabled">Facebook</span>
+        <span class="src-tab disabled">Instagram</span>
+      </div>
+    </div>
+
+    <div class="f-section">
+      <div class="f-sec-title">Constructor de filtros <span style="color:var(--muted-2);font-weight:500;font-size:11px">4 clausulas</span></div>
+
+      <div class="filter-row">
+        <select><option>Cargo</option><option>Empresa</option><option>Ciudad</option><option>Conexiones</option></select>
+        <select class="op"><option>LIKE</option></select>
+        <input value="%CEO%" />
+        <span class="rm">x</span>
+      </div>
+
+      <div class="filter-row">
+        <span class="conn and">AND</span>
+        <select><option>Ciudad</option></select>
+        <select class="op"><option>=</option></select>
+        <input value="Bogota" />
+        <span class="rm">x</span>
+      </div>
+
+      <div class="filter-row">
+        <span class="conn and">AND</span>
+        <select><option>Conexiones</option></select>
+        <select class="op"><option>&gt;</option></select>
+        <input value="1000" />
+        <span class="rm">x</span>
+      </div>
+
+      <div class="filter-row">
+        <span class="conn or">OR</span>
+        <select><option>Cargo</option></select>
+        <select class="op"><option>LIKE</option></select>
+        <input value="%CFO%" />
+        <span class="rm">x</span>
+      </div>
+
+      <button class="add-filter">+ Agregar clausula</button>
+    </div>
+
+    <div class="f-section">
+      <div class="f-sec-title">Presets guardados <span style="color:var(--muted-2);font-weight:500;font-size:11px">7</span></div>
+      <div class="preset-list">
+        <div class="preset active"><span>Prospectos CEO Bogota</span><span class="p-count">127</span></div>
+        <div class="preset"><span>CFOs Grandes Empresas</span><span class="p-count">89</span></div>
+        <div class="preset"><span>CTOs startup Bogota</span><span class="p-count">54</span></div>
+        <div class="preset"><span>Salones belleza Chapinero</span><span class="p-count">36</span></div>
+        <div class="preset"><span>Restaurantes zona T</span><span class="p-count">78</span></div>
+        <div class="preset"><span>Franquicias belleza LATAM</span><span class="p-count">142</span></div>
+        <div class="preset"><span>Startups fintech COL</span><span class="p-count">205</span></div>
+      </div>
+    </div>
+
+    <div class="f-section">
+      <button class="btn primary" style="width:100%">Guardar filtro actual</button>
+    </div>
+
+  </aside>
+
+  <div class="main">
+
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-icon k1">P</div>
+        <div class="kpi-body">
+          <div class="kpi-lbl">Prospectos filtrados</div>
+          <div class="kpi-val">127</div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon k2">L</div>
+        <div class="kpi-body">
+          <div class="kpi-lbl">Ultimo pipeline</div>
+          <div class="kpi-val">Ayer 03:14</div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon k3">A</div>
+        <div class="kpi-body">
+          <div class="kpi-lbl">Contactados hoy</div>
+          <div class="kpi-val">14</div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-icon k4">Q</div>
+        <div class="kpi-body">
+          <div class="kpi-lbl">Calificados a Lead</div>
+          <div class="kpi-val">9</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active">Prospectos scrapeados (127)</button>
+      <button class="tab">Lead confirmados (18)</button>
+      <button class="tab">Descartados (34)</button>
+    </div>
+
+    <div class="grid-card">
+      <div class="toolbar" style="border:none;border-radius:0;box-shadow:none;padding:14px 18px 12px">
+        <div class="toolbar-left">
+          <div class="toolbar-title">Prospectos CEO Bogota</div>
+          <div class="toolbar-sub">
+            <strong>127</strong> contactos
+            <span class="dot"></span>
+            <span>127 de LinkedIn</span>
+            <span class="dot"></span>
+            <span>Base: <code style="font-family:ui-monospace,monospace;background:var(--border-soft);padding:1px 6px;border-radius:3px;font-size:11.5px">dbn8n.dbo.N8N_NAVEGACION</code></span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn sm">Enviar a workflow</button>
+          <button class="btn sm">Asignar KAM</button>
+          <button class="btn sm">Fila 360</button>
+        </div>
+      </div>
+
+      <table class="contacts">
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox" /></th>
+            <th>Contacto</th>
+            <th>Empresa</th>
+            <th>Ubicacion</th>
+            <th>Fuente</th>
+            <th>Metrica</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a1">AR</div><div><div class="c-name">Andres Rodriguez</div><div class="c-title">CEO en Belleza Unas SAS</div></div></div></td>
+            <td>Belleza Unas SAS</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">2.340 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini hot">Hot</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td><div class="contact-cell"><div class="avatar a2">CT</div><div><div class="c-name">Camila Torres</div><div class="c-title">CFO en Grupo Nutresa</div></div></div></td>
+            <td>Grupo Nutresa</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">5.670 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini qual">Calificado</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a3">DV</div><div><div class="c-name">Diego Vasquez</div><div class="c-title">CTO en BitCode IT Services</div></div></div></td>
+            <td>BitCode IT Services</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">890 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini new">Nuevo</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a4">LM</div><div><div class="c-name">Laura Marulanda</div><div class="c-title">CEO en Nail Studio Chapinero</div></div></div></td>
+            <td>Nail Studio Chapinero</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip maps">Maps</span></td>
+            <td class="metric-cell"><span class="stars">4.9 &#9733;</span> <small>89 reseñas</small></td>
+            <td><div class="row-badges"><span class="b-mini hot">Hot</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a5">SM</div><div><div class="c-name">Sofia Marin</div><div class="c-title">CEO en Unas Divas Bogota</div></div></div></td>
+            <td>Unas Divas Bogota</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip maps">Maps</span></td>
+            <td class="metric-cell"><span class="stars">4.7 &#9733;</span> <small>234 reseñas</small></td>
+            <td><div class="row-badges"><span class="b-mini qual">Calificado</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a6">JG</div><div><div class="c-name">Juan Gomez</div><div class="c-title">CFO en TeamTravels S.A.S</div></div></div></td>
+            <td>TeamTravels S.A.S</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">1.420 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini new">Nuevo</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a7">MP</div><div><div class="c-name">Maria Perez</div><div class="c-title">CEO en FacturaTech</div></div></div></td>
+            <td>FacturaTech</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">3.210 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini hot">Hot</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a1">DR</div><div><div class="c-name">Diana Ramirez</div><div class="c-title">CEO en Andina Vidrios</div></div></div></td>
+            <td>Andina Vidrios</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">1.987 <small>conexiones</small></td>
+            <td><div class="row-badges"></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a2">RM</div><div><div class="c-name">Ricardo Martinez</div><div class="c-title">CFO en Titanio Portal</div></div></div></td>
+            <td>Titanio Portal</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">2.850 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini new">Nuevo</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td><div class="contact-cell"><div class="avatar a3">VG</div><div><div class="c-name">Valentina Gonzalez</div><div class="c-title">CEO en Metrotechnology</div></div></div></td>
+            <td>Metrotechnology</td>
+            <td>Bogota, Colombia</td>
+            <td><span class="source-chip linkedin">LinkedIn</span></td>
+            <td class="metric-cell">4.120 <small>conexiones</small></td>
+            <td><div class="row-badges"><span class="b-mini qual">Calificado</span></div></td>
+            <td><div class="action-cell"><button class="icon-btn">v</button><button class="icon-btn">w</button><button class="icon-btn">e</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-soft);font-size:12.5px;color:var(--muted)">
+        <span>Mostrando <strong style="color:var(--ink)">10</strong> de <strong style="color:var(--ink)">127</strong> contactos</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm">Anterior</button>
+          <button class="btn sm">Pagina 1 / 13</button>
+          <button class="btn sm">Siguiente</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.preset').forEach(function(p){
+    p.addEventListener('click', function(){
+      document.querySelectorAll('.preset').forEach(function(x){x.classList.remove('active')});
+      p.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.src-tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      if (t.classList.contains('disabled')) return;
+      document.querySelectorAll('.src-tab').forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.conn').forEach(function(c){
+    c.addEventListener('click', function(){
+      var order = ['and','or','andnot'];
+      var labels = { and: 'AND', or: 'OR', andnot: 'AND NOT' };
+      var current = order.find(function(x){return c.classList.contains(x)});
+      var next = order[(order.indexOf(current) + 1) % order.length];
+      c.classList.remove(current);
+      c.classList.add(next);
+      c.textContent = labels[next];
+    });
+  });
+</script>
