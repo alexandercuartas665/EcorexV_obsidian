@@ -114,6 +114,7 @@ OBSIDIAN.tareas/
 
 ## 03. Hoja de Ruta desarrollo
 - [[HOJA DE RUTA DESARROLLO]] — plan completo de construccion .NET 10: estrategia de arranque, solucion Clean Architecture con DAL dual, menu del prototipo, fundamentos multi-tenant, motores base, ETL de datos legacy, CI/CD, checklist y riesgos
+- [[PROMPT DE ARRANQUE - Sesion de desarrollo]] — prompt maestro auto-contenido para que una nueva sesion (multi-agente) inicie el desarrollo: rutas, lectura obligatoria, clonar backbone CUBOT.nails, Super Admin primero, registro de avance
 
 ## 04. Notas para desarrollador
 - [[Manejo de Datos - Alias, parametros, UDFs, consecutivos]] — `[dbx.GENE]`, PARAMXML, UDFs, consecutivos
