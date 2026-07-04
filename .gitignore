@@ -8,3 +8,7 @@
 Thumbs.db
 desktop.ini
 *.tmp
+
+# Artefactos internos de Claude Design (no versionar: rutas largas y copias)
+01. Requerimiento/Prototipo/uploads/
+01. Requerimiento/Prototipo/.thumbnail

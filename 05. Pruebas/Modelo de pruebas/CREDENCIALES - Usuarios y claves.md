@@ -43,13 +43,13 @@ ver [[HOJA DE RUTA DESARROLLO]] seccion 3.3). Consola separada con MFA (ver
 Owner del tenant demo sembrado. El tenant demo replica al **`01` = BITCODE** del
 sistema actual (ver [[Conexion a la BD del sistema actual (db3dev)]]).
 
-| Campo | Valor |
-|---|---|
-| **App** | `http://localhost:<puerto Web>` -> `/login` |
-| **Email** | `owner@sky-system.local` |
-| **Clave** | `Demo123*` (demo Development) |
-| Rol | `Owner` (tenant_role) |
-| Tenant | SKY SYSTEM (demo) |
+| Campo     | Valor                                       |
+| --------- | ------------------------------------------- |
+| **App**   | `http://localhost:<puerto Web>` -> `/login` |
+| **Email** | `owner@sky-system.local`                    |
+| **Clave** | `Demo123*` (demo Development)               |
+| Rol       | `Owner` (tenant_role)                       |
+| Tenant    | SKY SYSTEM (demo)                           |
 
 ## 3. Usuarios demo por rol (sembrados)
 
