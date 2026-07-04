@@ -46,6 +46,26 @@ migracion: el "corazon" (Flujos `000291`, Formularios `000131`, Reglas `000802`)
 son los tres motores portados (seccion 3.2 de [[Visión y entorno]]) y tienen
 prioridad sobre los catalogos.
 
+## 0.1 Tracker de construccion DESTINO (actualizado 2026-07-03)
+
+Estado real del codigo en EcorexV (rama `fase-0/clon-backbone`, commits a482b47..1a22907):
+
+| Modulo / capacidad | Legacy | Estado | Notas |
+|---|---|---|---|
+| Plataforma multi-tenant + Super Admin + planes | - | CONSTRUIDO | Backbone adaptado; tenant demo SKY SYSTEM; DAL dual + test aislamiento 2 motores |
+| Nucleo tareas (TaskItem, estados, worklog, kanban, wizard) | 000038/000636 | CONSTRUIDO | ADR-0013; consecutivos por tenant; concurrencia optimista |
+| Proyectos (con ACL de miembros) | 000042 | CONSTRUIDO (base) | Familia DOC_PROYECTOS_* extendida pendiente de ETL |
+| WorkflowEngine (motor BPMN) | 000291 | CONSTRUIDO (motor) | ADR-0014; editor visual bpmn-js PENDIENTE (autorizacion de descarga) |
+| DynamicFormRenderer + visor por token | 000131 | CONSTRUIDO (Tier 1) | ADR-0015; constructor drag-and-drop y tipos multimedia pendientes |
+| RulesEngine (verbos tipados) | 000802 | CONSTRUIDO (5 verbos) | ADR-0016; verbos IA/importacion pendientes |
+| Dependencias (organigrama) | 000850 | CONSTRUIDO | ADR-0017 |
+| Modulos web (module registry) | 000109 | CONSTRUIDO (base) | ADR-0017; menu derivado del registry + policies por modulo pendiente |
+| UI fiel al Prototipo Final (ECOREX.dc.html) | - | CONSTRUIDO | Tokens exactos + acordeones + dark mode; tabla de fidelidad en PROGRESO.md |
+| Programar actividad | 000889 | PENDIENTE | |
+| Comercial / CRM del workspace | 000477 | HEREDADO CRM | Pipeline/leads del backbone bajo "CRM (heredado)" |
+| Power BI Service / Agentes IA workspace | 000788/000867 | PENDIENTE | Catalogo del registry ya los lista como placeholder |
+| ETL desde db3dev (tenant 01=BITCODE) | - | PENDIENTE | FASE 6; requiere conexion (solo lectura) |
+
 ## 1. Referencia ORIGEN: mapa de modulos legacy
 
 > Lo que sigue es el levantamiento del sistema ORIGEN (WebForms `GestionMovil`).
