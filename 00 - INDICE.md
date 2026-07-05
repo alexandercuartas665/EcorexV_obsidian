@@ -8,7 +8,7 @@ url_prod: https://app.bitcode.com.co/Formularios/Modulos/Login/LoginBitcode.aspx
 base_datos_dev: db3dev (sql.bitcode.com.co,44566)
 total_docs: 52
 carpetas: 8
-fecha_ultima_actualizacion: 2026-07-02
+fecha_ultima_actualizacion: 2026-07-05
 estado: adaptado a la vision del sistema destino .NET 10 (ORIGEN preservado como referencia ETL)
 nivel_completitud: 90 por ciento
 ---
@@ -162,6 +162,20 @@ OBSIDIAN.tareas/
 
 ### Voy a planear la migracion
 1. [[HOJA DE RUTA DESARROLLO]] → 2. vault CUBOT.nails (esquema destino: DAL dual PostgreSQL/SQL Server + modulos base portados)
+
+## Novedades (2026-07-05)
+
+- **Tracker DESTINO reconciliado**: [[INVENTARIO GENERAL]] seccion 0.1 se actualizo con el
+  estado real del codigo (commits `a482b47..39b066e`): FASE 5, los 5 modulos de Capa 6
+  (conceptos, reglas, ficha de empresa, web scraping, cargador de contactos) y las 3
+  integraciones traidas de la familia CUBOT — **Inventario con catalogos normalizados**
+  (ADR-0027), **Plantillas WhatsApp HSM** (ADR-0029) e **Infraestructura IA** con su grupo
+  de menu propio + desacople de `crear_lead` (ADR-0028).
+- **Aclaracion de ADRs**: [[ADRs - Decisiones de arquitectura]] ahora explica que el repo
+  `docs/decisiones/` lleva dos series (0001-0010 heredadas del backbone CUBOT + 0011-0029
+  de implementacion de ECOREX Tareas), que NO mapean 1:1 con los 10 ADR estrategicos del vault.
+- **Corridas al dia**: [[00 - Registro de corridas]] registra las corridas de las 3
+  integraciones CUBOT (build + format + unit + integracion dual + E2E, todo verde).
 
 ## Novedades (2026-07-03)
 

@@ -46,25 +46,43 @@ migracion: el "corazon" (Flujos `000291`, Formularios `000131`, Reglas `000802`)
 son los tres motores portados (seccion 3.2 de [[Visión y entorno]]) y tienen
 prioridad sobre los catalogos.
 
-## 0.1 Tracker de construccion DESTINO (actualizado 2026-07-03)
+## 0.1 Tracker de construccion DESTINO (actualizado 2026-07-05)
 
-Estado real del codigo en EcorexV (rama `fase-0/clon-backbone`, commits a482b47..1a22907):
+Estado real del codigo en EcorexV (rama `fase-0/clon-backbone`, commits a482b47..39b066e).
+Los ADR de implementacion (0011..0029) viven en `docs/decisiones/` del repo destino; el
+detalle de cada sesion en `PROGRESO.md` y las corridas de prueba en el vault
+([[00 - Registro de corridas]]).
 
 | Modulo / capacidad | Legacy | Estado | Notas |
 |---|---|---|---|
 | Plataforma multi-tenant + Super Admin + planes | - | CONSTRUIDO | Backbone adaptado; tenant demo SKY SYSTEM; DAL dual + test aislamiento 2 motores |
 | Nucleo tareas (TaskItem, estados, worklog, kanban, wizard) | 000038/000636 | CONSTRUIDO | ADR-0013; consecutivos por tenant; concurrencia optimista |
+| Tableros unificados (indice + detalle + filtros + alcances + vistas Tablero/Lista/Calendario/Gantt) | 000636 | CONSTRUIDO | ADR-0021; "Administrar actividades" y el menu rapido del rail son EL MISMO sistema de tableros |
 | Proyectos (con ACL de miembros) | 000042 | CONSTRUIDO (base) | Familia DOC_PROYECTOS_* extendida pendiente de ETL |
-| WorkflowEngine (motor BPMN) | 000291 | CONSTRUIDO (motor) | ADR-0014; editor visual bpmn-js PENDIENTE (autorizacion de descarga) |
-| DynamicFormRenderer + visor por token | 000131 | CONSTRUIDO (Tier 1) | ADR-0015; constructor drag-and-drop y tipos multimedia pendientes |
-| RulesEngine (verbos tipados) | 000802 | CONSTRUIDO (5 verbos) | ADR-0016; verbos IA/importacion pendientes |
+| WorkflowEngine (motor BPMN) + editor canvas | 000291 | CONSTRUIDO | ADR-0014/0022; editor canvas propio funcional; BpmnXml regenerado (portable bpmn.io) |
+| DynamicFormRenderer + constructor + visor por token | 000131 | CONSTRUIDO | ADR-0015/0021; constructor drag-and-drop funcional; tipos multimedia avanzados pendientes |
+| RulesEngine (verbos tipados) + modulo Gestion de reglas | 000802 | CONSTRUIDO | ADR-0016/0023; layout 3 paneles + PARAM_XML editable; verbos IA/importacion pendientes |
+| Conceptos de actividad | 000270 | CONSTRUIDO | ADR-0024a; sobre ActivityType real |
+| Cargador de contactos (CSV -> mapeo -> dedup -> Leads) | 000873 | CONSTRUIDO | ADR-0024; carga transaccional con historial |
+| Extraccion de datos / web scraping | 000730 | CONSTRUIDO | ADR-0025; guard SSRF estricto (fail-closed); scheduler + multipaso pendientes |
+| Ficha de empresa (adm_empresas, en PlatformAdmin) | 000072 | CONSTRUIDO | ADR-0026; ficha real del tenant; 9 secciones placeholder (flujos SQL peligrosos NO reconstruidos) |
+| Inventario: Items + catalogos normalizados | 000066/000556/000506/000502/000606/000498 | CONSTRUIDO | ADR-0027; Item + Warehouse/Brand/Group/Subgroup/Type + stock por bodega; migracion dual; portado de CUBOT.nails |
+| Plantillas WhatsApp HSM | - | CONSTRUIDO | ADR-0029; portado de CUBOT.travels; Submit/SyncStatus STUBS (sin integracion Meta real) |
+| Infraestructura IA (Agentes, Lineas, Conversaciones, Bitacora) | 000867 | CONSTRUIDO (heredado + reorg) | ADR-0028; grupo propio "Infraestructura IA"; crear_lead desacoplado del CRM (IAgentLeadSink: NoOp + PipelineLeadSink) |
 | Dependencias (organigrama) | 000850 | CONSTRUIDO | ADR-0017 |
-| Modulos web (module registry) | 000109 | CONSTRUIDO (base) | ADR-0017; menu derivado del registry + policies por modulo pendiente |
-| UI fiel al Prototipo Final (ECOREX.dc.html) | - | CONSTRUIDO | Tokens exactos + acordeones + dark mode; tabla de fidelidad en PROGRESO.md |
+| Modulos web (module registry) | 000109 | CONSTRUIDO (base) | ADR-0017; menu derivado del registry + policies por modulo en "paso 1" (derivacion del registry = paso 2 pendiente, transversal) |
+| UI fiel al Prototipo Final (ECOREX.dc.html) | - | CONSTRUIDO | Tokens exactos + acordeones + dark mode; login "ventana al producto" (mockup del tablero) |
+| CI/CD pr-check (gitleaks + build Release + format + matriz dual) | - | CONSTRUIDO | ADR-0018/0019; gates de merge activos en GitHub Actions |
+| Comercial / CRM del workspace | 000477 | HEREDADO CRM | Pipeline/leads del backbone; grupo "CRM (heredado)" reducido a Asesores/Automatizaciones/Lista negra tras extraer la infra IA |
 | Programar actividad | 000889 | PENDIENTE | |
-| Comercial / CRM del workspace | 000477 | HEREDADO CRM | Pipeline/leads del backbone bajo "CRM (heredado)" |
-| Power BI Service / Agentes IA workspace | 000788/000867 | PENDIENTE | Catalogo del registry ya los lista como placeholder |
+| Power BI Service | 000788 | PENDIENTE | Catalogo del registry ya lo lista como placeholder |
 | ETL desde db3dev (tenant 01=BITCODE) | - | PENDIENTE | FASE 6; requiere conexion (solo lectura) |
+
+> **Deuda transversal de policies (paso 1 -> paso 2):** cada modulo nuevo registra su
+> policy como `RequireClaim("tenant_id")` (equivalente a `TenantMember`) con un nombre
+> estable (`Inventario.Ver`, `PlantillasWhatsApp.Editar`, `ExtraccionDatos.Editar`,
+> `AdmEmpresas.Ver`...). El "paso 2" comun es derivarlas del Module Registry (000109) y
+> anadir MFA en acciones criticas. No es especifico de un modulo.
 
 ## 1. Referencia ORIGEN: mapa de modulos legacy
 

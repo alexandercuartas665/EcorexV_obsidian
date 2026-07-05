@@ -10,7 +10,9 @@ estado: vivo
 > Registro de las decisiones arquitectonicas ya tomadas, con su contexto y
 > consecuencias, para que el "por que" no se pierda. Cada decision ya esta reflejada
 > en la [[HOJA DE RUTA DESARROLLO]] y las notas de capa; aqui se consolida el
-> razonamiento. Formato ADR ligero. En el repo destino se replican en `docs/decisiones/`.
+> razonamiento. Formato ADR ligero. El repo destino `docs/decisiones/` lleva su propia
+> numeracion de ADR de implementacion (0011-0029); ver la nota "Dos series de ADR" al
+> pie del indice.
 
 ## Indice
 
@@ -26,6 +28,21 @@ estado: vivo
 | 008 | Consola PlatformAdmin separada de la app del tenant | Aceptada |
 | 009 | AI Provider Gateway multi-proveedor | Aceptada |
 | 010 | Migracion por ETL (no big-bang), origen como referencia | Aceptada |
+
+> **Dos series de ADR (aclaracion, 2026-07-05).** Los 10 ADR de arriba son las
+> decisiones ESTRATEGICAS de ECOREX Tareas (arquitectura); este documento conserva su
+> "por que". En el repo destino `docs/decisiones/` conviven dos tracks numericos que NO
+> mapean 1:1 con esta lista: (a) los **0001-0010 heredados del backbone CUBOT** (puertos
+> docker, monorepo, net9 puente, frontend solo .NET, auth JWT, webhook chat, cuenta/
+> facturacion, webhook Wompi, motor de agenda -ya no aplica-, puertos dedicados); y (b)
+> los **0011-0029 de implementacion de ECOREX Tareas**: 0011 eliminar dominio belleza,
+> 0012 migracion .NET 10, 0013 nucleo TaskItem, 0014 WorkflowEngine, 0015 formularios
+> dinamicos, 0016 RulesEngine, 0017 organigrama + module registry, 0018 CI GitHub
+> Actions, 0019 E2E Playwright, 0020 tableros unificados, 0021 constructor de
+> formularios, 0022 editor de flujos canvas, 0023 modulo de reglas, 0024 cargador de
+> contactos + conceptos, 0025 web scraping, 0026 ficha de empresa, 0027 inventario, 0028
+> infraestructura IA, 0029 plantillas WhatsApp. El estado de construccion por modulo esta
+> en [[INVENTARIO GENERAL]] seccion 0.1.
 
 ---
 
