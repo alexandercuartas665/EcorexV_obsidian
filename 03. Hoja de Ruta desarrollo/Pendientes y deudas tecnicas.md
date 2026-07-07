@@ -80,10 +80,29 @@ fecha_ultima_actualizacion: 2026-07-07
 - Nota: `qa.usuario@sky-system.local` quedo con el rol demo "Asesor limitado"
   como caso visible del filtrado por permisos (revertible).
 
-## 6. Foco siguiente
-- **Flujos de trabajo (WorkflowEngine, modulo 000291).** El motor y el editor
-  canvas ya existen (ADR-0014 / ADR-0022); la proxima sesion trabaja sobre
-  flujos. Ver [[00 - Vision Flujos]] y [[AdmWorkflow - Motor de ejecucion]].
+## 6. Foco: Flujos de trabajo (modulo 000291)
+Meta acordada: **runtime operativo end-to-end** (que los flujos DIRIJAN el trabajo).
+Ver [[00 - Visión Flujos]], [[AdmWorkflow - Motor de ejecucion]],
+[[Ejecucion - SiguienteEstado y Reinicios]], [[Parametrizacion por nodo - panel Propiedades]].
+
+- [x] **Editor migrado a bpmn-js** (ADR-0034, reemplaza el canvas propio de
+      ADR-0022). v8.8.2 vendoreado del legacy; palette acotado (start/end/task/
+      gateway); parametrizacion por nodo por BpmnElementId; solo editor.
+- [ ] **Asignacion por nodo (WorkflowNodePolicy):** un nodo se asigna a
+      **dependencias/cargos** (NO a usuarios). El organigrama (000850) debe
+      ganar un **clasificador dependencia/cargo/funcionario**, y **solo cargos y
+      dependencias** son asignables a un nodo (los funcionarios no). Reemplaza el
+      placeholder "Asignar usuarios por nodo".
+- [ ] **Bandeja operativa** ("mis pasos pendientes"): atender el paso con su
+      formulario vinculado -> avanzar el caso (reglas autonomas, gateways de
+      aprobacion, loops), reasignar si el nodo lo permite; en vivo (SignalR).
+- [ ] Refinamientos: fidelidad de loops/reinicios en runtime, notificaciones
+      por nodo, TZ del tenant, sub-flujos / call activity (hoy solo visual).
+- [ ] Deudas del editor bpmn-js: actualizar de v8.8.2 a la linea vigente (17+);
+      modo oscuro del canvas (bpmn-js no conmuta, fondo claro fijo).
+- Decisiones tomadas: bpmn-js (no canvas propio); palette acotado; asignacion
+  por dependencia/cargo; gateways = condicion-en-arista (auto) + aprobacion
+  humana; formularios del nodo se renderizan al atender el paso.
 
 ---
 
