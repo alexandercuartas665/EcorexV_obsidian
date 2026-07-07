@@ -8,7 +8,7 @@ url_prod: https://app.bitcode.com.co/Formularios/Modulos/Login/LoginBitcode.aspx
 base_datos_dev: db3dev (sql.bitcode.com.co,44566)
 total_docs: 52
 carpetas: 8
-fecha_ultima_actualizacion: 2026-07-05
+fecha_ultima_actualizacion: 2026-07-07
 estado: adaptado a la vision del sistema destino .NET 10 (ORIGEN preservado como referencia ETL)
 nivel_completitud: 90 por ciento
 ---
@@ -115,6 +115,7 @@ OBSIDIAN.tareas/
 ## 03. Hoja de Ruta desarrollo
 - [[HOJA DE RUTA DESARROLLO]] — plan completo de construccion .NET 10: estrategia de arranque, solucion Clean Architecture con DAL dual, menu del prototipo, fundamentos multi-tenant, motores base, ETL de datos legacy, CI/CD, checklist y riesgos
 - [[PROMPT DE ARRANQUE - Sesion de desarrollo]] — prompt maestro auto-contenido para que una nueva sesion (multi-agente) inicie el desarrollo: rutas, lectura obligatoria, clonar backbone CUBOT.nails, Super Admin primero, registro de avance
+- [[Pendientes y deudas tecnicas]] — backlog vivo: deudas por modulo, stubs sin construir, FASE 6 (ETL) y abiertos de proceso
 
 ## 04. Notas para desarrollador
 - [[Manejo de Datos - Alias, parametros, UDFs, consecutivos]] — `[dbx.GENE]`, PARAMXML, UDFs, consecutivos
@@ -162,6 +163,19 @@ OBSIDIAN.tareas/
 
 ### Voy a planear la migracion
 1. [[HOJA DE RUTA DESARROLLO]] → 2. vault CUBOT.nails (esquema destino: DAL dual PostgreSQL/SQL Server + modulos base portados)
+
+## Novedades (2026-07-07)
+
+- **Hilo Usuarios -> Roles -> Enforcement** (ADR-0031/0032/0033, apoyo en el
+  hermano Visal): modulo de usuarios del tenant, roles dinamicos con matriz de
+  permisos (Modulo x Ver/Crear/Editar/Eliminar, catalogo derivado del menu) y
+  enforcement real (menu filtrado por Ver + acciones gateadas, con regla opt-in
+  que no bloquea a Owner/Admin ni a usuarios sin rol). Antes: **Menu
+  configurable por perfil** (ADR-0030) con editor y drag-and-drop.
+- **Nuevo backlog**: [[Pendientes y deudas tecnicas]] concentra todo lo
+  pendiente (deudas por modulo, stubs, FASE 6 ETL, abiertos de proceso).
+- Tracker DESTINO ([[INVENTARIO GENERAL]] 0.1) y [[00 - Registro de corridas]]
+  al dia con estos modulos.
 
 ## Novedades (2026-07-05)
 
