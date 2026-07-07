@@ -71,6 +71,7 @@ detalle de cada sesion en `PROGRESO.md` y las corridas de prueba en el vault
 | Infraestructura IA (Agentes, Lineas, Conversaciones, Bitacora) | 000867 | CONSTRUIDO (heredado + reorg) | ADR-0028; grupo propio "Infraestructura IA"; crear_lead desacoplado del CRM (IAgentLeadSink: NoOp + PipelineLeadSink) |
 | Dependencias (organigrama) | 000850 | CONSTRUIDO | ADR-0017 |
 | Modulos web (module registry) | 000109 | CONSTRUIDO (base) | ADR-0017; menu derivado del registry + policies por modulo en "paso 1" (derivacion del registry = paso 2 pendiente, transversal) |
+| Menu configurable por perfil ("vistas" del sistema) + Administrador de Menu | 000194 | CONSTRUIDO | ADR-0030; menu del workspace data-driven por vista/perfil (MenuView+MenuNode), asignacion usuario->vista, editor /configuracion-menu (arbol, propiedades, iconos, vista previa). Reusa el stub 000194. Es el "paso 2" del Module Registry |
 | UI fiel al Prototipo Final (ECOREX.dc.html) | - | CONSTRUIDO | Tokens exactos + acordeones + dark mode; login "ventana al producto" (mockup del tablero) |
 | CI/CD pr-check (gitleaks + build Release + format + matriz dual) | - | CONSTRUIDO | ADR-0018/0019; gates de merge activos en GitHub Actions |
 | Comercial / CRM del workspace | 000477 | HEREDADO CRM | Pipeline/leads del backbone; grupo "CRM (heredado)" reducido a Asesores/Automatizaciones/Lista negra tras extraer la infra IA |
