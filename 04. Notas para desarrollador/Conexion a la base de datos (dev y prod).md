@@ -77,12 +77,46 @@ publicada** al exterior. Se alcanza solo por un tunel SSH.
 
 ### 3.1 Abrir el tunel
 
-La IP interna del contenedor de Postgres cambia si se recrea; consultala en el
-server con `docker inspect ecorex-postgres-prod`.
+**El tunel debe estar arriba ANTES de arrancar el dev.** Mientras la ventana del
+tunel siga abierta, tu `localhost:15433` apunta a la BD de prod; si la cierras, el
+dev se queda sin BD.
 
-```bash
-ssh -i <RUTA_LLAVE_SSH> -N -L 15433:<IP_POSTGRES_PROD>:5432 <USUARIO>@<PROD_HOST>
-# deja esta terminal abierta; mientras viva, tu localhost:15433 apunta a la BD de prod
+**Forma recomendada: ejecutar el script `Script\abrir-tunel-prod.ps1`.** Detecta sola
+la IP del contenedor de Postgres (que cambia si se recrea) y abre el tunel. Es un
+archivo **LOCAL, gitignored** (no viene en el repo porque tiene el host del server):
+creas el archivo con este contenido y reemplazas `<USUARIO>`, `<PROD_HOST>` y el
+nombre de la llave por los reales (pidelos al lider):
+
+```powershell
+# Script\abrir-tunel-prod.ps1  -> USO:  pwsh -File .\Script\abrir-tunel-prod.ps1
+$Server='<USUARIO>@<PROD_HOST>'; $KeyPath=Join-Path $HOME '.ssh\<TU_LLAVE_SSH>'
+$LocalPort=15433; $PgContainer='ecorex-postgres-prod'; $PgPort=5432
+if (-not (Test-Path $KeyPath)) { Write-Host "Falta la llave $KeyPath" -ForegroundColor Red; Read-Host; exit 1 }
+if (Get-NetTCPConnection -LocalPort $LocalPort -State Listen -ErrorAction SilentlyContinue) { Write-Host "Puerto $LocalPort ya en uso (tunel abierto)"; Read-Host; exit 0 }
+$tmpl='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+# -n desconecta stdin (si no, ssh se cuelga esperando teclado en consola interactiva)
+$raw = & ssh -n -o BatchMode=yes -i $KeyPath -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 $Server "docker inspect -f '$tmpl' $PgContainer" 2>&1
+$PgIp = ("$raw" -split "`r?`n" | Where-Object { $_ -match '^\s*\d{1,3}(\.\d{1,3}){3}\s*$' } | Select-Object -First 1)
+if ([string]::IsNullOrWhiteSpace($PgIp)) { Write-Host "No obtuve la IP: $raw" -ForegroundColor Red; Read-Host; exit 1 }
+$PgIp = $PgIp.Trim()
+Write-Host "Tunel: localhost:$LocalPort -> $PgIp (deja ESTA ventana abierta)" -ForegroundColor Green
+& ssh -n -i $KeyPath -N -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes -L "${LocalPort}:${PgIp}:${PgPort}" $Server
+```
+
+> [!warning] Antivirus (Kaspersky)
+> Kaspersky puede poner en **cuarentena** este `.ps1` (lo lee como hacktool de tunel)
+> y/o **colgar `ssh.exe`** al ejecutarse. Sintomas: el archivo desaparece, o el script
+> se queda en "Conectando por SSH...". Solucion: agrega exclusiones en Kaspersky
+> (Amenazas y exclusiones) para la carpeta `Script\` **y** para el ejecutable
+> `C:\WINDOWS\System32\OpenSSH\ssh.exe` (marca "no analizar trafico de red"). Si tu
+> Kaspersky lo administra IT central, pideselo a IT. Mientras tanto puedes pausar el AV.
+
+**Forma manual (fallback, sin archivo):** un one-liner pegado en PowerShell (Kaspersky
+molesta menos con un comando tecleado que con un archivo guardado). La IP se consulta
+con `docker inspect ecorex-postgres-prod` en el server:
+
+```powershell
+ssh -n -i <RUTA_LLAVE_SSH> -N -L 15433:<IP_POSTGRES_PROD>:5432 <USUARIO>@<PROD_HOST>
 ```
 
 ### 3.2 Crear `appsettings.Development.local.json` (GITIGNORED)
