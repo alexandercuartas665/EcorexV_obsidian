@@ -12,3 +12,6 @@ desktop.ini
 # Artefactos internos de Claude Design (no versionar: rutas largas y copias)
 01. Requerimiento/Prototipo/uploads/
 01. Requerimiento/Prototipo/.thumbnail
+
+# Nota local con credencial real - NUNCA al repo publico
+04. Notas para desarrollador/Notas para desarrollador Alexander.md
