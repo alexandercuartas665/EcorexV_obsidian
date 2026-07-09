@@ -13,6 +13,26 @@ aviso_seguridad: las credenciales NO estan en este repo (publico); ver seccion 2
 > **copia de produccion en ambiente de desarrollo**: se puede consultar y probar
 > cambios sin afectar produccion. Aun asi, aplican los guardrails de la seccion 5.
 
+> [!warning] NO confundir con la BD del sistema NUEVO
+> Este documento es de **`db3dev`**: el sistema **LEGACY** `GestionMovil`
+> (**SQL Server**), que es el **ORIGEN** del ETL. Es de **SOLO LECTURA**.
+>
+> La BD del sistema **NUEVO** (ECOREX.tareas, **.NET 10 / PostgreSQL**), que es el
+> **DESTINO** y donde se desarrolla, se documenta aparte en
+> [[Conexion a la base de datos (dev y prod)]]. No mezclar credenciales, motores
+> ni herramientas entre ambas.
+>
+> | | db3dev (esta nota) | ECOREX.tareas |
+> |---|---|---|
+> | Rol | Origen (legacy) | Destino (nuevo) |
+> | Motor | SQL Server 2022 | PostgreSQL 16 |
+> | Acceso | Solo lectura | Lectura/escritura (dev) |
+> | Sistema | GestionMovil | ECOREX .NET 10 |
+
+> [!important] Autorizacion previa (regla del proyecto)
+> Antes de usar `db3dev` en una sesion hay que **pedir autorizacion explicita al
+> usuario** (no es una BD de uso libre). Ver `CLAUDE.md` regla 7 del repo de codigo.
+
 ## 1. Que es
 
 - **Motor**: SQL Server 2022.
@@ -80,6 +100,17 @@ Ademas, aunque sea DEV:
 - **Nunca** respaldar esta base a lugares publicos (contiene datos reales copiados de produccion).
 - **Nunca** commitear la cadena de conexion al repo.
 
+**Refuerzo recomendado (defensa en profundidad):** conectar con un **login de SQL
+Server de solo lectura** (rol `db_datareader` sobre `db3dev`), no con un usuario
+`sysadmin`/`db_owner`. Asi un `UPDATE`/`DELETE` accidental **falla por permisos**,
+no por disciplina. Pedir ese login al DBA/lider si no lo tienes. Como ultima linea,
+puedes forzar la sesion a solo lectura antes de consultar:
+
+```sql
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  -- sondeos sin bloquear a nadie
+-- (y trabajar siempre dentro de SELECT; ver la politica de la seccion 5)
+```
+
 ## 6. Como conectar
 
 - **Dentro del proyecto legacy** (`C:\Desarrollo\core`): patron `MotherData.AdmDatos` / `tbrec`
@@ -90,6 +121,16 @@ Ademas, aunque sea DEV:
 ```bash
 # Ejemplo sqlcmd (la cadena/credenciales vienen del entorno, no del repo)
 sqlcmd -S "$DB3DEV_HOST" -U "$DB3DEV_USER" -P "$DB3DEV_PASS" -d db3dev -Q "SELECT COUNT(*) FROM PRO_MODULOS;"
+```
+
+**Verifica que estas en la BD correcta** antes de cualquier consulta (evita confundir
+db3dev con otra base o con produccion real):
+
+```sql
+SELECT DB_NAME() AS base, @@SERVERNAME AS servidor,
+       (SELECT COUNT(*) FROM SUCURSAL) AS sucursales,     -- ~105
+       (SELECT COUNT(*) FROM PRO_MODULOS) AS modulos;     -- ~532
+-- base debe ser 'db3dev'. Si no cuadra, PARA y revisa la cadena de conexion.
 ```
 
 ## 7. Cuando el agente/dev deberia proponer usar esta conexion
@@ -109,6 +150,7 @@ Preguntas utiles antes de queries no triviales:
 
 ## 8. Enlaces
 
+- [[Conexion a la base de datos (dev y prod)]] — la BD del sistema NUEVO (destino, PostgreSQL); no confundir con esta
 - [[HOJA DE RUTA DESARROLLO]] — el ETL (seccion 9) consume esta BD
 - [[Modelo Entidad-Relacion logico]] — schema derivado de esta BD
 - [[INVENTARIO GENERAL]] — modulos que coinciden con `PRO_MODULOS`
