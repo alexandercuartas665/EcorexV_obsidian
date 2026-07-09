@@ -160,6 +160,36 @@ varios tenants, se elige al iniciar sesion (`UserTenant`, multi-tenant real).
 
 ---
 
+## 11. Tenants cliente en PRODUCCION (onboarding desde db3dev, 2026-07-09)
+
+> [!warning] Credenciales iniciales de personas reales (de prueba, rotables)
+> Cuentas sembradas desde el legacy db3dev con `LegacyOnboardingSeeder`. La clave
+> inicial de cada usuario es su **cedula (ID_USUARIO)**; cada quien la cambia en su
+> primer acceso. Son cedulas/correos reales: si este vault se mantiene publico,
+> considerar pasarlo a **privado**. Rotar tras las pruebas.
+
+Mapeo: SUCURSAL `01` -> **BITCODE**, `00136` -> **SKY SYSTEM**; tercer tenant
+**agrometalicas** creado a mano. Todos rol **Owner**.
+**Regla de acceso: login = correo corporativo, clave = cedula del usuario.**
+
+App de prod: `http://10.0.0.3:5480/login`
+
+Un usuario **validado** por tenant (los demas del tenant siguen la misma regla):
+
+| Tenant | Email (login) | Clave (cedula) | Rol |
+|---|---|---|---|
+| BITCODE | `acuartas@bitcode.com.co` | `80001976` | Owner |
+| SKY SYSTEM | `adriana.borrero@skysystem.com.co` | `51888215` | Owner |
+| agrometalicas | `calidad@agrometalicas.com` | `1116243150` | Owner |
+
+Super Admin de plataforma (prod): `admin@ecorex.local` (la clave es el secreto
+`ECOREX_SEED_ADMIN_PASSWORD` del `.env` del server, **NO** se documenta aqui).
+
+La lista completa de usuarios por tenant se deriva de db3dev (sucursal 01 / 00136);
+no se transcribe aqui para no multiplicar PII. Ver [[Conexion a la BD del sistema actual (db3dev)]].
+
+---
+
 > Documento de credenciales de PRUEBAS (Development). **Mantener los secretos reales
 > fuera de este repo publico** (`.env` + Key Vault). En produccion: rotar todas las
 > claves, MFA en PlatformAdmin, y crear los usuarios reales por onboarding/invitacion.
