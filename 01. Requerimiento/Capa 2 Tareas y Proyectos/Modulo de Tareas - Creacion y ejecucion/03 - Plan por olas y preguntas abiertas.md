@@ -104,14 +104,20 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
 - Resolver A.1-A.6 con el usuario. Extraer del `ECOREX.dc.html` los tokens exactos del modal y del
   menu. **Aceptacion**: decisiones firmadas + hoja de tokens.
 
-### Ola 1 - Datos: puente Concepto <-> Tarea
-- `TaskItem`: agregar `SubcategoriaId` (FK ActividadSubcategoria) + `EntidadId` (FK `Entidad`, la
-  Empresa/Area de la config -- ver PRE-1 reconciliacion; **NO** `OrgUnit`); migracion EF. Backfill
-  segun PRE-3: `SubcategoriaId` nullable, tareas existentes en NULL, se conserva `ActivityTypeId`.
-  Ajustar `TaskItemService.CreateAsync` para aceptar subcategoria + entidad y derivar board/columna/
-  flujo/flags del concepto.
-- **Aceptacion**: se puede crear un TaskItem ligado a una subcategoria; el board/columna se toman
-  del concepto; tests unit del servicio verdes; migracion aplica en PG y SQL Server.
+### Ola 1 - Datos: puente Concepto <-> Tarea  -- HECHA 2026-07-11 (commit `a60252e`)
+- `TaskItem`: `ActivityTypeId` pasa a NULLABLE (deprecado D1) + `SubcategoriaId` (FK
+  ActividadSubcategoria) + `EntidadId` (FK `Entidad`, Empresa/Area; NO `OrgUnit`), ambos nullable,
+  FK Restrict. Migracion `TaskItemConceptoBridge` (PG; SqlServer sigue en backlog DAL-dual).
+- `CreateAsync`: exige al menos una clasificacion (ActivityType o concepto); valida subcategoria/
+  entidad; si el request no fijo tablero y el concepto tiene `TaskBoardId`, la tarea hereda ese
+  tablero y cae en su PRIMERA columna (no la "terminado"). `UpdateAsync`/`ListAsync` + DTOs (summary
+  + filtro) tambien aceptan concepto/entidad. El arranque de flujo desde el concepto es la Ola 2.
+- Backfill PRE-3 aplicado: las 206 tareas existentes quedan con `SubcategoriaId`/`EntidadId` NULL y
+  conservan `ActivityTypeId`.
+- **Aceptacion CUMPLIDA**: tests de integracion (matriz dual, verdes en PG) -- alta por concepto
+  hereda tablero+primera columna, y "sin clasificacion -> Invalid". Regresion en Chrome: el alta
+  legacy por ActivityType sigue creando tareas (T00207). Migracion aplicada en local (falta prod +
+  SqlServer). NOTA: el alta por concepto aun no tiene UI (llega en la Ola 3, el modal).
 
 ### Ola 2 - Alta que CONSUME el concepto (sin UI nueva aun)
 - En `CreateAsync` (transaccional): si la subcategoria tiene `WorkflowDefinitionId`, llamar
