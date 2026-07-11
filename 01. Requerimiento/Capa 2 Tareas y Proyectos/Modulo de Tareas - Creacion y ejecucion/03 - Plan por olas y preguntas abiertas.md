@@ -58,25 +58,23 @@ Tareas previas, cada una verificable, que desbloquean el modulo:
 - [ ] **PRE-3 Backfill de tareas existentes.** Plan de migracion de `TaskItem.ActivityTypeId` ->
       `SubcategoriaId` (mapear o dejar null) sin perder datos. Aceptacion: script/plan de backfill
       revisado.
-- [ ] **PRE-4 Marca de "jefe / responsable" por miembro en Dependencias (000850).** HOY NO EXISTE:
-      `OrgUnitMember` solo tiene `Role` (texto libre) y a nivel de unidad esta
-      `OrgUnit.ResponsibleTenantUserId` (un unico responsable por unidad, no por miembro). El paso
-      "Encargado" del modal (cascada cargos -> encargado) necesita un default claro de QUIEN es el
-      responsable. Agregar un flag por miembro (p.ej. `OrgUnitMember.IsResponsible` / "es jefe"),
-      exponerlo en `Dependencias.razor`, y usarlo como Encargado propuesto por defecto en el alta.
-      Reconciliar con `ResponsibleTenantUserId` (mantener uno de los dos como fuente de verdad).
-      Aceptacion: se puede marcar a un miembro como jefe/responsable de su unidad; el selector
-      "Encargado" del alta lo propone por defecto. (Antes estaba como deuda "no bloqueante"; se sube
-      a prerequisito porque el modal lo consume.)
-- [ ] **PRE-5 Item de menu "despliega procesos" (grupo dinamico) - fundamento de datos.** HOY NO
-      EXISTE: `MenuNodeKind` es {QuickLink, Section, Subgroup, Item} (todo estatico) y `MenuNode` no
-      tiene ninguna marca de "fuente dinamica". Para el menu "Mis Procesos" dinamico (D3 / Ola 4)
-      hace falta primero poder MARCAR un nodo como "este grupo muestra las actividades tipo proceso":
-      agregar un `MenuNodeKind` nuevo (p.ej. `DynamicProcesses`) o un flag/fuente en `MenuNode`, y la
-      opcion en el editor `ConfiguracionMenu.razor` para activarlo. El renderizado (expandir con
-      categorias/subcategorias de proceso via `IActividadCatalogoService`) es la Ola 4; este PRE es
-      solo el esquema + editor. Aceptacion: en el editor de menu se puede marcar un grupo como
-      "procesos" y queda persistido; `NavMenu` sabe distinguirlo de un grupo normal.
+- [x] **PRE-4 Marca de "jefe / responsable" por miembro en Dependencias (000850). RESUELTO
+      2026-07-11** (commit `66bb60d`). Se agrego `OrgUnitMember.IsResponsible`: a lo sumo un jefe por
+      unidad; al marcarlo se sincroniza `OrgUnit.ResponsibleTenantUserId` con ese usuario, al
+      desmarcarlo/quitarlo se limpia (reconciliacion resuelta: el flag por miembro es la fuente y la
+      unidad refleja). Nuevo `IOrgUnitService.SetMemberResponsibleAsync` (multi-tabla en una
+      transaccion) + boton "Hacer jefe" / "Jefe" y badge en `Dependencias.razor`. Sera el Encargado
+      propuesto por defecto al crear actividades (lo consumira la Ola 3). Validado en Chrome:
+      marcar a un miembro como jefe reasigna el Responsable de la unidad y desmarca a los demas.
+- [x] **PRE-5 Item de menu "despliega procesos" (grupo dinamico) - fundamento de datos. RESUELTO
+      2026-07-11** (commit `66bb60d`). Se agrego `MenuNode.IsProcessGroup` (flag, no un `Kind`
+      nuevo): marca un grupo (Section/Subgroup) como "despliega los procesos". Cableado de punta a
+      punta: editor (`MenuEditorNodeDto`/`MenuNodeEditDto` + checkbox en `ConfiguracionMenu.razor`),
+      sidebar (`MenuNodeDto`/`MenuTreeBuilder.FlatNode` + badge "procesos" en `NavMenu`), clon y
+      export/import. El **render dinamico real** (expandir con categorias/subcategorias de proceso
+      via `IActividadCatalogoService`) sigue siendo la **Ola 4**; este PRE es el esquema + editor.
+      Validado en Chrome: se marca el grupo, persiste tras recargar y el sidebar muestra el badge
+      PROCESOS.
 
 ## B. Plan por olas (cada una entregable y verificable)
 
