@@ -11,7 +11,7 @@ modulos_cubiertos: [Flujos 000291, Formularios 000131, Reglas 000802, Agentes IA
 > de reflejarlo en el sistema SIN tocar codigo. En el sistema destino .NET 10 modela
 > sobre los tres motores portados: **WorkflowEngine** (BPMN), **DynamicFormRenderer**
 > (formularios EAV) y **RulesEngine** (reglas). Todo lo que configura queda aislado
-> dentro de su tenant SKY SYSTEM. Aspecto en [[00 - Prototipo Final ECOREX]]; vision
+> dentro de su tenant SKY SYSTEM. Aspecto en [[Visión y entorno|Prototipo Final ECOREX]]; vision
 > en [[Visión y entorno]].
 
 ---
@@ -279,7 +279,7 @@ Todo lo que Andres configura queda ligado al `tenant_id` de SKY SYSTEM.
 
 ## Enlaces a documentacion tecnica
 
-- Aspecto y navegacion destino: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion destino: [[Visión y entorno|Prototipo Final ECOREX]]
 - Vision maestra del sistema: [[Visión y entorno]]
 - Motor BPMN: [[00 - Visión Flujos]] y [[AdmWorkflow - Motor de ejecucion]]
 - Parametrizacion por nodo: [[Parametrizacion por nodo - panel Propiedades]]

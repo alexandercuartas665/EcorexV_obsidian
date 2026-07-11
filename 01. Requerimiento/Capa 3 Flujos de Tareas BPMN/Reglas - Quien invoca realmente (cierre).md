@@ -13,7 +13,7 @@ destino_clase: RulesEngine
 > misterio del origen: el ejecutor generico `cl_manejador_Reglas` esta roto, pero
 > las reglas si se ejecutan — via `cl_gestion_reglas` (en Bootstrap). Fija primero
 > el contrato DESTINO y conserva el analisis del origen. Enlaza tambien con
-> [[00 - Prototipo Final ECOREX]], [[Reglas - Motor y discrepancia]] y
+> [[Visión y entorno|Prototipo Final ECOREX]], [[Reglas - Motor y discrepancia]] y
 > [[Reglas - Catalogo real y verbos Ensamblado]].
 
 ## D. RulesEngine — contrato destino

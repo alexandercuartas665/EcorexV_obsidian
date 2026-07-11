@@ -12,7 +12,7 @@ destino_metodo: WorkflowEngine.AdvanceAsync / SeedCaseAsync / ProcessRestartAsyn
 > Plano del port del avance de casos. Fija primero el mapeo al DESTINO
 > (`WorkflowEngine` en .NET 10) y conserva el analisis del ORIGEN
 > (`AdmWorkflow.vb`, VB) como reglas de negocio a preservar. Enlaza con
-> [[Visión y entorno]] y [[00 - Prototipo Final ECOREX]]; complementa
+> [[Visión y entorno]] y [[Visión y entorno|Prototipo Final ECOREX]]; complementa
 > [[AdmWorkflow - Motor de ejecucion]].
 
 ## D. Encuadre DESTINO — las 5 funciones portadas

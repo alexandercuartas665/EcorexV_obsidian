@@ -22,7 +22,7 @@ verificado_en_prod: 2026-07-01 app.bitcode.com.co usuario 80001976
 > de creacion. La seccion **0 (abajo)** fija la **VISION DESTINO**: como se
 > reconstruye este wizard en **Blazor (.NET 10)** con el aspecto del prototipo
 > final. Vision maestra en [[Visión y entorno]]; aspecto definitivo en
-> [[00 - Prototipo Final ECOREX]].
+> [[Visión y entorno|Prototipo Final ECOREX]].
 
 ---
 
@@ -32,7 +32,7 @@ En el destino, `ctrTareasII` deja de ser un `.ascx` con code-behind y postbacks 
 se convierte en un **componente Blazor** `NuevaActividadDialog` (dialog modal
 invocado desde la ruta `/tareas`). Se preserva la intencion de UX del wizard
 (clasificacion -> contacto -> formulario -> documentos -> formacion) pero
-alineada al estandar visual de [[00 - Prototipo Final ECOREX]] (estilo
+alineada al estandar visual de [[Visión y entorno|Prototipo Final ECOREX]] (estilo
 Linear/Height, tarjetas KPI, modo oscuro). Diferencias clave frente al origen:
 
 1. **Cascadas sin postback**: los combos Empresa -> Tipo/Area -> Subcategoria ->
@@ -634,7 +634,7 @@ Un solo archivo HTML autocontenido.
 ## Enlaces
 
 - Vision maestra del destino: [[Visión y entorno]]
-- Aspecto y navegacion definitivos: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion definitivos: [[Visión y entorno|Prototipo Final ECOREX]]
 - Ver control complementario: [[ctrVertareasII - Spec para reconstruir en Claude Design]]
 - Paginas que lo consumen: [[Tareas y Proyectos - paginas basicas]]
 - Motor de formularios destino: [[00 - Visión Formularios]]

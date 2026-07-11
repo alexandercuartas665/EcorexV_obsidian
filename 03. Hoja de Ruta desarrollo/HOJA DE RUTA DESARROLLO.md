@@ -11,7 +11,7 @@ Esta hoja de ruta describe el camino recomendado para construir el nuevo **ECORE
 - **Codigo destino (.NET 10):** `C:\DesarrolloIA\ECOREX.tareas` (clon local del repo destino)
 - **Repositorio GitHub destino (oficial):** [alexandercuartas665/EcorexV](https://github.com/alexandercuartas665/EcorexV.git)
 - **Documento maestro de vision:** [[Visión y entorno]]
-- **Prototipo visual definitivo:** [[00 - Prototipo Final ECOREX]]
+- **Prototipo visual definitivo:** [[Visión y entorno|Prototipo Final ECOREX]]
 - **Inventario modular:** [[INVENTARIO GENERAL]]
 - **Multi-tenant real:** [[Gestion de Empresas - Admin multi-tenant]]
 - **DAL dual:** [[00 - Visión MotherData]]
@@ -47,7 +47,7 @@ En ambos casos, la fuente de la logica de negocio es el legacy (`C:\Desarrollo\c
 | 4 | [[00 - Visión MotherData]] | DAL dual `IEcorexDbContext` (PostgreSQL + SQL Server). |
 | 5 | [[Modelo Entidad-Relacion logico]] | Mapeo de tablas legacy -> entidades EF Core con `TenantId` (plano del ETL). |
 | 6 | [[00 - Visión Flujos]] / [[00 - Visión Formularios]] | Motores WorkflowEngine y DynamicFormRenderer. |
-| 7 | [[00 - Prototipo Final ECOREX]] | Aspecto y navegacion definitivos. |
+| 7 | [[Visión y entorno|Prototipo Final ECOREX]] | Aspecto y navegacion definitivos. |
 
 **Prompt sugerido para el agente de desarrollo:**
 
@@ -73,7 +73,7 @@ No implementes codigo todavia. Confirma que entendiste el mapa.
 
 > **Esto es lo PRIMERO que se construye una vez haya scaffold, multi-tenancy y autenticacion.** No se pueden armar vistas sueltas sin definir la columna vertebral de navegacion. El menu debe quedar prototipado en Blazor y conectado a las policies antes de implementar el contenido de cada pagina, para que el producto no nazca incoherente.
 
-La base es el layout del [[00 - Prototipo Final ECOREX|prototipo final]]: doble panel (rail de iconos + sidebar `SKY SYSTEM`) con la navegacion en dos bloques.
+La base es el layout del [[Visión y entorno|prototipo final]]: doble panel (rail de iconos + sidebar `SKY SYSTEM`) con la navegacion en dos bloques.
 
 ### Menu objetivo (consola del tenant)
 
@@ -310,7 +310,7 @@ La fase que el tenant usa a diario. Se apoya en el prototipo, no copia estructur
 |-------|--------|-----------|------|
 | 1 | Tareas | `TaskItem` (titulo, actividad, proyecto, responsable, estado, fechas, etiquetas). | [[ctrTareasII - Spec para reconstruir en Claude Design]] |
 | 2 | Detalle de tarea | Panel con cabecera + worklog + concurrencia optimista. | [[ctrVertareasII - Spec para reconstruir en Claude Design]] |
-| 3 | Tableros | Kanban por proyecto (Por hacer/En progreso/En revision/Completado) + filtros + SignalR. | [[00 - Prototipo Final ECOREX]] |
+| 3 | Tableros | Kanban por proyecto (Por hacer/En progreso/En revision/Completado) + filtros + SignalR. | [[Visión y entorno|Prototipo Final ECOREX]] |
 | 4 | Proyectos | Contenedor con equipo, etiquetas, vistas Tablero/Timeline/Calendario. | [[Tareas y Proyectos - paginas basicas]] |
 
 **Validacion:** dos usuarios ven el mismo tablero actualizarse en vivo (SignalR); mover una tarjeta cambia el estado con auditoria.

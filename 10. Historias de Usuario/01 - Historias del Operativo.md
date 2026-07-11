@@ -10,7 +10,7 @@ modulos_cubiertos: [Crear Actividad 000038, Administrar Tareas 000636, Mis Tarea
 > aislado). Es la persona que asigna trabajo, monitorea avance y cierra casos. NO
 > configura procesos ni edita formularios - simplemente **usa** lo que Andres dejo
 > configurado. En el sistema destino .NET 10 trabaja dentro del layout del
-> [[00 - Prototipo Final ECOREX]]: sidebar SKY SYSTEM, Inicio con KPIs y tableros
+> [[Visión y entorno|Prototipo Final ECOREX]]: sidebar SKY SYSTEM, Inicio con KPIs y tableros
 > Kanban. La vision maestra esta en [[Visión y entorno]].
 
 ---
@@ -84,7 +84,7 @@ aislada dentro de SKY SYSTEM. Guadalupe no ve nada de esto - solo recibe un toas
 
 ### Notas para el prototipo
 En el prototipo final el tablero Kanban con columnas `Por hacer / En progreso / En
-revision / Completado` ya esta definido - ver [[00 - Prototipo Final ECOREX]]
+revision / Completado` ya esta definido - ver [[Visión y entorno|Prototipo Final ECOREX]]
 (pantalla "Proyecto - detalle + Tablero Kanban"). En destino el DnD se implementa
 en Blazor con persistencia transaccional y actualizacion viva por SignalR.
 
@@ -217,7 +217,7 @@ Y en la barra superior consulta constantemente:
 
 ## Enlaces a documentacion tecnica
 
-- Aspecto y navegacion destino: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion destino: [[Visión y entorno|Prototipo Final ECOREX]]
 - Vision maestra del sistema: [[Visión y entorno]]
 - Motor de flujos: [[00 - Visión Flujos]] y [[AdmWorkflow - Motor de ejecucion]]
 - Ejecucion paso a paso: [[Ejecucion - SiguienteEstado y Reinicios]]

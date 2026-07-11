@@ -11,7 +11,7 @@ stack_destino: .NET 10 / ASP.NET Core 10 / Blazor
 > **Arbol del menu ORIGEN, conservado como plano de navegacion a migrar.** Es la
 > vista jerarquica de TODOS los menus del sistema legacy `das_module.aspx`. En el
 > DESTINO (.NET 10) este arbol NO se copia literal: el sidebar del prototipo
-> ([[00 - Prototipo Final ECOREX]]) reorganiza la navegacion en dos bloques
+> ([[Visión y entorno|Prototipo Final ECOREX]]) reorganiza la navegacion en dos bloques
 > **PRINCIPAL** (Inicio, Anuncios, Gestor de tareas, Configuracion) y **MODULOS**
 > (los procesos del tenant, cada uno con su codigo `000XXX`). Los codigos de 6
 > digitos se preservan como clave de negocio (`Module.LegacyModuleCode`); la

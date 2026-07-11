@@ -279,7 +279,7 @@ legacy alimentan el ETL historico; el sistema vivo escribe solo a `AdminAuditLog
 
 - [[Visión y entorno]] - arquitectura, seguridad (14), deploy (15), riesgos (17)
 - [[Shell del sistema - Master + Controles compartidos]] - login, permisos, SignalR y auditoria en el shell
-- [[00 - Prototipo Final ECOREX]] - aspecto destino
+- [[Visión y entorno|Prototipo Final ECOREX]] - aspecto destino
 - [[Gestion de Empresas - Admin multi-tenant]] - multi-tenant real y correccion de errores heredados
 - [[00 - Visión Formularios]] / [[00 - Visión Flujos]] - EAV y BPMN (union `FORX_DATA_FLUJO`)
 

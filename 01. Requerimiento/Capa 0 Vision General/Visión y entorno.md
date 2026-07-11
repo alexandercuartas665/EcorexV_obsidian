@@ -12,7 +12,7 @@ stack_destino: .NET 10 / ASP.NET Core / EF Core 10 / Blazor
 > (`GestionMovil`). Este documento describe el sistema DESTINO — que se va a
 > construir y por que — y conserva al final el entorno del sistema ORIGEN como
 > referencia de migracion. El aspecto y la navegacion definitivos estan en
-> [[00 - Prototipo Final ECOREX]].
+> [[Visión y entorno|Prototipo Final ECOREX]].
 
 ## 1. Vision general de la plataforma
 
@@ -56,7 +56,7 @@ y escalabilidad horizontal.
 
 ## 2. Analisis del prototipo
 
-El prototipo final ([[00 - Prototipo Final ECOREX]], `ECOREX - Prototipo Final.html`)
+El prototipo final ([[Visión y entorno|Prototipo Final ECOREX]], `ECOREX - Prototipo Final.html`)
 fija el aspecto y la interaccion definitivos. Es una SPA React de referencia
 visual — no codigo de produccion — que evidencia con claridad la orientacion del
 producto:
@@ -410,11 +410,11 @@ columna `SUCURSAL`. Tenant demo: **SKY SYSTEM**.
   Analitica), Agentes IA, SISTEMA (General, Desarrollo: Reglas/SQL/Controles/Reportes...).
 
 El aspecto DESTINO que reemplaza a este shell legacy esta en
-[[00 - Prototipo Final ECOREX]].
+[[Visión y entorno|Prototipo Final ECOREX]].
 
 ## Relacion con otras notas
 
-- [[00 - Prototipo Final ECOREX]] — aspecto y navegacion definitivos
+- [[Visión y entorno|Prototipo Final ECOREX]] — aspecto y navegacion definitivos
 - [[Gestion de Empresas - Admin multi-tenant]] — multi-tenant real y correccion de errores
 - [[Puntos ciegos y motores transversales]] — motores transversales del origen
 - [[HOJA DE RUTA DESARROLLO]] — fases de la migracion

@@ -12,7 +12,7 @@ modulos_cubiertos: [Visor por token, Mis Tareas Cliente 000620, Formulario 00031
 >
 > En el sistema destino .NET 10, Carlos ve una **pagina publica aislada** (nunca el
 > shell del tenant) y Maria trabaja dentro del layout del
-> [[00 - Prototipo Final ECOREX]]. Vision en [[Visión y entorno]].
+> [[Visión y entorno|Prototipo Final ECOREX]]. Vision en [[Visión y entorno]].
 
 ---
 
@@ -212,7 +212,7 @@ Maria puede ver Reglas y Flujos pero NO tiene la policy para editarlos (solo And
 
 ## Enlaces a documentacion tecnica
 
-- Aspecto y navegacion destino: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion destino: [[Visión y entorno|Prototipo Final ECOREX]]
 - Vision maestra del sistema: [[Visión y entorno]]
 - Visor por token: [[Visor por token - docu_viewform]]
 - Constructor de formularios: [[00 - Visión Formularios]]

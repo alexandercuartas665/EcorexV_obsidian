@@ -14,7 +14,7 @@ destino_clase: RulesEngine
 > pero el ejecutor generico `cl_manejador_Reglas` lee de tablas
 > (`TURNOS_REGLAS_R`) que no existen en `db3dev` -> esta roto. Fija primero como
 > el DESTINO elimina esta clase de error y conserva el analisis. Enlaza con
-> [[Visión y entorno]] (seccion 9), [[00 - Prototipo Final ECOREX]] y
+> [[Visión y entorno]] (seccion 9), [[Visión y entorno|Prototipo Final ECOREX]] y
 > [[Reglas - Quien invoca realmente (cierre)]].
 
 ## D. Encuadre DESTINO — RulesEngine

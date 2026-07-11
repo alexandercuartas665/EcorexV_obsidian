@@ -21,7 +21,7 @@ nivel_completitud: 90 por ciento
 > RLS) y conserva el sistema ORIGEN (WebForms + VB.NET + `MotherData`, multi-tenant
 > por columna `SUCURSAL`) como **referencia de migracion / plano del ETL**. Cada
 > nota tecnica separa ORIGEN (que hacia el legacy) de DESTINO (como se reconstruye).
-> El aspecto y la navegacion definitivos estan en [[00 - Prototipo Final ECOREX]] y
+> El aspecto y la navegacion definitivos estan en [[Visión y entorno|Prototipo Final ECOREX]] y
 > la vision maestra en [[Visión y entorno]].
 >
 > **Organizacion del vault**: identica a CUBOT.nails — `01. Requerimiento`
@@ -67,6 +67,8 @@ OBSIDIAN.tareas/
 - [[Tareas y Proyectos - paginas basicas]]
 - [[ctrTareasII - Spec para reconstruir en Claude Design]] — wizard crear tarea (5 pasos)
 - [[ctrVertareasII - Spec para reconstruir en Claude Design]] — detalle + timer worklog + 4 tabs
+- [[AdmWorkflow - Motor de flujo de la tarea]] — el proceso que acompaña a una tarea: ciclo de vida, reglas por actividad, reinicios, autorizacion, mover a flujo (AdmWorkflow.vb, 1613 lineas)
+- [[crtFlujoProcesos - Graficador de flujo en el visor]] — herramienta que dibuja el flujo (bpmn-js) dentro del visor de tareas, con paneles de reglas/componentes/permisos por nodo
 
 ### Capa 3 - Flujos de Tareas BPMN (mod 000291)
 - [[00 - Visión Flujos]]
@@ -100,7 +102,7 @@ OBSIDIAN.tareas/
 - [[Agentes de IA - Arquitectura y Operacion]] — capa inteligente gobernada: AI Provider Gateway multi-proveedor, Asistente Operativo (crea/mueve tareas), Copiloto de Configuracion (propone flujos/formularios/reglas), cupos por plan, guardrails. Generaliza el `clChatGPT` legacy.
 
 ### Prototipo
-- **[[00 - Prototipo Final ECOREX]]** — prototipo visual DEFINITIVO del sistema destino (.NET 10). Es el concepto de arranque del proyecto. Recorre cada pantalla con capturas embebidas
+- **[[Visión y entorno|Prototipo Final ECOREX]]** — prototipo visual DEFINITIVO del sistema destino (.NET 10). Es el concepto de arranque del proyecto. Recorre cada pantalla con capturas embebidas
 - `ECOREX - Prototipo Final.html` — SPA React ejecutable (self-contained, doble clic)
 - `ECOREX.dc.html` + `support.js` — fuente Claude Design (para re-importar/editar)
 - `capturas/` — screenshots oficiales por pantalla (Inicio, Tableros, Proyecto, Dependencias, Modulos web, Anuncios)
@@ -153,7 +155,7 @@ OBSIDIAN.tareas/
 1. [[00 - Visión Formularios]] → 2. [[Constructor - Patron EAV y motor visual]] → 3. [[Esquema completo - Tablas y tipos de control]]
 
 ### Quiero ver como se vera el sistema nuevo
-1. [[00 - Prototipo Final ECOREX]] → abrir `ECOREX - Prototipo Final.html` en el navegador
+1. [[Visión y entorno|Prototipo Final ECOREX]] → abrir `ECOREX - Prototipo Final.html` en el navegador
 
 ### Voy a reconstruir un modulo en Claude Design
 1. [[00 - INDICE Modulos Ecorex]] → spec del modulo (Capa 6) → concepto HTML en `01. Requerimiento/Prototipo/conceptos-claude-design/`
@@ -195,7 +197,7 @@ OBSIDIAN.tareas/
 
 - **Vault adaptado a la vision destino (.NET 10)**: se reescribio la vision maestra [[Visión y entorno]] al nivel del referente CUBOT.nails (18 secciones) y luego se adaptaron ~40 notas de todas las capas (0-6, Inventario, Notas dev, Historias) para reflejar el sistema DESTINO .NET 10, conservando el analisis legacy como referencia de ETL. Patron: cada nota separa ORIGEN vs DESTINO. Trabajo hecho con 7 subagentes en paralelo + auditoria de integridad (0 links rotos reales)
 - **Capa 1 y vision como destino**: [[Gestion de Empresas - Admin multi-tenant]] y [[Visión y entorno]] son ahora specs del sistema destino (multi-tenant real, correccion de los 9 errores heredados)
-- **Prototipo Final incorporado**: llego el prototipo visual definitivo del sistema destino (.NET 10) desde Claude Design. Vive en `01. Requerimiento/Prototipo/` con su nota [[00 - Prototipo Final ECOREX]], SPA ejecutable, fuente `.dc` y 12 capturas por pantalla. **Es el concepto de arranque del proyecto**
+- **Prototipo Final incorporado**: llego el prototipo visual definitivo del sistema destino (.NET 10) desde Claude Design. Vive en `01. Requerimiento/Prototipo/` con su nota [[Visión y entorno|Prototipo Final ECOREX]], SPA ejecutable, fuente `.dc` y 12 capturas por pantalla. **Es el concepto de arranque del proyecto**
 - **Capturas viejas eliminadas**: se quitaron los 3 GIFs de produccion del sistema legacy (ya no representan el aspecto objetivo). Las referencias en Flujos/Formularios se reapuntaron al prototipo
 - **Conceptos DC agrupados**: los 5 `proto_*.html` puntuales pasaron a `Prototipo/conceptos-claude-design/` (siguen como referencia por spec de Capa 6)
 - README de capturas obsoleto eliminado
@@ -210,6 +212,6 @@ OBSIDIAN.tareas/
 ## Estado
 
 - **Total notas**: 52 md (+ prototipo final HTML/`.dc`, 12 capturas, 1 .bpmn, 5 conceptos DC)
-- **Prototipo**: [[00 - Prototipo Final ECOREX]] es la referencia visual oficial del proyecto
+- **Prototipo**: [[Visión y entorno|Prototipo Final ECOREX]] es la referencia visual oficial del proyecto
 - **Cobertura**: ~90 por ciento — el resto son TODOs listados en la [[HOJA DE RUTA DESARROLLO]]
 - **Convencion**: notas nuevas en ASCII; wikilinks por nombre de archivo (sin rutas)

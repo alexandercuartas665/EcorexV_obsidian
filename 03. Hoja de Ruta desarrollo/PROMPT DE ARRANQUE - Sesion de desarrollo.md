@@ -159,5 +159,5 @@ Primer mensaje esperado de vuelta: el resumen de entendimiento del punto 1 (no c
 ## Enlaces
 
 - [[HOJA DE RUTA DESARROLLO]] — el plan que este prompt ejecuta
-- [[Visión y entorno]] / [[00 - Prototipo Final ECOREX]] — que y como se ve
+- [[Visión y entorno]] / [[Visión y entorno|Prototipo Final ECOREX]] — que y como se ve
 - [[Conexion a la BD del sistema actual (db3dev)]] — la BD legacy (solo lectura)

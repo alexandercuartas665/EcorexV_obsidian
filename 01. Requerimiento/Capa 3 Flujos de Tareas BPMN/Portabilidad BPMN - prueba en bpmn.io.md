@@ -12,13 +12,13 @@ destino_editor: bpmn-js embebido en Blazor (JS interop)
 > por tanto portable sin lock-in. Es un **punto a favor de la migracion** a
 > .NET 10: el editor visual se reusa tal cual. Fija primero la decision DESTINO
 > y conserva el detalle de la prueba. Enlaza con [[Visión y entorno]] (seccion 7)
-> y [[00 - Prototipo Final ECOREX]].
+> y [[Visión y entorno|Prototipo Final ECOREX]].
 
 ## D. Decision de arquitectura DESTINO
 
 - **Editor visual**: se reutiliza **bpmn-js** embebido en **Blazor** via JS
   interop (marca cero horas de reescritura del editor; el prototipo aun lo lista
-  como pendiente — ver [[00 - Prototipo Final ECOREX]] "que falta").
+  como pendiente — ver [[Visión y entorno|Prototipo Final ECOREX]] "que falta").
 - **Persistencia del diagrama**: columna `xml_bpmn` en `workflow_definition`
   (jsonb en Postgres / nvarchar(max) en SQL Server, via `IEcorexDbContext`), mas
   las tablas normalizadas `workflow_node` / `workflow_edge` / `workflow_node_*`

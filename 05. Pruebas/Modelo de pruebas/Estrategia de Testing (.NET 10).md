@@ -135,7 +135,7 @@ Ver [[HOJA DE RUTA DESARROLLO]] seccion 9. Pruebas dedicadas al migrador:
 - Recorrido: login -> crear tarea -> avanzar por flujo -> completar.
 - Cambio de tenant (PlatformAdmin).
 - Aislamiento visual (un usuario no ve datos de otro tenant).
-- El aspecto coincide con [[00 - Prototipo Final ECOREX]] (smoke visual).
+- El aspecto coincide con [[Visión y entorno|Prototipo Final ECOREX]] (smoke visual).
 
 ## 6. Fixtures y seeds
 

@@ -11,7 +11,7 @@ modulos_cubiertos: [Usuarios 000073, Roles 000194, Dependencias 000850, Config E
 > guardiana de los datos maestros de SKY SYSTEM. Es **Administradora del tenant**
 > (no PlatformAdmin): gobierna usuarios, roles y organigrama DENTRO de su empresa,
 > nunca planes ni otros tenants. Trabaja en el sistema destino .NET 10 con el
-> aspecto del [[00 - Prototipo Final ECOREX]]; vision en [[Visión y entorno]].
+> aspecto del [[Visión y entorno|Prototipo Final ECOREX]]; vision en [[Visión y entorno]].
 
 ---
 
@@ -267,7 +267,7 @@ Desarrollo
 
 ## Enlaces a documentacion tecnica
 
-- Aspecto y navegacion destino: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion destino: [[Visión y entorno|Prototipo Final ECOREX]]
 - Vision maestra del sistema: [[Visión y entorno]]
 - Multi-tenant real y correccion de errores: [[Gestion de Empresas - Admin multi-tenant]]
 - Manejo de datos y permisos: [[Manejo de Datos - Alias, parametros, UDFs, consecutivos]]

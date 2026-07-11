@@ -98,7 +98,7 @@ El primer piloto (migrar un tenant real como SKY SYSTEM) requiere:
 - [ ] PlatformAdmin + gestion de tenants operativa
 - [ ] Un tenant provisionado (aislamiento probado: test cross-tenant que DEBE fallar)
 - [ ] Modulos, usuarios y permisos (policies) del tenant migrados
-- [ ] Tareas, Proyectos y Tableros funcionando con el aspecto del [[00 - Prototipo Final ECOREX|prototipo]]
+- [ ] Tareas, Proyectos y Tableros funcionando con el aspecto del [[Visión y entorno|prototipo]]
 - [ ] Al menos 1 flujo BPMN ejecutando (WorkflowEngine) end-to-end
 - [ ] Al menos 1 formulario dinamico capturando datos (jsonb)
 - [ ] Motor de reglas ejecutando un verbo Ensamblado

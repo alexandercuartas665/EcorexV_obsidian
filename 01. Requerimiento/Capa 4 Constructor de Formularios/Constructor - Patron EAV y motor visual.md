@@ -13,7 +13,7 @@ estado: documentado en profundidad (destino + referencia origen)
 > almacena** un formulario y sus respuestas -- el destino document-oriented
 > (`jsonb`/`nvarchar(max)`) y el origen EAV (`FORX_DATA`) que se conserva como
 > plano del ETL -- y **como se renderiza** (motor visual polimorfico). Stack y
-> arquitectura en [[Visión y entorno]]; aspecto en [[00 - Prototipo Final ECOREX]].
+> arquitectura en [[Visión y entorno]]; aspecto en [[Visión y entorno|Prototipo Final ECOREX]].
 
 ---
 

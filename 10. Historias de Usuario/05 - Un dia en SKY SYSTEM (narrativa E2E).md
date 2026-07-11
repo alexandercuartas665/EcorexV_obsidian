@@ -9,7 +9,7 @@ duracion_de_lectura: 12 minutos
 > Esta es la historia real de un pedido de un cliente, contada desde las 8AM
 > hasta que se cierra la tarea al final del dia, en el **sistema destino .NET 10**.
 > Atraviesa los modulos del prototipo final y muestra como se conectan en la
-> practica. Aspecto en [[00 - Prototipo Final ECOREX]]; vision en [[Visión y entorno]].
+> practica. Aspecto en [[Visión y entorno|Prototipo Final ECOREX]]; vision en [[Visión y entorno]].
 
 ---
 
@@ -340,7 +340,7 @@ AdminAuditLog inmutable.
 
 Cada seccion de esta narrativa tiene su detalle tecnico en otro doc del vault. Sugerido leer despues:
 
-1. Aspecto y navegacion destino: [[00 - Prototipo Final ECOREX]]
+1. Aspecto y navegacion destino: [[Visión y entorno|Prototipo Final ECOREX]]
 2. Vision maestra del sistema: [[Visión y entorno]]
 3. Motor BPMN completo: [[00 - Visión Flujos]]
 4. Motor de Reglas: [[Reglas - Catalogo real y verbos Ensamblado]]

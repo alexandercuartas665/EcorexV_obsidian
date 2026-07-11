@@ -162,12 +162,6 @@ varios tenants, se elige al iniciar sesion (`UserTenant`, multi-tenant real).
 
 ## 11. Tenants cliente en PRODUCCION (onboarding desde db3dev, 2026-07-09)
 
-> [!warning] Credenciales iniciales de personas reales (de prueba, rotables)
-> Cuentas sembradas desde el legacy db3dev con `LegacyOnboardingSeeder`. La clave
-> inicial de cada usuario es su **cedula (ID_USUARIO)**; cada quien la cambia en su
-> primer acceso. Son cedulas/correos reales: si este vault se mantiene publico,
-> considerar pasarlo a **privado**. Rotar tras las pruebas.
-
 Mapeo: SUCURSAL `01` -> **BITCODE**, `00136` -> **SKY SYSTEM**; tercer tenant
 **agrometalicas** creado a mano. Todos rol **Owner**.
 **Regla de acceso: login = correo corporativo, clave = cedula del usuario.**

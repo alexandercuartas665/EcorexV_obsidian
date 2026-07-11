@@ -15,7 +15,7 @@ stack_destino: .NET 10 / EF Core 10 / PostgreSQL o SQL Server
 > relaciones logicas). La **seccion 9 es el mapeo ORIGEN -> DESTINO**: la tabla
 > que el desarrollador de .NET 10 usa para crear las entidades. Vision maestra en
 > [[Visión y entorno]] (seccion 4 multi-tenant, 13 persistencia); aspecto en
-> [[00 - Prototipo Final ECOREX]].
+> [[Visión y entorno|Prototipo Final ECOREX]].
 
 ## 0. Principios del esquema DESTINO
 

@@ -12,7 +12,7 @@ stack_destino: .NET 10 / ASP.NET Core / Blazor / SignalR
 > cual cada pantalla renderiza solo su cuerpo. Este documento describe el shell
 > DESTINO sobre **.NET 10 / Blazor** - el layout de doble panel del prototipo - y
 > conserva al final el shell ORIGEN (WebForms `MasterFormsII`) como referencia de
-> migracion. El aspecto definitivo esta en [[00 - Prototipo Final ECOREX]]; la
+> migracion. El aspecto definitivo esta en [[Visión y entorno|Prototipo Final ECOREX]]; la
 > arquitectura global en [[Visión y entorno]].
 
 ---
@@ -285,7 +285,7 @@ embebido con contexto del modulo; deshabilitado. En destino se retoma como
 
 ## Relacion con otras notas
 
-- [[00 - Prototipo Final ECOREX]] - aspecto y navegacion definitivos del shell destino
+- [[Visión y entorno|Prototipo Final ECOREX]] - aspecto y navegacion definitivos del shell destino
 - [[Visión y entorno]] - arquitectura global y stack destino
 - [[Puntos ciegos y motores transversales]] - PermissionsManager (policies), SignalR, ChatGPT, auditoria
 - [[Gestion de Empresas - Admin multi-tenant]] - resolucion de tenant y branding por empresa

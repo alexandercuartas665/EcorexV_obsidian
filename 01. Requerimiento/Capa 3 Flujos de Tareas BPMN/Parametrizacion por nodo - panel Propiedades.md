@@ -14,7 +14,7 @@ destino_componente: WorkflowNodePropertiesPanel (Blazor) + workflow_node_* (EF C
 > reconstruye en el DESTINO como un panel **Blazor** ligado al evento
 > `element.click` de bpmn-js via JS interop. Fija primero el encuadre destino y
 > conserva el analisis del origen. Enlaza con [[Visión y entorno]],
-> [[00 - Prototipo Final ECOREX]] y [[00 - Visión Flujos]].
+> [[Visión y entorno|Prototipo Final ECOREX]] y [[00 - Visión Flujos]].
 
 ## D. Encuadre DESTINO — panel de propiedades Blazor
 

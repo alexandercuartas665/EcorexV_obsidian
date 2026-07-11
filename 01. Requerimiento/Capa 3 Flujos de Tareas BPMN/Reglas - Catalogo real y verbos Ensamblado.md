@@ -12,7 +12,7 @@ destino_clase: RulesEngine / IRuleVerb registry
 > 0 `mDATA`. Es la evidencia de que en la practica solo el modo Ensamblado esta
 > en uso. Fija primero como el DESTINO formaliza estos verbos y conserva el
 > catalogo. Enlaza con [[Visión y entorno]] (seccion 9),
-> [[00 - Prototipo Final ECOREX]] y [[Reglas - Quien invoca realmente (cierre)]].
+> [[Visión y entorno|Prototipo Final ECOREX]] y [[Reglas - Quien invoca realmente (cierre)]].
 
 ## D. Encuadre DESTINO — registro de verbos tipado
 

@@ -13,7 +13,7 @@ proposito: entender el sistema desde el punto de vista de las personas que lo us
 > "abre el sistema", ve el layout del prototipo final: rail de iconos, sidebar
 > `SKY SYSTEM / Plan Empresa - ECOREX`, dashboard "Buenos dias" con tarjetas KPI y
 > tableros Kanban. El aspecto y la navegacion definitivos estan en
-> [[00 - Prototipo Final ECOREX]] y la vision maestra en [[Visión y entorno]].
+> [[Visión y entorno|Prototipo Final ECOREX]] y la vision maestra en [[Visión y entorno]].
 
 ---
 

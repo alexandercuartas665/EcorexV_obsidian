@@ -2529,6 +2529,92 @@
       </div>
       </sc-if>
 
+      <!-- ===== PROGRAMAR ACTIVIDAD (000889) ===== -->
+      <sc-if value="{{isProgramar}}" hint-placeholder-val="">
+      <div style="padding:var(--pad)">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;justify-content:space-between;margin-bottom:18px">
+          <div>
+            <div style="font-size:11px;color:var(--ink-3);font-weight:600;letter-spacing:.04em;margin-bottom:5px">MÓDULO 000889 · TAREAS</div>
+            <h1 style="font-weight:800;font-size:28px;letter-spacing:-.03em">Programar actividad</h1>
+            <p style="color:var(--ink-2);font-size:14px;margin-top:6px">Programa notificaciones/alertas o la creación automática de actividades con reglas de repetición.</p>
+          </div>
+          <button onClick="{{openPrgNew}}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:11px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-weight:700;font-size:13.5px;cursor:pointer" style-hover="opacity:.9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Nueva programación</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--sh-sm);overflow:hidden">
+          <div style="display:grid;grid-template-columns:120px 1.6fr 1.2fr 1.3fr 90px 44px;background:var(--surface-2);border-bottom:1px solid var(--line)">
+            <div style="padding:11px 16px;font-size:10.5px;font-weight:600;color:var(--ink-3)">TIPO</div><div style="padding:11px 12px;font-size:10.5px;font-weight:600;color:var(--ink-3)">NOMBRE</div><div style="padding:11px 12px;font-size:10.5px;font-weight:600;color:var(--ink-3)">REGLA</div><div style="padding:11px 12px;font-size:10.5px;font-weight:600;color:var(--ink-3)">CANALES</div><div style="padding:11px 12px;font-size:10.5px;font-weight:600;color:var(--ink-3)">ESTADO</div><div></div>
+          </div>
+          <sc-for list="{{prgListRows}}" as="p" hint-placeholder-count="3">
+            <div onClick="{{p.edit}}" style="display:grid;grid-template-columns:120px 1.6fr 1.2fr 1.3fr 90px 44px;border-top:1px solid var(--line);align-items:center;cursor:pointer" style-hover="background:var(--surface-2)">
+              <div style="padding:12px 16px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;background:{{p.tipoSoft}};color:{{p.tipoColor}}">{{p.tipoLabel}}</span></div>
+              <div style="padding:12px 12px;min-width:0"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{p.nombre}}</div><div style="font-size:11px;color:var(--ink-3)">{{p.sub}}</div></div>
+              <div style="padding:12px 12px;font-size:12.5px;color:var(--ink-2)">{{p.regla}}</div>
+              <div style="padding:12px 12px;font-size:12px;color:var(--ink-2)">{{p.canales}}</div>
+              <div style="padding:12px 12px"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;background:{{p.estSoft}};color:{{p.estColor}}">{{p.estado}}</span></div>
+              <div style="display:grid;place-items:center;color:var(--ink-3)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{prgModalOpen}}" hint-placeholder-val="">
+        <div onClick="{{closePrg}}" style="position:fixed;inset:0;z-index:60;background:rgba(15,15,18,.5);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;animation:ec-fade .15s ease">
+          <div onClick="{{stop}}" style="width:min(620px,96vw);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--line-2);border-radius:20px;box-shadow:var(--sh-lg);animation:ec-pop .2s ease">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2">
+              <div><div style="font-size:11px;color:var(--ink-3);font-weight:600;letter-spacing:.04em;margin-bottom:3px">PROGRAMACIÓN</div><div style="font-weight:800;font-size:19px;letter-spacing:-.01em">Nueva programación</div></div>
+              <button onClick="{{closePrg}}" style="width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink-2)" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+            </div>
+            <div style="padding:22px 24px">
+              <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);margin-bottom:9px">¿QUÉ DESEAS PROGRAMAR?</label>
+              <div style="display:flex;gap:12px;margin-bottom:20px"><sc-for list="{{prgTipoTabs}}" as="t" hint-placeholder-count="2"><button onClick="{{t.go}}" style="{{t.style}}">{{t.svg}}{{t.label}}</button></sc-for></div>
+              <label style="display:block;font-size:11.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px">Nombre</label>
+              <input value="{{prgName}}" onInput="{{onPrgName}}" placeholder="Ej. Recordatorio pago proveedores" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--line-2);border-radius:11px;background:var(--surface-2);font:inherit;font-size:14px;color:var(--ink);outline:none;margin-bottom:18px">
+              <sc-if value="{{prgIsAct}}" hint-placeholder-val="">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;padding:14px;background:var(--t-violet-bg);border-radius:12px">
+                  <div><label style="display:block;font-size:11px;font-weight:600;color:var(--ink-2);margin-bottom:6px">Categoría de la actividad</label><select value="{{prgCatSel}}" onChange="{{onPrgCat}}" style="width:100%;height:40px;padding:0 11px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{prgCatOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.value}}">{{o.label}}</option></sc-for></select></div>
+                  <div><label style="display:block;font-size:11px;font-weight:600;color:var(--ink-2);margin-bottom:6px">Sub-categoría</label><select value="{{prgSubSel}}" onChange="{{onPrgSub}}" style="width:100%;height:40px;padding:0 11px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{prgSubOpts}}" as="o" hint-placeholder-count="2"><option value="{{o.value}}">{{o.label}}</option></sc-for></select></div>
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><label style="font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3)">CONJUNTOS DE REGLAS DE EJECUCIÓN</label><button onClick="{{prgAddRule}}" style="height:30px;padding:0 12px;border-radius:8px;border:1px dashed var(--line-2);background:none;color:var(--ink-3);font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px" style-hover="border-color:var(--brand);color:var(--brand)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Agregar regla</button></div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:20px">
+                <sc-for list="{{prgRuleRows}}" as="r" hint-placeholder-count="1">
+                  <div style="border:1px solid var(--line);border-radius:12px;background:var(--surface-2);overflow:hidden">
+                    <div style="display:flex;align-items:center;gap:9px;padding:11px 13px;border-bottom:1px solid var(--line)">
+                      <span style="width:24px;height:24px;flex:none;border-radius:7px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:11px;font-weight:800">{{r.idxLabel}}</span>
+                      <span style="flex:1;font-size:12px;color:var(--ink-2);min-width:0">{{r.resumen}}</span>
+                      <button onClick="{{r.remove}}" title="Quitar" style="width:28px;height:28px;flex:none;border:none;background:none;border-radius:7px;cursor:pointer;color:var(--ink-3);display:grid;place-items:center" style-hover="background:var(--t-rose-bg);color:var(--danger)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+                    </div>
+                    <div style="padding:13px;display:flex;flex-direction:column;gap:11px">
+                      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                        <span style="font-size:11.5px;font-weight:600;color:var(--ink-3);width:70px">Frecuencia</span>
+                        <select value="{{r.tipo}}" onChange="{{r.onTipo}}" style="height:36px;padding:0 9px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{r.freqOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.value}}">{{o.label}}</option></sc-for></select>
+                        <sc-if value="{{r.notUna}}" hint-placeholder-val="{{true}}"><span style="font-size:12px;color:var(--ink-3)">cada</span><input value="{{r.cada}}" onInput="{{r.onCada}}" style="width:52px;height:36px;padding:0 8px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;text-align:center;color:var(--ink);outline:none"><span style="font-size:12px;color:var(--ink-3)">{{r.cadaUnit}}</span></sc-if>
+                      </div>
+                      <sc-if value="{{r.isSemanal}}" hint-placeholder-val="">
+                        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:600;color:var(--ink-3);width:70px">Días</span><sc-for list="{{r.diasChips}}" as="d" hint-placeholder-count="7"><button onClick="{{d.toggle}}" style="{{d.style}}">{{d.label}}</button></sc-for></div>
+                      </sc-if>
+                      <sc-if value="{{r.isMensual}}" hint-placeholder-val="">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:600;color:var(--ink-3);width:70px">El</span><select value="{{r.ordinal}}" onChange="{{r.onOrdinal}}" style="height:36px;padding:0 9px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{r.ordinalOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.value}}">{{o.label}}</option></sc-for></select><select value="{{r.diaSem}}" onChange="{{r.onDiaSem}}" style="height:36px;padding:0 9px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{r.diaSemOpts}}" as="o" hint-placeholder-count="8"><option value="{{o.value}}">{{o.label}}</option></sc-for></select></div>
+                      </sc-if>
+                      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding-top:11px;border-top:1px solid var(--line)">
+                        <span style="font-size:11.5px;font-weight:600;color:var(--ink-3);width:70px">Repetir</span>
+                        <div onClick="{{r.toggleRepite}}" style="{{r.repSwitch}}"><span style="{{r.repKnob}}"></span></div>
+                        <sc-if value="{{r.repite}}" hint-placeholder-val=""><span style="font-size:12px;color:var(--ink-3)">cada</span><input value="{{r.cadaH}}" onInput="{{r.onCadaH}}" style="width:48px;height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12.5px;text-align:center;color:var(--ink);outline:none"><span style="font-size:12px;color:var(--ink-3)">h, de</span><input type="time" value="{{r.desde}}" onInput="{{r.onDesde}}" style="height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;color:var(--ink);outline:none"><span style="font-size:12px;color:var(--ink-3)">a</span><input type="time" value="{{r.hasta}}" onInput="{{r.onHasta}}" style="height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;color:var(--ink);outline:none"></sc-if>
+                        <sc-if value="{{r.repite}}" hint-placeholder-val="{{true}}"><span style="font-size:12px;color:var(--ink-3)">a las</span><input type="time" value="{{r.hora}}" onInput="{{r.onHora}}" style="height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;color:var(--ink);outline:none"></sc-if>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:600;color:var(--ink-3);width:70px">Vigencia</span><span style="font-size:12px;color:var(--ink-3)">desde</span><input type="date" value="{{r.inicio}}" onInput="{{r.onInicio}}" style="height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;color:var(--ink);outline:none"><span style="font-size:12px;color:var(--ink-3)">hasta</span><input type="date" value="{{r.fin}}" onInput="{{r.onFin}}" style="height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12px;color:var(--ink);outline:none"><span style="font-size:11px;color:var(--ink-3)">(sin fin si vacío)</span></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);margin-bottom:10px">CANALES DE TRANSMISIÓN</label>
+              <div style="display:flex;gap:9px;flex-wrap:wrap"><sc-for list="{{prgChannelChips}}" as="c" hint-placeholder-count="4"><button onClick="{{c.toggle}}" style="{{c.style}}">{{c.svg}}{{c.label}}</button></sc-for></div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:10px;padding:0 24px 20px"><button onClick="{{closePrg}}" style="height:42px;padding:0 18px;border-radius:11px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-weight:600;font-size:13.5px;color:var(--ink-2);cursor:pointer" style-hover="background:var(--surface-3)">Cancelar</button><button onClick="{{closePrg}}" style="height:42px;padding:0 22px;border-radius:11px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Guardar programación</button></div>
+          </div>
+        </div>
+      </sc-if>
+      </sc-if>
+
       <!-- ===== CLIENTES (000232) ===== -->
       <sc-if value="{{isClientes}}" hint-placeholder-val="">
       <div style="padding:var(--pad)">
@@ -3227,9 +3313,9 @@
             </div>
             <div onDragOver="{{col.onDragOver}}" onDrop="{{col.onDrop}}" style="display:flex;flex-direction:column;gap:12px;min-height:60px">
               <sc-for list="{{col.cards}}" as="c" hint-placeholder-count="2">
-                <div draggable="true" onClick="{{c.open}}" onDragStart="{{c.onDragStart}}" onDragEnd="{{c.onDragEnd}}" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--sh-sm);cursor:grab" style-hover="box-shadow:var(--sh-md);border-color:var(--line-2)">
+                <div draggable="true" onClick="{{c.open}}" onDragStart="{{c.onDragStart}}" onDragEnd="{{c.onDragEnd}}" style="background:var(--surface);border:1px solid var(--line);border-left:3px solid {{c.cardAccent}};border-radius:16px;padding:16px;box-shadow:var(--sh-sm);cursor:grab" style-hover="box-shadow:var(--sh-md);border-color:var(--line-2)">
                   <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px">
-                    <div style="flex:1;font-size:14.5px;font-weight:700;line-height:1.3;letter-spacing:-.01em">{{c.title}}</div>
+                    <div style="flex:1;font-size:14.5px;font-weight:700;line-height:1.3;letter-spacing:-.01em;color:{{c.titleColor}}">{{c.title}}</div>
                     <button style="width:22px;height:22px;flex:none;border-radius:6px;border:none;background:none;color:var(--ink-3);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--surface-3)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></button>
                   </div>
                   <p style="font-size:12.5px;color:var(--ink-2);line-height:1.45;margin-bottom:14px">{{c.desc}}</p>
@@ -3339,10 +3425,8 @@
         <div onClick="{{taskModalData.close}}" style="position:fixed;inset:0;z-index:60;background:rgba(15,15,18,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:2.5vh 2vw;animation:ec-fade .15s ease">
           <div onClick="{{stop}}" style="width:min(1200px,96vw);height:92vh;background:var(--surface);border:1px solid var(--line-2);border-radius:20px;box-shadow:var(--sh-lg);overflow:hidden;display:flex;flex-direction:column;animation:ec-pop .2s ease">
             <!-- header -->
-            <div style="display:flex;align-items:center;gap:12px;padding:16px 26px;border-bottom:1px solid var(--line);flex:none">
-              <div style="flex:1;min-width:0;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ECOREX <span style="color:var(--line-2)">/</span> Actividades <span style="color:var(--line-2)">/</span> <span style="color:var(--ink);font-weight:600">{{taskModalData.code}} · {{taskModalData.title}}</span></div>
-              <button style="height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg> Anterior</button>
-              <button style="height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface-3);color:var(--ink)">Siguiente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></button>
+            <div style="{{taskModalData.headerStyle}}">
+              <div style="flex:1;min-width:0;font-size:12.5px;color:{{taskModalData.crumbColor}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">ECOREX / Actividades / <span style="font-weight:600">{{taskModalData.code}} · {{taskModalData.title}}</span></div>
               <button onClick="{{taskModalData.close}}" style="width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink-2)" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
             </div>
             <!-- tabs -->
@@ -3357,10 +3441,17 @@
                 <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--sh-sm)">
                   <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
                     <div style="flex:1;min-width:0">
-                      <h2 style="font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.2">{{taskModalData.code}} · {{taskModalData.title}}</h2>
+                      <h2 style="font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.2;color:{{taskModalData.titleColor}}">{{taskModalData.code}} · {{taskModalData.title}}</h2>
                       <div style="font-size:12.5px;color:var(--ink-3);margin-top:5px">Encargado: <b style="color:var(--ink-2)">{{taskModalData.encargado}}</b> · Cliente: <b style="color:var(--ink-2)">{{taskModalData.cliente}}</b></div>
                     </div>
-                    <span style="width:24px;height:24px;border-radius:7px;background:{{taskModalData.colColor}};border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line-2);cursor:pointer" title="Color del caso"></span>
+                    <div style="position:relative">
+                      <span onClick="{{taskModalData.toggleColorMenu}}" style="width:24px;height:24px;border-radius:7px;background:{{taskModalData.colColor}};border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line-2);cursor:pointer;display:block" title="Color de la tarjeta y el título"></span>
+                      <sc-if value="{{taskModalData.colorMenuOpen}}" hint-placeholder-val="">
+                        <div style="position:absolute;top:32px;right:0;z-index:20;display:flex;gap:7px;padding:9px;background:var(--surface);border:1px solid var(--line-2);border-radius:11px;box-shadow:var(--sh-lg);animation:ec-pop .14s ease">
+                          <sc-for list="{{taskModalData.colorSwatches}}" as="sw" hint-placeholder-count="6"><span onClick="{{sw.pick}}" style="{{sw.style}}"></span></sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
                   </div>
                   <!-- meta pills -->
                   <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
@@ -3372,36 +3463,75 @@
                   </div>
                   <!-- acciones -->
                   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
-                    <button style="height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg> Asignar</button>
-                    <button style="height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer" style-hover="background:var(--surface-3);color:var(--ink)">Reasignar</button>
-                    <button style="height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--amber);cursor:pointer" style-hover="background:var(--t-amber-bg)">Suspender</button>
-                    <button style="height:34px;padding:0 15px;border-radius:9px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="opacity:.9">Guardar avance</button>
+                    <button onClick="{{taskModalData.prev}}" title="Tarea anterior" style="height:34px;width:34px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--ink-2)" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+                    <button onClick="{{taskModalData.next}}" title="Tarea siguiente" style="height:34px;width:34px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--ink-2)" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
                     <span style="width:1px;height:24px;background:var(--line-2);margin:0 2px"></span>
-                    <span style="font-size:12px;color:var(--ink-3);align-self:center">Mover a:</span>
-                    <sc-for list="{{taskModalData.moveOptions}}" as="m" hint-placeholder-count="4"><button onClick="{{m.go}}" style="{{m.style}}">{{m.label}}</button></sc-for>
+                    <button style="height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"></path></svg> Asignar / Reasignar</button>
+                    <button onClick="{{taskModalData.toggleSusp}}" style="{{taskModalData.suspStyle}}" style-hover="opacity:.85">{{taskModalData.suspLabel}}</button>
+                    <button onClick="{{taskModalData.toggleClose}}" style="{{taskModalData.closeStyle}}" style-hover="opacity:.9">{{taskModalData.closeLabel}}</button>
+                    <span style="width:1px;height:24px;background:var(--line-2);margin:0 2px"></span>
+                    <span style="font-size:12px;color:var(--ink-3);align-self:center">Avance:</span>
+                    <select value="{{taskModalData.moveCur}}" onChange="{{taskModalData.onMove}}" style="height:34px;padding:0 30px 0 12px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{taskModalData.moveOptions}}" as="m" hint-placeholder-count="4"><option value="{{m.key}}">{{m.label}}</option></sc-for></select>
                   </div>
                 </div>
 
                 <!-- FLUJO DEL PROCESO -->
+                <sc-if value="{{taskModalData.hasFlow}}" hint-placeholder-val="{{true}}">
                 <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-                    <div><div style="font-weight:700;font-size:14px">{{taskModalData.procName}}</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">{{taskModalData.stepPos}}</div></div>
-                    <div style="display:flex;gap:8px">
-                      <button style="height:34px;padding:0 14px;border-radius:9px;border:none;background:var(--t-green);color:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="opacity:.9">Continuar →</button>
-                      <button style="height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--danger);cursor:pointer" style-hover="background:var(--t-rose-bg)">Rechazar</button>
+                    <div><div style="font-weight:700;font-size:14px">{{taskModalData.flow.name}}</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">Toca un nodo para saltar a ese paso · abre su menú para anotar o cerrar</div></div>
+                    <div style="display:flex;align-items:center;gap:12px;font-size:11px;color:var(--ink-3)">
+                      <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:var(--t-blue)"></span>Automático</span>
+                      <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:var(--t-violet)"></span>Manual</span>
                     </div>
                   </div>
-                  <div style="display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:4px">
-                    <sc-for list="{{taskModalData.steps}}" as="s" hint-placeholder-count="4">
-                      <span style="{{s.chipStyle}}">
-                        <sc-if value="{{s.done}}" hint-placeholder-val=""><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"></path></svg></sc-if>
-                        <sc-if value="{{s.current}}" hint-placeholder-val=""><span style="width:8px;height:8px;border-radius:50%;background:{{s.color}};animation:ec-pulse 1.4s infinite"></span></sc-if>
-                        {{s.name}}
-                      </span>
-                      <sc-if value="{{s.last}}" hint-placeholder-val="{{true}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></sc-if>
-                    </sc-for>
+                  <div onClick="{{taskModalData.flow.closeMenu}}" style="position:relative;overflow-x:auto;padding:4px 2px 8px">
+                    <div style="position:relative;width:{{taskModalData.flow.W}};height:{{taskModalData.flow.H}}">
+                      <svg width="{{taskModalData.flow.W}}" height="{{taskModalData.flow.H}}" viewBox="{{taskModalData.flow.vb}}" style="position:absolute;inset:0;pointer-events:none">
+                        <sc-for list="{{taskModalData.flow.edges}}" as="e" hint-placeholder-count="4">
+                          <path d="{{e.d}}" fill="none" stroke="{{e.stroke}}" stroke-width="{{e.sw}}" marker-end="url(#flowarrow)"></path>
+                          <sc-if value="{{e.hasLabel}}" hint-placeholder-val=""><text x="{{e.lx}}" y="{{e.ly}}" fill="{{e.labelColor}}" font-size="10" font-weight="700" text-anchor="middle">{{e.label}}</text></sc-if>
+                        </sc-for>
+                        <defs><marker id="flowarrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--line-2)"></path></marker></defs>
+                      </svg>
+                      <sc-for list="{{taskModalData.flow.nodes}}" as="n" hint-placeholder-count="5">
+                        <div style="{{n.nodeStyle}}" onClick="{{n.pick}}">
+                          <sc-if value="{{n.isGw}}" hint-placeholder-val="">
+                            <div style="{{n.gwBgStyle}}"></div>
+                            <div style="{{n.gwInnerStyle}}">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12a3 3 0 0 0 3 3h6"></path><path d="m18 15 3 3-3 3"></path></svg>
+                              <span onClick="{{n.openMenu}}" style="font-size:8.5px;font-weight:800;cursor:pointer;line-height:1">Rutas ⋯</span>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{n.notGw}}" hint-placeholder-val="{{true}}">
+                            <div style="display:flex;align-items:center;justify-content:center;gap:5px"><span style="display:flex">{{n.iconSvg}}</span><span style="font-size:11.5px;font-weight:700;line-height:1.15">{{n.label}}</span><span onClick="{{n.openMenu}}" style="margin-left:2px;opacity:.7;cursor:pointer">⋯</span></div>
+                            <sc-if value="{{n.autoBadge}}" hint-placeholder-val=""><div style="display:inline-flex;align-items:center;gap:3px;margin-top:4px;font-size:8px;font-weight:800;letter-spacing:.04em;padding:1px 6px;border-radius:4px;background:var(--t-blue);color:#fff"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-3 7h5l-3 7"/></svg>AUTOMÁTICO</div></sc-if>
+                            <sc-if value="{{n.notRobot}}" hint-placeholder-val="{{true}}"><div style="font-size:9px;opacity:.8;margin-top:3px">{{n.by}}</div></sc-if>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px"><sc-if value="{{n.closed}}" hint-placeholder-val=""><span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--t-green);color:#fff">CERRADO</span></sc-if><sc-if value="{{n.hasNote}}" hint-placeholder-val=""><span title="Tiene anotación" style="font-size:9px">💬</span></sc-if></div>
+                          </sc-if>
+                          <sc-if value="{{n.menuOpen}}" hint-placeholder-val="">
+                            <div onClick="{{stop}}" style="{{n.menuWrap}}">
+                              <div style="width:220px;background:var(--surface);border:1px solid var(--line-2);border-radius:11px;box-shadow:var(--sh-lg);padding:11px;text-align:left;animation:ec-pop .13s ease">
+                              <sc-if value="{{n.isGw}}" hint-placeholder-val="">
+                                <div style="font-size:10.5px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:8px">¿QUÉ RUTA TOMAR?</div>
+                                <sc-for list="{{n.routes}}" as="r" hint-placeholder-count="2">
+                                  <button onClick="{{r.pick}}" style="{{r.style}}"><span style="width:20px;height:20px;flex:none;border-radius:6px;background:var(--surface-2);display:grid;place-items:center;font-size:10px;font-weight:800">{{r.label}}</span><span style="flex:1;min-width:0">→ {{r.to}}</span></button>
+                                </sc-for>
+                              </sc-if>
+                              <sc-if value="{{n.notGw}}" hint-placeholder-val="{{true}}">
+                                <div style="font-size:10.5px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:6px">ANOTACIÓN PARA EL EQUIPO</div>
+                                <textarea value="{{n.note}}" onInput="{{n.onNote}}" placeholder="Escribe una nota…" style="width:100%;min-height:52px;padding:8px 9px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);font:inherit;font-size:12px;color:var(--ink);outline:none;resize:vertical;line-height:1.45"></textarea>
+                                <button onClick="{{n.toggleClose}}" style="width:100%;margin-top:8px;height:32px;border-radius:8px;border:none;background:var(--t-green);color:#fff;font:inherit;font-size:12px;font-weight:600;cursor:pointer">{{n.closeLabel}}</button>
+                              </sc-if>
+                              </div>
+                            </div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
                   </div>
                 </div>
+                </sc-if>
 
                 <!-- GRID main + sidebar -->
                 <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:16px;align-items:start">
@@ -3470,10 +3600,171 @@
                 </div>
               </div>
               </sc-if>
-              <sc-if value="{{taskModalData.notGeneral}}" hint-placeholder-val="">
-                <div style="padding:60px 26px;text-align:center;color:var(--ink-3)">
-                  <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px;display:block;opacity:.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M9 3v18M3 9h6"></path></svg>
-                  <div style="font-size:14px">Contenido de esta pestaña en construcción</div>
+              <!-- ===== AVANZADO ===== -->
+              <sc-if value="{{taskModalData.isAvanzado}}" hint-placeholder-val="">
+                <div style="padding:22px 26px;display:flex;flex-direction:column;gap:16px">
+                  <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                      <div><div style="font-weight:700;font-size:14px">Reenviar seguimiento</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">Comparte el avance de esta actividad con otra persona</div></div>
+                      <div onClick="{{taskModalData.adv.toggleFwd}}" style="{{taskModalData.adv.fwdSwitch}}"><span style="{{taskModalData.adv.fwdKnob}}"></span></div>
+                    </div>
+                    <sc-if value="{{taskModalData.adv.fwdOn}}" hint-placeholder-val="">
+                      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+                        <div style="font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);margin-bottom:9px">ENVIAR SEGUIMIENTO A</div>
+                        <div style="display:flex;flex-direction:column;gap:7px">
+                          <sc-for list="{{taskModalData.adv.fwdPeople}}" as="p" hint-placeholder-count="3"><label style="display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid var(--line-2);border-radius:10px;cursor:pointer" style-hover="background:var(--surface-2)"><input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:var(--brand)"><span style="width:28px;height:28px;flex:none;border-radius:50%;background:{{p.bg}};display:grid;place-items:center;color:#fff;font-weight:700;font-size:10px">{{p.ini}}</span><span style="font-size:13px;font-weight:500">{{p.name}}</span></label></sc-for>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
+                    <div style="font-weight:700;font-size:14px;margin-bottom:4px">Proyecto vinculado</div>
+                    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">Relaciona la actividad a un proyecto para seguir su ciclo</div>
+                    <select value="{{taskModalData.adv.projSel}}" onChange="{{taskModalData.adv.onProj}}" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--line-2);border-radius:11px;background:var(--surface-2);font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{taskModalData.adv.projOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.value}}">{{o.label}}</option></sc-for></select>
+                    <sc-if value="{{taskModalData.adv.hasProj}}" hint-placeholder-val="">
+                      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-size:12px;color:var(--ink-3)">Responsable · <b style="color:var(--ink-2)">{{taskModalData.adv.proj.resp}}</b></span><span style="font-size:13px;font-weight:800;color:var(--brand)">{{taskModalData.adv.proj.avance}}</span></div>
+                        <div style="display:flex;flex-direction:column;gap:2px">
+                          <sc-for list="{{taskModalData.adv.proj.fases}}" as="f" hint-placeholder-count="5">
+                            <div style="display:flex;align-items:center;gap:11px;padding:6px 0"><span style="{{f.dotStyle}}"></span><span style="{{f.lblStyle}}">{{f.name}}</span><sc-if value="{{f.current}}" hint-placeholder-val=""><span style="font-size:9px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:5px;background:var(--brand-soft);color:var(--brand)">FASE ACTUAL</span></sc-if></div>
+                          </sc-for>
+                        </div>
+                        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+                          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);margin-bottom:8px">HITO AL QUE APORTA</label>
+                          <select value="{{taskModalData.adv.hitoSel}}" onChange="{{taskModalData.adv.onHito}}" style="width:100%;height:40px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface-2);font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{taskModalData.adv.hitoOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.value}}">{{o.label}}</option></sc-for></select>
+                          <sc-if value="{{taskModalData.adv.hasHito}}" hint-placeholder-val="">
+                            <div style="margin-top:12px">
+                              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:11.5px;color:var(--ink-3)">{{taskModalData.adv.hitoProgress.label}}</span><span style="font-size:12px;font-weight:800;color:var(--brand)">{{taskModalData.adv.hitoProgress.pct}}</span></div>
+                              <div style="height:8px;border-radius:6px;background:var(--surface-3);overflow:hidden"><div style="{{taskModalData.adv.hitoProgress.barStyle}}"></div></div>
+                            </div>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <!-- TAREAS VINCULADAS -->
+                  <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px">
+                      <div style="font-weight:700;font-size:14px">Tareas vinculadas <span style="font-size:11px;font-weight:600;color:var(--ink-3)">· {{taskModalData.adv.childCount}}</span></div>
+                      <button onClick="{{taskModalData.adv.openChildForm}}" style="height:32px;padding:0 13px;border-radius:9px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="opacity:.9"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Crear tarea hija</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">Subtareas simples (heredan el vínculo, no el flujo del proceso)</div>
+                    <sc-if value="{{taskModalData.adv.childFormOpen}}" hint-placeholder-val="">
+                      <div style="border:1px solid var(--line-2);border-radius:12px;padding:14px;background:var(--surface-2);margin-bottom:12px">
+                        <input value="{{taskModalData.adv.ncTitle}}" onInput="{{taskModalData.adv.onNcTitle}}" placeholder="Título de la tarea hija…" style="width:100%;height:38px;padding:0 12px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:13px;color:var(--ink);outline:none;margin-bottom:10px">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                          <div><label style="display:block;font-size:10.5px;font-weight:600;color:var(--ink-3);margin-bottom:5px">CATEGORÍA</label><select value="{{taskModalData.adv.ncCat}}" onChange="{{taskModalData.adv.onNcCat}}" style="width:100%;height:36px;padding:0 9px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{taskModalData.adv.ncCatOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.value}}">{{o.label}}</option></sc-for></select></div>
+                          <div><label style="display:block;font-size:10.5px;font-weight:600;color:var(--ink-3);margin-bottom:5px">SUB-CATEGORÍA</label><select value="{{taskModalData.adv.ncSub}}" onChange="{{taskModalData.adv.onNcSub}}" style="width:100%;height:36px;padding:0 9px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;outline:none"><sc-for list="{{taskModalData.adv.ncSubOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.value}}">{{o.label}}</option></sc-for></select></div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button onClick="{{taskModalData.adv.closeChildForm}}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);cursor:pointer">Cancelar</button><button onClick="{{taskModalData.adv.saveChild}}" style="height:34px;padding:0 16px;border-radius:9px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer">Crear</button></div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{taskModalData.adv.hasChildren}}" hint-placeholder-val="">
+                      <div style="display:flex;flex-direction:column;gap:7px">
+                        <sc-for list="{{taskModalData.adv.childTasks}}" as="c" hint-placeholder-count="2">
+                          <div style="display:flex;align-items:center;gap:11px;padding:10px 13px;border:1px solid var(--line);border-radius:10px" style-hover="background:var(--surface-2)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9 6h11M9 12h11M9 18h11M4 6v.01M4 12v.01M4 18v.01"></path></svg>
+                            <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{c.title}}</div><div style="font-size:11px;color:var(--ink-3)">{{c.cat}} · {{c.sub}}</div></div>
+                            <span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--surface-3);color:var(--ink-2)">{{c.estado}}</span>
+                            <button onClick="{{c.open}}" title="Abrir" style="width:28px;height:28px;flex:none;border:1px solid var(--line-2);background:var(--surface);border-radius:7px;cursor:pointer;color:var(--ink-2);display:grid;place-items:center" style-hover="background:var(--brand-soft);color:var(--brand);border-color:var(--brand)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></button>
+                            <button onClick="{{c.remove}}" title="Quitar" style="width:28px;height:28px;flex:none;border:none;background:none;border-radius:7px;cursor:pointer;color:var(--ink-3);display:grid;place-items:center" style-hover="background:var(--t-rose-bg);color:var(--danger)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <!-- COPIAR TAREA -->
+                  <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                      <div><div style="font-weight:700;font-size:14px">Copiar tarea</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">Crea una tarea nueva con el mismo concepto y flujo (arranca en el paso inicial)</div></div>
+                      <button onClick="{{taskModalData.adv.copyTask}}" style="height:34px;padding:0 15px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="border-color:var(--brand);color:var(--brand)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h8"></path></svg>Copiar tarea</button>
+                    </div>
+                    <sc-if value="{{taskModalData.adv.hasCopies}}" hint-placeholder-val="">
+                      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+                        <div style="font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);margin-bottom:9px">COPIAS REALIZADAS · {{taskModalData.adv.copyCount}}</div>
+                        <div style="display:flex;flex-direction:column;gap:6px">
+                          <sc-for list="{{taskModalData.adv.copies}}" as="cp" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:10px;padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h8"></path></svg><span style="flex:1;font-size:12.5px;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{cp.title}}</span><span style="font-size:10.5px;color:var(--ink-3)">{{cp.when}}</span></div></sc-for>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- ===== APLICACIONES (formularios) ===== -->
+              <sc-if value="{{taskModalData.isApps}}" hint-placeholder-val="">
+                <div style="padding:22px 26px;display:flex;flex-direction:column;gap:16px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                    <div><div style="font-weight:700;font-size:14px">Formularios vinculados</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">Formularios conectados a esta actividad</div></div>
+                    <button style="height:34px;padding:0 14px;border-radius:9px;border:none;background:var(--brand);color:var(--on-brand);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="opacity:.9"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Conectar</button>
+                  </div>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <sc-for list="{{taskModalData.apps.forms}}" as="f" hint-placeholder-count="2"><div style="flex:1;min-width:200px;display:flex;align-items:center;gap:11px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh-sm)"><span style="width:36px;height:36px;flex:none;border-radius:9px;background:var(--t-violet-bg);color:var(--t-violet);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M9 13h6M9 17h4"></path></svg></span><div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{f.t}}</div><div style="font-size:11px;color:var(--ink-3);font-family:monospace">{{f.code}} · {{f.estado}}</div></div></div></sc-for>
+                  </div>
+                  <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh-sm);overflow:hidden">
+                    <div style="padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;background:var(--surface-2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--t-violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg><span style="font-weight:700;font-size:13.5px">Formulario de visita técnica</span><span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--t-violet);background:var(--t-violet-bg);padding:2px 8px;border-radius:5px">MAQUETA</span></div>
+                    <div style="padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                      <sc-for list="{{taskModalData.apps.fields}}" as="fld" hint-placeholder-count="6"><div style="{{fld.wrap}}"><label style="display:block;font-size:11.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px">{{fld.label}}</label><div style="{{fld.control}}">{{fld.shown}}</div></div></sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- ===== ARCHIVOS (galería de documentos) ===== -->
+              <sc-if value="{{taskModalData.isArchivos}}" hint-placeholder-val="">
+                <div style="padding:22px 26px;display:flex;flex-direction:column;gap:16px">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <div style="flex:1"><div style="font-weight:700;font-size:14px">Documentos de la actividad</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">{{taskModalData.docs.count}} archivos cargados</div></div>
+                    <div style="display:flex;gap:7px"><sc-for list="{{taskModalData.docs.modeBtns}}" as="m" hint-placeholder-count="3"><button onClick="{{m.go}}" style="{{m.style}}">{{m.svg}}{{m.label}}</button></sc-for></div>
+                  </div>
+                  <!-- GALERÍA -->
+                  <sc-if value="{{taskModalData.docs.isGrid}}" hint-placeholder-val="{{true}}">
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                      <sc-for list="{{taskModalData.docs.cards}}" as="d" hint-placeholder-count="4"><div onClick="{{d.open}}" style="background:var(--surface);border:1px solid var(--line);border-radius:13px;overflow:hidden;cursor:pointer;box-shadow:var(--sh-sm)" style-hover="box-shadow:var(--sh-md);border-color:var(--ink-3)"><div style="height:96px;display:grid;place-items:center;background:var(--surface-2);color:{{d.color}}">{{d.svg}}</div><div style="padding:10px 11px"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{d.name}}</div><div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;color:#fff;background:{{d.color}}">{{d.type}}</span><span style="font-size:10.5px;color:var(--ink-3)">{{d.size}}</span></div></div></div></sc-for>
+                    </div>
+                  </sc-if>
+                  <!-- LISTA -->
+                  <sc-if value="{{taskModalData.docs.isList}}" hint-placeholder-val="">
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:var(--sh-sm)">
+                      <sc-for list="{{taskModalData.docs.rows}}" as="d" hint-placeholder-count="4"><div onClick="{{d.open}}" style="display:flex;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line);cursor:pointer" style-hover="background:var(--surface-2)"><span style="width:34px;height:34px;flex:none;border-radius:8px;display:grid;place-items:center;color:#fff;background:{{d.color}}">{{d.svg}}</span><span style="flex:1;font-size:13px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{d.name}}</span><span style="font-size:10px;font-weight:700;color:var(--ink-3)">{{d.type}}</span><span style="font-size:11.5px;color:var(--ink-3);width:70px;text-align:right">{{d.size}}</span></div></sc-for>
+                    </div>
+                  </sc-if>
+                  <!-- VISOR -->
+                  <sc-if value="{{taskModalData.docs.isViewer}}" hint-placeholder-val="">
+                    <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--sh-sm)">
+                      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)">
+                        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;color:#fff;background:{{taskModalData.docs.cur.color}}">{{taskModalData.docs.cur.type}}</span>
+                        <span style="flex:1;font-size:13px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{taskModalData.docs.cur.name}}</span>
+                        <span style="font-size:11.5px;color:var(--ink-3)">{{taskModalData.docs.pos}}</span>
+                      </div>
+                      <div style="position:relative;height:360px;background:var(--surface-3);display:grid;place-items:center;overflow:hidden">
+                        <button onClick="{{taskModalData.docs.prev}}" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--ink);box-shadow:var(--sh-md);z-index:2" style-hover="background:var(--surface-2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+                        <button onClick="{{taskModalData.docs.next}}" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--ink);box-shadow:var(--sh-md);z-index:2" style-hover="background:var(--surface-2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+                        <!-- render simulado según tipo -->
+                        <sc-if value="{{taskModalData.docs.cur.isDoc}}" hint-placeholder-val="{{true}}">
+                          <div style="width:280px;height:330px;background:#fff;border-radius:4px;box-shadow:0 6px 24px -6px rgba(0,0,0,.3);padding:26px 24px;overflow:hidden">
+                            <div style="width:60%;height:13px;border-radius:3px;background:{{taskModalData.docs.cur.color}};margin-bottom:16px"></div>
+                            <div style="display:flex;flex-direction:column;gap:8px"><div style="height:8px;border-radius:2px;background:#e5e5e5"></div><div style="height:8px;border-radius:2px;background:#e5e5e5;width:92%"></div><div style="height:8px;border-radius:2px;background:#e5e5e5;width:80%"></div><div style="height:8px;border-radius:2px;background:#efefef;width:96%;margin-top:8px"></div><div style="height:8px;border-radius:2px;background:#efefef;width:70%"></div><div style="height:8px;border-radius:2px;background:#efefef;width:88%"></div></div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{taskModalData.docs.cur.isSheet}}" hint-placeholder-val="">
+                          <div style="width:340px;height:300px;background:#fff;border-radius:4px;box-shadow:0 6px 24px -6px rgba(0,0,0,.3);overflow:hidden;display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:26px">
+                            <div style="background:var(--t-green);grid-column:1/-1"></div>
+                            <div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div>
+                            <div style="border:1px solid #eee"></div><div style="border:1px solid #eee;background:#f6f6f6"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee;background:#f6f6f6"></div><div style="border:1px solid #eee"></div>
+                            <div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee;background:#f6f6f6"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div>
+                            <div style="border:1px solid #eee;background:#f6f6f6"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee"></div><div style="border:1px solid #eee;background:#f6f6f6"></div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{taskModalData.docs.cur.isImg}}" hint-placeholder-val="">
+                          <div style="width:300px;height:300px;border-radius:6px;box-shadow:0 6px 24px -6px rgba(0,0,0,.3);background:linear-gradient(135deg,#93c5fd,#3b82f6);display:grid;place-items:center;color:#fff"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"></path></svg></div>
+                        </sc-if>
+                      </div>
+                      <div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line);overflow-x:auto">
+                        <sc-for list="{{taskModalData.docs.thumbs}}" as="t" hint-placeholder-count="5"><div onClick="{{t.go}}" style="{{t.style}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg><span style="font-size:7px;font-weight:800">{{t.type}}</span></div></sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
                 </div>
               </sc-if>
             </div>
@@ -3994,13 +4285,6 @@
         <div style="display:flex;align-items:center;gap:14px;padding:18px 26px;border-bottom:1px solid var(--line);flex:none">
           <div style="width:38px;height:38px;flex:none;border-radius:11px;background:var(--brand);display:grid;place-items:center;color:var(--on-brand)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
           <div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--ink-3);font-weight:600;letter-spacing:.03em">ECOREX · Actividades</div><div style="font-weight:800;font-size:16px;letter-spacing:-.01em">Nueva actividad</div></div>
-          <div style="display:flex;align-items:center;gap:9px">
-            <span style="font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.03em">MODO DE VISUALIZACIÓN</span>
-            <div style="position:relative">
-              <select value="{{modoVal}}" onChange="{{onModo}}" style="appearance:none;-webkit-appearance:none;height:34px;padding:0 30px 0 13px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface);font:inherit;font-size:12.5px;font-weight:700;color:var(--brand);cursor:pointer;outline:none"><sc-for list="{{modoOpts}}" as="o" hint-placeholder-count="3"><option value="{{o}}">{{o}}</option></sc-for></select>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:11px;top:11px;pointer-events:none"><path d="m6 9 6 6 6-6"></path></svg>
-            </div>
-          </div>
           <button onClick="{{closeActWizard}}" style="width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink-2)" style-hover="background:var(--surface-3);color:var(--ink)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
         </div>
         <!-- steps nav + summary row -->
@@ -4014,10 +4298,10 @@
           </sc-for>
         </div>
         <!-- body -->
-        <div style="flex:1;overflow-y:auto;padding:24px 26px;background:var(--surface-2)">
+        <div style="flex:1;overflow-y:auto;padding:3px;background:var(--surface-2)">
           <!-- STEP 1 -->
           <sc-if value="{{actIsStep1}}" hint-placeholder-val="{{true}}">
-          <div style="display:flex;flex-direction:column;gap:16px;max-width:820px;margin:0 auto">
+          <div style="display:flex;flex-direction:column;gap:16px;width:100%">
             <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
               <div style="display:flex;align-items:center;gap:11px;margin-bottom:4px"><span style="width:30px;height:30px;border-radius:9px;background:var(--t-blue-bg);color:var(--t-blue);display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span><div style="font-weight:700;font-size:15px">Clasificación y asignación</div></div>
               <p style="font-size:12.5px;color:var(--ink-3);margin:0 0 16px 41px">Define a qué proceso pertenece la actividad, quién la atiende y para cuándo.</p>
@@ -4058,7 +4342,7 @@
           </sc-if>
           <!-- STEP 2 -->
           <sc-if value="{{actIsStep2}}" hint-placeholder-val="">
-          <div style="display:flex;flex-direction:column;gap:16px;max-width:820px;margin:0 auto">
+          <div style="display:flex;flex-direction:column;gap:16px;width:100%">
             <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
               <div style="font-weight:700;font-size:15px;margin-bottom:16px">Información del contacto</div>
               <input placeholder="Nombre completo del solicitante" style="{{actInStyle}};margin-bottom:12px">
@@ -4077,7 +4361,7 @@
           </sc-if>
           <!-- STEP 3 -->
           <sc-if value="{{actIsStep3}}" hint-placeholder-val="">
-          <div style="max-width:820px;margin:0 auto">
+          <div style="width:100%">
             <sc-if value="{{actHasForm}}" hint-placeholder-val="{{true}}">
             <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
               <div style="font-weight:700;font-size:15px;margin-bottom:6px">Formulario dinámico</div>
@@ -4096,7 +4380,7 @@
           </sc-if>
           <!-- STEP 4 -->
           <sc-if value="{{actIsStep4}}" hint-placeholder-val="">
-          <div style="max-width:820px;margin:0 auto">
+          <div style="width:100%">
             <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)">
               <div style="font-weight:700;font-size:15px;margin-bottom:14px">Archivos adjuntos</div>
               <select style="{{actSelStyle}};margin-bottom:14px"><option>Concepto del archivo…</option><option>Cotización</option><option>Soporte</option><option>Evidencia</option></select>
@@ -4434,7 +4718,7 @@ class Component extends DCLogic {
         items:[
           MI('Proyectos','000042','proyectos'),
           MI('Administrar actividades','000636','work'),
-          MI('Programar actividad','000889',null),
+          MI('Programar actividad','000889','programar'),
         ]},
       {key:'nego',name:'Negocio',icon:'brief',color:'var(--t-rose)',items:[
         MI('Directorio General','000232','clientes'),
@@ -4679,7 +4963,7 @@ class Component extends DCLogic {
       const FTb = activeBoard.tasks.filter(t=>(actPrio.length===0||actPrio.includes(t.prio))&&(actStat.length===0||actStat.includes(effCol(t)))&&scopeMatch(t)&&headerMatch(t));
       board = activeBoard.columns.map(c=>{const ci=colInfo[c.key];const cs=FTb.filter(t=>effCol(t)===c.key);return {name:ci.name,badgeBg:ci.badge[0],badgeFg:ci.badge[1],count:String(cs.length),colKey:c.key,
         onDragOver:(e)=>{e.preventDefault();}, onDrop:(e)=>{e.preventDefault();if(this.state.dragTask)moveTask(this.state.dragTask,c.key);},
-        cards:cs.map(t=>({title:t.title,desc:t.desc,prog:t.prog,pct:t.pct,progColor:t.progColor,due:t.due,dueColor:t.dueColor,people:t.people.map(av),imgs:t.imgs,files:t.files,comments:t.comments,
+        cards:cs.map(t=>({title:t.title,titleColor:(S.tmColor&&S.tmColor[t.title])||'var(--ink)',cardAccent:(S.tmColor&&S.tmColor[t.title])||'transparent',desc:t.desc,prog:t.prog,pct:t.pct,progColor:t.progColor,due:t.due,dueColor:t.dueColor,people:t.people.map(av),imgs:t.imgs,files:t.files,comments:t.comments,
           open:()=>this.setState({taskModal:t.title}),
           onDragStart:(e)=>{this.setState({dragTask:t.title});if(e.dataTransfer){e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',t.title);}catch(_){}}},
           onDragEnd:()=>this.setState({dragTask:null})}))};});
@@ -4692,7 +4976,77 @@ class Component extends DCLogic {
         const prTone=PR[tmT.prio]||['var(--ink-3)','var(--surface-3)'];
         const pctN=parseInt(tmT.pct,10)||0;
         const cols=activeBoard.columns;
+        // ---- FLUJO DE TRABAJO (ruta) — no todas las tareas tienen ----
+        const TFLOWS={
+          'Cotizar equipos de red':{name:'FLUJO 0D7 · Requerimiento comercial',nodes:[
+            {id:'n1',label:'Solicitud',type:'start',by:'Guadalupe L.',x:0,y:1},
+            {id:'n2',label:'Validar stock',type:'robot',by:'Sistema',x:1,y:1},
+            {id:'n3',label:'Cotizar',type:'human',by:'Daniel C.',x:2,y:1},
+            {id:'n4',label:'¿Aprobado?',type:'gateway',by:'',x:3,y:1},
+            {id:'n5',label:'Generar OC',type:'human',by:'María G.',x:4,y:0},
+            {id:'n6',label:'Rechazado',type:'end',by:'',x:4,y:2},
+            {id:'n7',label:'Notificar cliente',type:'robot',by:'Sistema',x:5,y:0},
+          ],edges:[['n1','n2'],['n2','n3'],['n3','n4'],['n4','n5','Sí'],['n4','n6','No'],['n5','n7']],cur:'n3',closed:['n1','n2']},
+          'Requerimiento infraestructura sede norte':{name:'FLUJO 0D7 · Infraestructura',nodes:[
+            {id:'m1',label:'Levantar req.',type:'start',by:'Guadalupe L.',x:0,y:1},
+            {id:'m2',label:'Visita técnica',type:'human',by:'Julián R.',x:1,y:1},
+            {id:'m3',label:'Diseño',type:'human',by:'Daniel C.',x:2,y:1},
+            {id:'m4',label:'Aprobación',type:'gateway',by:'',x:3,y:1},
+            {id:'m5',label:'Ejecutar',type:'human',by:'María G.',x:4,y:1},
+            {id:'m6',label:'Cierre',type:'end',by:'',x:5,y:1},
+          ],edges:[['m1','m2'],['m2','m3'],['m3','m4'],['m4','m5','Sí'],['m5','m6']],cur:'m2',closed:['m1']},
+        };
+        const rawFlow=TFLOWS[tmT.title]||null;
+        const flowClosedOv=(S.flowNodeClosed&&S.flowNodeClosed[tmT.title])||{};
+        const flowCurOv=(S.flowNodeCur&&S.flowNodeCur[tmT.title])||null;
+        const flowNotes=(S.flowNodeNotes&&S.flowNodeNotes[tmT.title])||{};
+        const flowMenuNode=S.flowMenuNode||null;
+        const typeMeta={start:['Inicio','var(--t-slate)','flag'],robot:['Automático','var(--t-blue)','bolt'],human:['Manual','var(--t-violet)','users'],gateway:['Decisión','var(--t-amber)','flow'],end:['Fin','var(--t-green)','check']};
+        let taskFlowData=null;
+        if(rawFlow){
+          const curId=flowCurOv||rawFlow.cur;
+          const colW=150, rowH=78, padX=14, padY=14;
+          const nmap={}; rawFlow.nodes.forEach(n=>nmap[n.id]=n);
+          const maxX=Math.max.apply(null,rawFlow.nodes.map(n=>n.x)), maxY=Math.max.apply(null,rawFlow.nodes.map(n=>n.y));
+          const W=padX*2+(maxX+1)*colW, H=padY*2+(maxY+1)*rowH;
+          const cx=(n)=>padX+n.x*colW+58, cy=(n)=>padY+n.y*rowH+26;
+          const flowRouteOv=(S.flowNodeRoute&&S.flowNodeRoute[tmT.title])||{};
+          const edges=rawFlow.edges.map(e=>{const a=nmap[e[0]],b=nmap[e[1]];const gwA=a.type==='gateway';const x1=gwA?cx(a)+30:cx(a)+58,y1=cy(a),x2=(b.type==='gateway'?cx(b)-30:cx(b)-58),y2=cy(b);const midx=(x1+x2)/2;
+            const chosen=gwA&&flowRouteOv[a.id]===e[2];const dim=gwA&&flowRouteOv[a.id]&&flowRouteOv[a.id]!==e[2];
+            return {d:'M '+x1+' '+y1+' C '+midx+' '+y1+' '+midx+' '+y2+' '+x2+' '+y2,label:e[2]||'',lx:midx,ly:(y1+y2)/2-6,hasLabel:!!e[2],
+              stroke:chosen?'var(--t-green)':(dim?'var(--line)':'var(--line-2)'),sw:chosen?'2.5':'2',
+              labelColor:chosen?'var(--t-green)':'var(--ink-3)'};});
+          const nodes=rawFlow.nodes.map(n=>{const closed=flowClosedOv[n.id]!==undefined?flowClosedOv[n.id]:(rawFlow.closed.indexOf(n.id)>=0);
+            const cur=n.id===curId;const tm=typeMeta[n.type]||typeMeta.human;const isGw=n.type==='gateway';const note=flowNotes[n.id]||'';const isRobot=n.type==='robot';
+            const outs=isGw?rawFlow.edges.filter(e=>e[0]===n.id):[];
+            const chosenRoute=flowRouteOv[n.id]||'';
+            const baseBorder=cur?tm[1]:(closed?'var(--t-green)':(isRobot?'var(--t-blue)':'var(--line-2)'));
+            const baseBg=cur?tm[1]:(closed?'var(--t-green-bg)':(isRobot?'var(--t-blue-bg)':'var(--surface)'));
+            return {id:n.id,label:n.label,by:n.by,typeLabel:tm[0],color:tm[1],closed,cur,isGw,notGw:!isGw,hasNote:!!note,note,isRobot,notRobot:!isRobot&&!isGw,
+              left:(cx(n)-58)+'px',top:(cy(n)-26)+'px',
+              nodeStyle:isGw
+                ?('position:absolute;box-sizing:border-box;width:76px;height:76px;left:'+(cx(n)-38)+'px;top:'+(cy(n)-38)+'px;display:flex;align-items:center;justify-content:center;cursor:pointer;font:inherit')
+                :('position:absolute;box-sizing:border-box;width:120px;left:'+(cx(n)-60)+'px;top:'+(cy(n)-26)+'px;padding:9px 10px 8px;border-radius:12px;text-align:center;cursor:pointer;font:inherit;transition:box-shadow .15s,border-color .15s;border:1.5px solid '+baseBorder+';background:'+baseBg+';color:'+(cur?'#fff':'var(--ink)')+';box-shadow:'+(cur?'0 4px 14px -2px '+tm[1]:'var(--sh-sm)')+(isRobot?';border-style:dashed':'')),
+              gwBgStyle:'position:absolute;inset:8px;transform:rotate(45deg);border-radius:12px;border:1.5px solid '+(cur?tm[1]:(closed?'var(--t-green)':'var(--t-amber)'))+';background:'+(cur?tm[1]:(closed?'var(--t-green-bg)':'var(--t-amber-bg)'))+';box-shadow:'+(cur?'0 4px 14px -2px '+tm[1]:'var(--sh-sm)'),
+              gwInnerStyle:'position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1px;color:'+(cur?'#fff':'var(--t-amber)'),
+              menuWrap:'position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;z-index:30',
+              hasChosen:!!chosenRoute, chosenLabel:chosenRoute,
+              autoBadge:isRobot,
+              routes:outs.map(e=>{const on=chosenRoute===e[2];return {label:e[2]||'(sin etiqueta)',to:(nmap[e[1]]||{}).label||'',on,
+                pick:()=>this.setState({flowNodeRoute:Object.assign({},S.flowNodeRoute||{},{[tmT.title]:Object.assign({},flowRouteOv,{[n.id]:e[2]})}),flowNodeCur:Object.assign({},S.flowNodeCur||{},{[tmT.title]:e[1]}),flowMenuNode:null}),
+                style:'width:100%;display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:8px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;text-align:left;border:1px solid '+(on?'var(--t-green)':'var(--line-2)')+';background:'+(on?'var(--t-green-bg)':'var(--surface)')+';color:'+(on?'var(--t-green)':'var(--ink)')+';margin-bottom:5px'};}),
+              pick:()=>this.setState({flowNodeCur:Object.assign({},S.flowNodeCur||{},{[tmT.title]:n.id})}),
+              openMenu:(e)=>{e.stopPropagation();this.setState({flowMenuNode:S.flowMenuNode===n.id?null:n.id});},
+              menuOpen:flowMenuNode===n.id,
+              toggleClose:(e)=>{e.stopPropagation();const m=Object.assign({},flowClosedOv);m[n.id]=!closed;this.setState({flowNodeClosed:Object.assign({},S.flowNodeClosed||{},{[tmT.title]:m}),flowMenuNode:null});},
+              closeLabel:closed?'Reabrir nodo':'Dar por terminado',
+              onNote:(e)=>{const m=Object.assign({},flowNotes);m[n.id]=e.target.value;this.setState({flowNodeNotes:Object.assign({},S.flowNodeNotes||{},{[tmT.title]:m})});},
+              iconSvg:I(P[tm[2]]||P.users,{s:12})};});
+          taskFlowData={name:rawFlow.name,W:W+'px',H:H+'px',vb:'0 0 '+W+' '+H,edges,nodes,
+            closeMenu:()=>this.setState({flowMenuNode:null})};
+        }
         taskModalData={
+          hasFlow:!!taskFlowData, noFlow:!taskFlowData, flow:taskFlowData,
           title:tmT.title, desc:tmT.desc, code:'T'+String(42+activeBoard.tasks.indexOf(tmT)).padStart(4,'0'),
           proyecto:activeBoard.name, colName, colColor, prio:tmT.prio, prioColor:prTone[0], prioSoft:prTone[1],
           prog:tmT.prog, pct:tmT.pct, pctN:String(pctN), progColor:tmT.progColor, due:tmT.due, dueColor:tmT.dueColor,
@@ -4705,12 +5059,97 @@ class Component extends DCLogic {
           // pestañas
           tabs:[['general','Desc. General'],['avanzado','Avanzado'],['apps','Aplicaciones'],['archivos','Archivos']].map(([id,label])=>{const on=(S.taskTab||'general')===id;return {label,go:()=>this.setState({taskTab:id}),style:'padding:11px 4px;margin-right:22px;border:none;background:none;cursor:pointer;font:inherit;font-size:13.5px;font-weight:600;color:'+(on?'var(--ink)':'var(--ink-3)')+';border-bottom:2px solid '+(on?'var(--ink)':'transparent')};}),
           isGeneral:(S.taskTab||'general')==='general', notGeneral:(S.taskTab||'general')!=='general',
+          isAvanzado:(S.taskTab)==='avanzado', isApps:(S.taskTab)==='apps', isArchivos:(S.taskTab)==='archivos',
+          // --- AVANZADO: reenvío/seguimiento + vínculo a proyecto ---
+          adv:(()=>{
+            const fwdOn=!!(S.tmFwd&&S.tmFwd[tmT.title]);
+            const projSel=(S.tmProj&&S.tmProj[tmT.title])||'';
+            const projOpts=[['','Sin proyecto vinculado'],['PRY-0042','PRY-0042 · Implementación ERP ANDINA'],['PRY-0051','PRY-0051 · Migración red INGETEL'],['PRY-0067','PRY-0067 · Roll-out CRM Produvarios']];
+            const projMeta={'PRY-0042':{fases:['Levantamiento','Diseño','Desarrollo','QA','Go-live'],faseCur:2,avance:'48%',resp:'María G.'},'PRY-0051':{fases:['Diagnóstico','Cableado','Config','Pruebas','Cierre'],faseCur:1,avance:'22%',resp:'Julián R.'},'PRY-0067':{fases:['Kickoff','Parametrización','Datos','Capacitación','Salida'],faseCur:3,avance:'71%',resp:'Laura P.'}};
+            const pm=projMeta[projSel];
+            const hitoMeta={'PRY-0042':['Levantamiento de requerimientos','Diseño de solución','Desarrollo e integración','Pruebas QA','Salida a producción'],'PRY-0051':['Diagnóstico de red','Cableado estructurado','Configuración de equipos','Pruebas de conectividad','Cierre y entrega'],'PRY-0067':['Kickoff','Parametrización CRM','Migración de datos','Capacitación','Salida en vivo']};
+            const hitos=hitoMeta[projSel]||[];
+            const hitoSel=(S.tmHito&&S.tmHito[tmT.title])||'';
+            const hitoIdx=hitos.indexOf(hitoSel);
+            const childKey='child::'+tmT.title;
+            const childTasks=S.tmChildren&&S.tmChildren[tmT.title]||[];
+            const copies=S.tmCopies&&S.tmCopies[tmT.title]||[];
+            const nc=S.tmNewChild||{};
+            const catMap={Comercial:['Cotización','Seguimiento cliente','Requerimiento infraestructura'],Operaciones:['Visita técnica','Mantenimiento preventivo'],'Gestión Humana':['Contratación','Permiso laboral'],Financiera:['Pago a proveedor','Factura']};
+            const ncCat=nc.cat||'Comercial'; const ncSub=nc.sub||catMap[ncCat][0];
+            return {fwdOn, toggleFwd:()=>{const m=Object.assign({},S.tmFwd||{});m[tmT.title]=!fwdOn;this.setState({tmFwd:m});},
+              fwdSwitch:'width:44px;height:24px;border-radius:13px;position:relative;cursor:pointer;transition:background .15s;background:'+(fwdOn?'var(--brand)':'var(--line-2)'),
+              fwdKnob:'position:absolute;top:2px;left:'+(fwdOn?'22px':'2px')+';width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);transition:left .15s',
+              fwdPeople:['Laura Peña','Andrés Martínez','María Gómez'].map(p=>({name:p,ini:p.split(' ').map(w=>w[0]).slice(0,2).join(''),bg:avBg(p.slice(0,2))})),
+              projOpts:projOpts.map(([v,l])=>({value:v,label:l})),projSel,
+              onProj:(e)=>{const m=Object.assign({},S.tmProj||{});m[tmT.title]=e.target.value;const h=Object.assign({},S.tmHito||{});h[tmT.title]='';this.setState({tmProj:m,tmHito:h});},
+              hasProj:!!pm, proj:pm?{avance:pm.avance,resp:pm.resp,
+                fases:pm.fases.map((f,i)=>({name:f,done:i<pm.faseCur,current:i===pm.faseCur,
+                  dotStyle:'width:12px;height:12px;border-radius:50%;flex:none;border:2px solid '+(i<=pm.faseCur?'var(--brand)':'var(--line-2)')+';background:'+(i<pm.faseCur?'var(--brand)':(i===pm.faseCur?'var(--surface)':'var(--surface)')),
+                  lblStyle:'font-size:12.5px;font-weight:'+(i===pm.faseCur?'700':'500')+';color:'+(i<=pm.faseCur?'var(--ink)':'var(--ink-3)')}))}:null,
+              hitoOpts:[{value:'',label:'Selecciona el hito…'}].concat(hitos.map(h=>({value:h,label:h}))),hitoSel,
+              onHito:(e)=>{const m=Object.assign({},S.tmHito||{});m[tmT.title]=e.target.value;this.setState({tmHito:m});},
+              hasHito:hitoIdx>=0,
+              hitoProgress:hitoIdx>=0?(()=>{const total=childTasks.length+2;const done=Math.min(total,Math.max(1,Math.round(total*0.55)));const pct=Math.round(done/total*100);return {pct:pct+'%',barStyle:'height:100%;border-radius:6px;background:var(--brand);width:'+pct+'%',label:done+' de '+total+' actividades hacia este hito'};})():null,
+              // ---- tareas vinculadas (hijas) ----
+              childTasks:childTasks.map((c,i)=>({title:c.title,cat:c.cat,sub:c.sub,estado:c.estado||'Nuevo',
+                open:()=>this.setState({taskModal:{title:c.title,desc:'Tarea hija de: '+tmT.title,prio:'Media',prog:'0/1',pct:'0%',progColor:'var(--ink-2)',due:'—',dueColor:'var(--ink-2)',people:tmT.people.slice(0,1),imgs:0,files:0,comments:0},taskTab:'general'}),
+                remove:()=>{const arr=childTasks.slice();arr.splice(i,1);this.setState({tmChildren:Object.assign({},S.tmChildren||{},{[tmT.title]:arr})});}})),
+              childCount:String(childTasks.length),hasChildren:childTasks.length>0,
+              childFormOpen:!!S.tmChildForm,
+              openChildForm:()=>this.setState({tmChildForm:true,tmNewChild:{cat:'Comercial',sub:catMap.Comercial[0],title:''}}),
+              closeChildForm:()=>this.setState({tmChildForm:false}),
+              ncTitle:nc.title||'',onNcTitle:(e)=>this.setState({tmNewChild:Object.assign({},nc,{title:e.target.value})}),
+              ncCat, ncCatOpts:Object.keys(catMap).map(c=>({value:c,label:c})),onNcCat:(e)=>this.setState({tmNewChild:Object.assign({},nc,{cat:e.target.value,sub:catMap[e.target.value][0]})}),
+              ncSub, ncSubOpts:(catMap[ncCat]||[]).map(s=>({value:s,label:s})),onNcSub:(e)=>this.setState({tmNewChild:Object.assign({},nc,{sub:e.target.value})}),
+              saveChild:()=>{const t=(nc.title||'').trim()||ncSub;const arr=childTasks.concat([{title:t,cat:ncCat,sub:ncSub,estado:'Nuevo'}]);this.setState({tmChildren:Object.assign({},S.tmChildren||{},{[tmT.title]:arr}),tmChildForm:false});},
+              // ---- copiar tarea ----
+              copies:copies.map(c=>({title:c.title,when:c.when})),copyCount:String(copies.length),hasCopies:copies.length>0,
+              copyTask:()=>{const n=copies.length+1;const arr=copies.concat([{title:tmT.title+' (copia '+n+')',when:'ahora'}]);this.setState({tmCopies:Object.assign({},S.tmCopies||{},{[tmT.title]:arr})});}};
+          })(),
+          // --- APLICACIONES: gestión de formularios ---
+          apps:(()=>{
+            const forms=[{t:'Formulario de visita técnica',code:'FRM-014',estado:'Vinculado'},{t:'Checklist de instalación',code:'FRM-021',estado:'Vinculado'}];
+            return {forms:forms.map(f=>({t:f.t,code:f.code,estado:f.estado})),
+              fields:[['Cliente','text','ALPES TECHNOLOGY'],['Fecha de visita','date','2026-07-12'],['Tipo de servicio','select','Instalación'],['Sede','text','Sede Norte'],['Observaciones','area','Requiere validación de red antes de instalar.'],['Firma del técnico','sign','']].map(([label,kind,val])=>({label,
+                wrap:(kind==='area'||kind==='sign')?'grid-column:1 / -1':'',
+                control:kind==='sign'?'height:70px;border:1.5px dashed var(--line-2);border-radius:9px;display:grid;place-items:center;color:var(--ink-3);font-size:12px;font-style:italic':(kind==='area'?'min-height:56px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface-2);padding:9px 11px;font-size:13px;color:var(--ink)':'height:40px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface-2);padding:0 11px;display:flex;align-items:center;font-size:13px;color:var(--ink)'),
+                shown:kind==='sign'?'Firmar aquí':(kind==='select'?(val+'  ▾'):val)}))};
+          })(),
+          // --- ARCHIVOS: galería de documentos con 3 vistas ---
+          docs:(()=>{
+            const files=[
+              {name:'Cotización_Lenovo.pdf',type:'PDF',size:'240 KB',color:'var(--t-rose)'},
+              {name:'Plano_red_sede_norte.xlsx',type:'XLSX',size:'88 KB',color:'var(--t-green)'},
+              {name:'Foto_rack_actual.jpg',type:'IMG',size:'1.2 MB',color:'var(--t-blue)'},
+              {name:'Acta_visita.pdf',type:'PDF',size:'156 KB',color:'var(--t-rose)'},
+              {name:'Especificaciones.docx',type:'DOCX',size:'64 KB',color:'var(--t-violet)'},
+            ];
+            const mode=(S.docView&&S.docView[tmT.title])||'grid';
+            const idx=(S.docIdx&&S.docIdx[tmT.title])||0;
+            const setMode=(mm)=>{const m=Object.assign({},S.docView||{});m[tmT.title]=mm;this.setState({docView:m});};
+            const setIdx=(ii)=>{const m=Object.assign({},S.docIdx||{});m[tmT.title]=((ii%files.length)+files.length)%files.length;this.setState({docIdx:m});};
+            const cur=files[idx]||files[0];
+            const modeBtns=[['grid','Galería','grid'],['list','Lista','list'],['viewer','Visor','eye']].map(([k,label,ic])=>{const on=mode===k;return {label,svg:I(P[ic]||P.grid,{s:14}),go:()=>setMode(k),
+              style:'display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid '+(on?'var(--ink)':'var(--line-2)')+';background:'+(on?'var(--ink)':'var(--surface)')+';color:'+(on?'#fff':'var(--ink-2)')+';border-radius:9px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600'};});
+            const iconFor=(t)=>t==='IMG'?'grid':t==='XLSX'?'grid':'file';
+            return {isGrid:mode==='grid',isList:mode==='list',isViewer:mode==='viewer',modeBtns,count:String(files.length),
+              cards:files.map((f,i)=>({name:f.name,type:f.type,size:f.size,color:f.color,svg:I(P[iconFor(f.type)]||P.file,{s:20}),
+                open:()=>{setIdx(i);setMode('viewer');}})),
+              rows:files.map((f,i)=>({name:f.name,type:f.type,size:f.size,color:f.color,svg:I(P[iconFor(f.type)]||P.file,{s:16}),
+                open:()=>{setIdx(i);setMode('viewer');}})),
+              cur:{name:cur.name,type:cur.type,size:cur.size,color:cur.color,isImg:cur.type==='IMG',isSheet:cur.type==='XLSX',isDoc:cur.type!=='IMG'&&cur.type!=='XLSX'},
+              pos:(idx+1)+' / '+files.length,
+              prev:()=>setIdx(idx-1),next:()=>setIdx(idx+1),
+              thumbs:files.map((f,i)=>({type:f.type,color:f.color,active:i===idx,go:()=>setIdx(i),
+                style:'width:44px;height:56px;flex:none;border-radius:7px;border:2px solid '+(i===idx?'var(--brand)':'var(--line-2)')+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;background:var(--surface);color:'+f.color}))};
+          })(),
           // pasos del flujo (chevrons)
           steps:cols.map((c,idx)=>{const ci=colInfo[c.key];const curIdx=cols.findIndex(x=>x.key===effCol(tmT));const done=idx<curIdx,current=idx===curIdx;
             return {name:ci.name,color:ci.color,done,current,last:idx===cols.length-1,
               chipStyle:'display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:10px;white-space:nowrap;font-size:12px;font-weight:600;border:1px solid '+(current?ci.color:'var(--line)')+';background:'+(done?ci.color:current?'var(--surface)':'var(--surface-2)')+';color:'+(done?'#fff':current?'var(--ink)':'var(--ink-3)'),
               dot:done?'done':current?'current':'pending'};}),
-          moveOptions:cols.map(c=>{const on=c.key===effCol(tmT);const ci=colInfo[c.key];return {label:ci.name,on,color:ci.color,
+          moveOptions:cols.filter(c=>c.key!=='nuevo').map(c=>{const on=c.key===effCol(tmT);const ci=colInfo[c.key];return {key:c.key,label:ci.name,on,color:ci.color,
             go:()=>this.setState({taskColOv:Object.assign({},taskColOv,{[tmT.title]:c.key})}),
             style:'display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:9px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;border:1px solid '+(on?ci.color:'var(--line-2)')+';background:'+(on?ci.color:'var(--surface)')+';color:'+(on?'#fff':'var(--ink-2)')};}),
           // worklog
@@ -4731,6 +5170,23 @@ class Component extends DCLogic {
             {who:'MA',txt:'creó la tarea',time:'ayer',bg:avBg('MA')},
           ],
           close:()=>this.setState({taskModal:null,tmRunning:false}),
+          moveCur:effCol(tmT),
+          titleColor:(S.tmColor&&S.tmColor[tmT.title])||'var(--ink)',
+          colColor:(S.tmColor&&S.tmColor[tmT.title])||colColor,
+          colorMenuOpen:!!S.tmColorMenu,
+          toggleColorMenu:()=>this.setState({tmColorMenu:!S.tmColorMenu}),
+          colorSwatches:['var(--ink)','var(--t-violet)','var(--t-blue)','var(--t-green)','var(--t-amber)','var(--danger)','var(--t-rose)','var(--t-slate)','#0EA5E9','#DB2777','#7C3AED','#EA580C','#0D9488','#65A30D'].map(cx=>({style:'width:22px;height:22px;border-radius:6px;cursor:pointer;background:'+cx+';box-shadow:0 0 0 1px var(--line-2)',pick:()=>{const m=Object.assign({},S.tmColor||{});m[tmT.title]=cx;this.setState({tmColor:m,tmColorMenu:false});}})),
+          crumbColor:(S.tmColor&&S.tmColor[tmT.title])?'rgba(255,255,255,.92)':'var(--ink-3)',
+          headerStyle:(S.tmColor&&S.tmColor[tmT.title])?('display:flex;align-items:center;gap:12px;padding:16px 26px;border-bottom:1px solid var(--line);flex:none;background:'+(S.tmColor[tmT.title])+';color:#fff'):'display:flex;align-items:center;gap:12px;padding:16px 26px;border-bottom:1px solid var(--line);flex:none',
+          onMove:(e)=>this.setState({taskColOv:Object.assign({},taskColOv,{[tmT.title]:e.target.value})}),
+          suspLabel:(S.tmSusp&&S.tmSusp[tmT.title])?'Activar':'Suspender',
+          suspStyle:'height:34px;padding:0 13px;border-radius:9px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;'+((S.tmSusp&&S.tmSusp[tmT.title])?'border:1px solid var(--t-green);background:var(--t-green-bg);color:var(--t-green)':'border:1px solid var(--line-2);background:var(--surface);color:var(--amber)'),
+          toggleSusp:()=>{const m=Object.assign({},S.tmSusp||{});m[tmT.title]=!m[tmT.title];this.setState({tmSusp:m});},
+          closeLabel:(S.tmClosed&&S.tmClosed[tmT.title])?'Reabrir actividad':'Cerrar actividad',
+          closeStyle:'height:34px;padding:0 15px;border-radius:9px;border:none;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;'+((S.tmClosed&&S.tmClosed[tmT.title])?'background:var(--t-green);color:#fff':'background:var(--brand);color:var(--on-brand)'),
+          toggleClose:()=>{const m=Object.assign({},S.tmClosed||{});m[tmT.title]=!m[tmT.title];this.setState({tmClosed:m});},
+          prev:()=>{const i=activeBoard.tasks.indexOf(tmT);const p=activeBoard.tasks[(i-1+activeBoard.tasks.length)%activeBoard.tasks.length];if(p)this.setState({taskModal:p.title});},
+          next:()=>{const i=activeBoard.tasks.indexOf(tmT);const n=activeBoard.tasks[(i+1)%activeBoard.tasks.length];if(n)this.setState({taskModal:n.title});},
         };
       }
       listRows = FTb.map(t=>({title:t.title,desc:t.desc,statusName:colInfo[t.col].name,statusColor:colInfo[t.col].color,people:t.people.map(av),prio:t.prio,prioColor:PR[t.prio][0],prioSoft:PR[t.prio][1],prog:t.prog,pct:t.pct,progColor:t.progColor,due:t.due,dueColor:t.dueColor}));
@@ -5929,7 +6385,61 @@ class Component extends DCLogic {
       '000801':{title:'Autocompletado de formularios',cols:[['cod','Código'],['nom','Nombre'],['sql','Fuente SQL'],['est','Estado','sel']],rows:[['AC-01','Ciudades','SELECT NOMBRE FROM CIUDAD','Activo'],['AC-02','Clientes','SELECT CLI_NOMBRE FROM CRM_CLIENTE','Activo']]},
     };
     const catKey=S.catKey||'000556';
-    // ===================== MÓDULO CLIENTES (000232) =====================
+    // ===================== PROGRAMAR ACTIVIDAD (000889) =====================
+    const prgTipo=S.prgTipo||'notificacion';
+    const prgList=S.prgList||[
+      {id:'PRG-01',tipo:'notificacion',nombre:'Recordatorio pago proveedores',regla:'Mensual · día 5',canales:['Correo'],estado:'Activa'},
+      {id:'PRG-02',tipo:'actividad',nombre:'Visita técnica preventiva',regla:'Bimestral',canales:['WhatsApp','Correo'],cat:'Operaciones',sub:'Visita técnica',estado:'Activa'},
+      {id:'PRG-03',tipo:'notificacion',nombre:'Alerta cierre de mes',regla:'Fecha específica · 30/07',canales:['Slack'],estado:'Pausada'},
+    ];
+    const prgRuleSets=S.prgRuleSets||[{tipo:'Semanal',cada:1,dias:['Lun'],diaMes:1,ordinal:'Primer',diaSem:'Lunes',hora:'08:00',repite:false,cadaH:2,desde:'08:00',hasta:'17:00',inicio:'2026-07-01',fin:''}];
+    const prgChannels=S.prgChannels||['Correo'];
+    const CHAN=[['Correo','mail'],['WhatsApp','message'],['Slack','flow'],['SMS','message']];
+    const prgFreqOpts=['Una vez','Diaria','Semanal','Mensual'];
+    const prgDiasSem=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    const prgOrdinales=['Primer','Segundo','Tercer','Cuarto','Último'];
+    const prgDiasSemFull=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo','día'];
+    const prgActCats={Comercial:['Cotización','Seguimiento cliente'],Operaciones:['Visita técnica','Mantenimiento preventivo'],'Gestión Humana':['Contratación','Permiso laboral'],Financiera:['Pago a proveedor','Factura']};
+    const prgCatSel=S.prgCat||'Operaciones';
+    const prgSubSel=S.prgSub||prgActCats[prgCatSel][0];
+    const prgTipoTabs=[['notificacion','Notificación / Alerta','bell'],['actividad','Crear actividad','check']].map(([id,label,ic])=>{const on=prgTipo===id;return{label,svg:I(P[ic]||P.bell,{s:16}),go:()=>this.setState({prgTipo:id}),
+      style:'flex:1;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px;border-radius:13px;cursor:pointer;font:inherit;font-size:14px;font-weight:700;border:2px solid '+(on?'var(--brand)':'var(--line-2)')+';background:'+(on?'var(--brand-soft)':'var(--surface)')+';color:'+(on?'var(--brand)':'var(--ink-2)')};});
+    const prgIsNotif=prgTipo==='notificacion', prgIsAct=prgTipo==='actividad';
+    const prgFreqUnit={Diaria:'día(s)',Semanal:'semana(s)',Mensual:'mes(es)'};
+    const setRule=(i,patch)=>{const a=prgRuleSets.map(x=>Object.assign({},x));a[i]=Object.assign({},a[i],patch);this.setState({prgRuleSets:a});};
+    const prgRuleRows=prgRuleSets.map((r,i)=>{
+      const resumen=(()=>{
+        if(r.tipo==='Una vez')return 'Una vez el '+(r.inicio||'—')+' a las '+r.hora;
+        let base=r.tipo==='Diaria'?('Cada '+r.cada+' día(s)'):r.tipo==='Semanal'?('Cada '+r.cada+' sem. los '+(r.dias||[]).join(', ')):('El '+r.ordinal.toLowerCase()+' '+r.diaSem+' cada '+r.cada+' mes(es)');
+        base+=r.repite?(' · cada '+r.cadaH+'h de '+r.desde+' a '+r.hasta):(' a las '+r.hora);
+        return base;
+      })();
+      return {idx:i,idxLabel:String(i+1),tipo:r.tipo,resumen,
+      isDiaria:r.tipo==='Diaria',isSemanal:r.tipo==='Semanal',isMensual:r.tipo==='Mensual',isUna:r.tipo==='Una vez',notUna:r.tipo!=='Una vez',
+      cada:String(r.cada),cadaUnit:prgFreqUnit[r.tipo]||'',hora:r.hora,repite:!!r.repite,cadaH:String(r.cadaH),desde:r.desde,hasta:r.hasta,inicio:r.inicio,fin:r.fin,ordinal:r.ordinal,diaSem:r.diaSem,
+      freqOpts:prgFreqOpts.map(f=>({value:f,label:f,sel:f===r.tipo})),
+      ordinalOpts:prgOrdinales.map(o=>({value:o,label:o,sel:o===r.ordinal})),
+      diaSemOpts:prgDiasSemFull.map(d=>({value:d,label:d,sel:d===r.diaSem})),
+      diasChips:prgDiasSem.map(d=>{const on=(r.dias||[]).indexOf(d)>=0;return {label:d,on,
+        toggle:()=>{const s=(r.dias||[]).slice();const k=s.indexOf(d);if(k>=0)s.splice(k,1);else s.push(d);setRule(i,{dias:s});},
+        style:'width:38px;height:34px;border-radius:9px;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;border:1.5px solid '+(on?'var(--brand)':'var(--line-2)')+';background:'+(on?'var(--brand)':'var(--surface)')+';color:'+(on?'#fff':'var(--ink-2)')};}),
+      onTipo:(e)=>setRule(i,{tipo:e.target.value}),onCada:(e)=>setRule(i,{cada:e.target.value}),onHora:(e)=>setRule(i,{hora:e.target.value}),
+      onOrdinal:(e)=>setRule(i,{ordinal:e.target.value}),onDiaSem:(e)=>setRule(i,{diaSem:e.target.value}),
+      toggleRepite:()=>setRule(i,{repite:!r.repite}),repSwitch:'width:40px;height:22px;border-radius:12px;position:relative;cursor:pointer;transition:background .15s;background:'+(r.repite?'var(--brand)':'var(--line-2)'),repKnob:'position:absolute;top:2px;left:'+(r.repite?'20px':'2px')+';width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);transition:left .15s',
+      onCadaH:(e)=>setRule(i,{cadaH:e.target.value}),onDesde:(e)=>setRule(i,{desde:e.target.value}),onHasta:(e)=>setRule(i,{hasta:e.target.value}),
+      onInicio:(e)=>setRule(i,{inicio:e.target.value}),onFin:(e)=>setRule(i,{fin:e.target.value}),
+      remove:()=>{const a=prgRuleSets.slice();a.splice(i,1);this.setState({prgRuleSets:a.length?a:[{tipo:'Semanal',cada:1,dias:['Lun'],diaMes:1,ordinal:'Primer',diaSem:'Lunes',hora:'08:00',repite:false,cadaH:2,desde:'08:00',hasta:'17:00',inicio:'2026-07-01',fin:''}]});}};});
+    const prgAddRule=()=>this.setState({prgRuleSets:prgRuleSets.concat([{tipo:'Mensual',cada:1,dias:['Lun'],diaMes:1,ordinal:'Primer',diaSem:'Lunes',hora:'09:00',repite:false,cadaH:2,desde:'08:00',hasta:'17:00',inicio:'2026-07-01',fin:''}])});
+    const prgChannelChips=CHAN.map(([n,ic])=>{const on=prgChannels.indexOf(n)>=0;return{label:n,svg:I(P[ic]||P.mail,{s:15}),
+      toggle:()=>{const a=prgChannels.slice();const idx=a.indexOf(n);if(idx>=0)a.splice(idx,1);else a.push(n);this.setState({prgChannels:a});},
+      style:'display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:11px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;border:2px solid '+(on?'var(--brand)':'var(--line-2)')+';background:'+(on?'var(--brand-soft)':'var(--surface)')+';color:'+(on?'var(--brand)':'var(--ink-2)')};});
+    const prgModalOpen=!!S.prgModal;
+    const prgListRows=prgList.map(p=>{const est=p.estado==='Activa'?['var(--t-green)','var(--t-green-bg)']:['var(--t-amber)','var(--t-amber-bg)'];const tp=p.tipo==='actividad'?['Actividad','var(--t-violet)','var(--t-violet-bg)']:['Notificación','var(--t-blue)','var(--t-blue-bg)'];
+      return{id:p.id,nombre:p.nombre,regla:p.regla,canales:p.canales.join(' · '),estado:p.estado,estColor:est[0],estSoft:est[1],tipoLabel:tp[0],tipoColor:tp[1],tipoSoft:tp[2],
+        sub:p.tipo==='actividad'?(p.cat+' · '+p.sub):'—',
+        edit:()=>this.setState({prgModal:true,prgEditId:p.id,prgTipo:p.tipo,prgName:p.nombre})};});
+    const prgCatOpts=Object.keys(prgActCats).map(c=>({value:c,label:c}));
+    const prgSubOpts=(prgActCats[prgCatSel]||[]).map(s=>({value:s,label:s}));
     const cliSeed=[
       {id:'cli1',tipo:'empresa',tipos:['cliente'],nombre:'ANDINA S.A.S',nit:'901.111.222-1',vendedor:'Julián R.',ciudad:'Bogotá',sector:'Manufactura',estado:'Activo',
         contactos:[{id:'c1a',nombre:'Julián Restrepo',cargo:'Gerente de compras',email:'jrestrepo@andina.com',tel:'+57 310 555 0011'},{id:'c1b',nombre:'Paola Méndez',cargo:'Analista',email:'pmendez@andina.com',tel:'+57 312 555 0022'}]},
@@ -6172,7 +6682,14 @@ class Component extends DCLogic {
       tplList, tplVarGroups, tplSubject:selTpl.subject, tplBody:selTpl.body, tplName:selTpl.name, tplType:selTpl.type, tplKey:selTplId,
       calScope, calView, isCalMes:calView==='mes', isCalSemana:calView==='semana', calScopeTabs, calViewTabs, legendItems,
       calWeekdays:calWeekdays2, monthCells, weekDays, weekRangeLabel, calPrevWeek, calNextWeek,
-      screen:S.screen, isNotificaciones:S.screen==='notificaciones', isProyectos:S.screen==='proyectos', isDashboard:S.screen==='dashboard', isWork:S.screen==='work', isFlujos:S.screen==='flujos', isForms:S.screen==='forms', isEntidad:S.screen==='entidad', isEmpresas:S.screen==='empresas', isActividades:S.screen==='actividades', isContactos:S.screen==='contactos', isClientes:S.screen==='clientes', isSeguimiento:S.screen==='seguimiento', isScraping:S.screen==='scraping', isAnuncios:S.screen==='anuncios', isCalendar:S.screen==='calendar', isDependencias:S.screen==='dependencias', isEntidad:S.screen==='entidad', isPlantillas:S.screen==='plantillas', isRoles:S.screen==='roles', isUsuarios:S.screen==='usuarios', isModulosWeb:S.screen==='modulosweb', isSqlAdmin:S.screen==='sqladmin', isConsecutivos:S.screen==='consecutivos', isParamXml:S.screen==='paramxml', isReglas:S.screen==='reglas', isReportes:S.screen==='reportes', isServicios:S.screen==='servicios', isAlertas:S.screen==='alertas', isNotifConfig:S.screen==='notifconfig', isIndicadores:S.screen==='indicadores', isCatalogo:S.screen==='catalogo', isObjetos:S.screen==='objetos', isProyectos:S.screen==='proyectos',
+      screen:S.screen, isProgramar:S.screen==='programar', isNotificaciones:S.screen==='notificaciones', isProyectos:S.screen==='proyectos',
+      prgTipoTabs, prgIsNotif, prgIsAct, prgRuleRows, prgAddRule, prgChannelChips, prgListRows,
+      prgCatOpts, prgSubOpts, prgCatSel, prgSubSel, onPrgCat:(e)=>this.setState({prgCat:e.target.value,prgSub:(prgActCats[e.target.value]||[])[0]}), onPrgSub:(e)=>this.setState({prgSub:e.target.value}),
+      prgName:S.prgName||'', onPrgName:(e)=>this.setState({prgName:e.target.value}),
+      prgModalOpen, prgIsEdit:!!S.prgEditId,
+      openPrgNew:()=>this.setState({prgModal:true,prgEditId:null,prgName:'',prgTipo:'notificacion'}),
+      closePrg:()=>this.setState({prgModal:false,prgEditId:null}),
+      prgCount:String(prgList.length), isDashboard:S.screen==='dashboard', isWork:S.screen==='work', isFlujos:S.screen==='flujos', isForms:S.screen==='forms', isEntidad:S.screen==='entidad', isEmpresas:S.screen==='empresas', isActividades:S.screen==='actividades', isContactos:S.screen==='contactos', isClientes:S.screen==='clientes', isSeguimiento:S.screen==='seguimiento', isScraping:S.screen==='scraping', isAnuncios:S.screen==='anuncios', isCalendar:S.screen==='calendar', isDependencias:S.screen==='dependencias', isEntidad:S.screen==='entidad', isPlantillas:S.screen==='plantillas', isRoles:S.screen==='roles', isUsuarios:S.screen==='usuarios', isModulosWeb:S.screen==='modulosweb', isSqlAdmin:S.screen==='sqladmin', isConsecutivos:S.screen==='consecutivos', isParamXml:S.screen==='paramxml', isReglas:S.screen==='reglas', isReportes:S.screen==='reportes', isServicios:S.screen==='servicios', isAlertas:S.screen==='alertas', isNotifConfig:S.screen==='notifconfig', isIndicadores:S.screen==='indicadores', isCatalogo:S.screen==='catalogo', isObjetos:S.screen==='objetos', isProyectos:S.screen==='proyectos',
       showBoardsIndex:S.screen==='work'&&!S.workBoard, boardOpen:S.screen==='work'&&!!S.workBoard,
       isTablero:S.screen==='work'&&!!S.workBoard&&S.workView==='tablero', isLista:S.screen==='work'&&!!S.workBoard&&S.workView==='lista', isCalendario:S.screen==='work'&&!!S.workBoard&&S.workView==='calendario', isGantt:S.screen==='work'&&!!S.workBoard&&S.workView==='gantt',
       boardsIndex, boardTitle, boardStatusLabel, boardStatusColor, boardDeadline,

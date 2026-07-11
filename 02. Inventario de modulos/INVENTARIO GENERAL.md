@@ -12,7 +12,7 @@ stack_destino: .NET 10 / ASP.NET Core 10 / EF Core 10 / Blazor
 > referencia del sistema ORIGEN es el mapa exacto del legacy que se migra: cada
 > modulo `000XXX`, su pagina fisica y su tabla. La vision maestra esta en
 > [[Visión y entorno]]; el aspecto y la navegacion definitivos en
-> [[00 - Prototipo Final ECOREX]]. Separar ORIGEN vs DESTINO es la disciplina de
+> [[Visión y entorno|Prototipo Final ECOREX]]. Separar ORIGEN vs DESTINO es la disciplina de
 > todo el vault.
 
 ## 0. Vision DESTINO del inventario (.NET 10)

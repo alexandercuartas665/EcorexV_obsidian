@@ -11,7 +11,7 @@ stack_destino: .NET 10 / ASP.NET Core / EF Core 10 / Blazor / SignalR
 > patron del vault: primero la VISION DESTINO (.NET 10 / Blazor, seccion 0) y
 > luego el ANALISIS DEL ORIGEN legacy (WebForms) como plano del ETL y catalogo
 > de reglas de negocio a preservar. Aspecto y navegacion definitivos en
-> [[00 - Prototipo Final ECOREX]]; vision maestra en [[Visión y entorno]].
+> [[Visión y entorno|Prototipo Final ECOREX]]; vision maestra en [[Visión y entorno]].
 
 ---
 
@@ -171,7 +171,7 @@ Sucursal `"01"` es la del **proveedor (3DEV/Bitcode)** — activa funciones de s
 > implementa con un **authorization handler** por recurso (no un `FindReader`
 > suelto antes de borrar) y el borrado es **soft-delete** auditado. La cabecera
 > del prototipo (Estado, Asignados con avatares, Fecha limite, Etiquetas) y las
-> pestanas `Vista Tablero / Timeline / Calendario` de [[00 - Prototipo Final ECOREX]]
+> pestanas `Vista Tablero / Timeline / Calendario` de [[Visión y entorno|Prototipo Final ECOREX]]
 > reemplazan el layout WebForms; las ~20 tablas `PROYECTOS_*` / `DOC_PROYECTOS_*`
 > mapean a entidades EF Core `ITenantScoped` (ver plano del ETL abajo).
 

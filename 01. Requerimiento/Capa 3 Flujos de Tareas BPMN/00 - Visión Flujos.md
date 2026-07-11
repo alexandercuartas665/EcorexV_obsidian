@@ -18,7 +18,7 @@ stack_destino: .NET 10 / ASP.NET Core / EF Core 10 / Blazor / bpmn-js / SignalR
 > Este documento describe QUE se construye (el `WorkflowEngine` y su editor
 > visual) y conserva al final el analisis del sistema ORIGEN (`AdmWorkflow` +
 > `DOC_PROCESOS*`) como plano del ETL. Enlaza con [[Visión y entorno]] (vision
-> maestra) y [[00 - Prototipo Final ECOREX]] (aspecto y navegacion).
+> maestra) y [[Visión y entorno|Prototipo Final ECOREX]] (aspecto y navegacion).
 
 ## D1. Que es en el destino
 
@@ -100,12 +100,12 @@ volumen lo justifique.
 
 > A partir de aqui se conserva el ANALISIS DEL ORIGEN (sistema legacy WebForms)
 > como referencia de migracion / reglas de negocio a preservar. El aspecto
-> DESTINO que reemplaza este shell esta en [[00 - Prototipo Final ECOREX]].
+> DESTINO que reemplaza este shell esta en [[Visión y entorno|Prototipo Final ECOREX]].
 
 # Módulo ESPECIAL: Flujos del Proceso (000291) [ORIGEN / legacy]
 
 > [!success] UI viva capturada en producción
-> Hallazgos confirmados visitando la pantalla en `app.bitcode.com.co` (el aspecto DESTINO esta en [[00 - Prototipo Final ECOREX]]):
+> Hallazgos confirmados visitando la pantalla en `app.bitcode.com.co` (el aspecto DESTINO esta en [[Visión y entorno|Prototipo Final ECOREX]]):
 > - **Tabs principales**: `Diseño` (#tab-1) y `Detalle` (#tab-3)
 > - **Botones topbar**: `Nuevo Flujo`, `Guardar Cambios` (con marcador "último guardado: Sesion actual")
 > - **Editor BPMN**: 4 elementos `<svg>` con clase `.djs-container` — **es bpmn-js library** (confirmado por el prefijo `djs-` / `bjs-` típico de [bpmn-io.github.io/bpmn-js](https://github.com/bpmn-io/bpmn-js)). Mismo motor visual que DokTrino.

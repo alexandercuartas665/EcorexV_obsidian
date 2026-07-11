@@ -150,6 +150,6 @@ Este patrón (audit-parallel-fix) se puede repetir en futuras sesiones cuando se
 
 > Nota posterior: las historias 00-05 se adaptaron a la vision del sistema destino
 > .NET 10 (prototipo final ECOREX). Los escenarios ahora transcurren en el layout de
-> [[00 - Prototipo Final ECOREX]] con los motores WorkflowEngine / DynamicFormRenderer
+> [[Visión y entorno|Prototipo Final ECOREX]] con los motores WorkflowEngine / DynamicFormRenderer
 > / RulesEngine y multi-tenant real. Ver [[Visión y entorno]]. Este registro de
 > auditoria se conserva como historico sin reescribir.

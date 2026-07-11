@@ -15,7 +15,7 @@ destino_stack: .NET 10 / EF Core 10 / IEcorexDbContext (dual)
 > contrato del componente DESTINO (`WorkflowEngine` en .NET 10) y luego conserva
 > el analisis completo de la clase ORIGEN `AdmWorkflow` (VB, WebForms) como
 > reglas de negocio a preservar. Enlaza con [[Visión y entorno]] (seccion 7) y
-> [[00 - Prototipo Final ECOREX]].
+> [[Visión y entorno|Prototipo Final ECOREX]].
 
 ## D0. WorkflowEngine — contrato destino
 

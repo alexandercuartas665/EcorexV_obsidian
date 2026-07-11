@@ -23,7 +23,7 @@ verificado_en_prod: 2026-07-01 app.bitcode.com.co
 > ciclo de vida de la tarea. La seccion **0 (abajo)** fija la **VISION DESTINO**:
 > como se reconstruye este panel en **Blazor (.NET 10)** con el aspecto del
 > prototipo final. Vision maestra en [[Visión y entorno]]; aspecto definitivo en
-> [[00 - Prototipo Final ECOREX]].
+> [[Visión y entorno|Prototipo Final ECOREX]].
 
 ---
 
@@ -36,7 +36,7 @@ adjuntos, notas, navegacion entre casos) y adopta el lenguaje visual del prototi
 final. Reencuadre por bloque:
 
 1. **Cabecera al estilo prototipo**: el HERO del origen (5 meta pills) se alinea a
-   la cabecera de [[00 - Prototipo Final ECOREX]]: **Estado, Asignados** (avatares),
+   la cabecera de [[Visión y entorno|Prototipo Final ECOREX]]: **Estado, Asignados** (avatares),
    **Fecha limite** (con dias restantes), **Etiquetas**, mas Prioridad y Tiempo
    usado. Cuando el detalle se abre en contexto de proyecto, comparte las
    pestanas **Vista Tablero / Timeline / Calendario** del proyecto.
@@ -473,7 +473,7 @@ timer y notas. Un solo archivo HTML.
 ## Enlaces
 
 - Vision maestra del destino: [[Visión y entorno]]
-- Aspecto y navegacion definitivos: [[00 - Prototipo Final ECOREX]]
+- Aspecto y navegacion definitivos: [[Visión y entorno|Prototipo Final ECOREX]]
 - Control complementario (crear): [[ctrTareasII - Spec para reconstruir en Claude Design]]
 - Paginas que lo consumen: [[Tareas y Proyectos - paginas basicas]]
 - Motor BPMN al avanzar paso: [[Ejecucion - SiguienteEstado y Reinicios]]

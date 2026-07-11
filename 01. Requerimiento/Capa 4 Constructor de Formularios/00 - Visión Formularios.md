@@ -17,7 +17,7 @@ estado: vision del sistema destino + analisis del origen como referencia ETL
 > (`ENCUESTAS_MOV`, `FORX_DATA`, `crtCargaEncuestaII`, `cl_FormCreator`) como
 > reglas de negocio a preservar y plano del ETL. El stack, la arquitectura y el
 > aislamiento multi-tenant se definen en [[Visión y entorno]]; el aspecto y la
-> navegacion definitivos en [[00 - Prototipo Final ECOREX]].
+> navegacion definitivos en [[Visión y entorno|Prototipo Final ECOREX]].
 
 ## 1. Que es y por que existe
 
@@ -158,7 +158,7 @@ y [[Reglas - Quien invoca realmente (cierre)]].
 ## 8. Notas relacionadas
 
 - [[Visión y entorno]] -- vision maestra, stack y arquitectura destino
-- [[00 - Prototipo Final ECOREX]] -- aspecto y navegacion definitivos
+- [[Visión y entorno|Prototipo Final ECOREX]] -- aspecto y navegacion definitivos
 - [[Constructor - Patron EAV y motor visual]] -- patron EAV -> jsonb, motor visual
 - [[Esquema completo - Tablas y tipos de control]] -- plano ETL (tablas y 19 tipos)
 - [[Motores y renderers - cl_FormCreator + crtCargaEncuestaII + cl_gestion_reglas]] -- motores del origen -> destino
