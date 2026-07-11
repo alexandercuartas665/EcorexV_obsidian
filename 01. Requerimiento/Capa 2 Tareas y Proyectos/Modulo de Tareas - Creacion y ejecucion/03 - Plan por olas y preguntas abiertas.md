@@ -150,21 +150,31 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   concepto conservado. Fix incluido: se elimino la regla CSS obsoleta `.tk-wizard{max-width:620px}`
   que aplastaba el overlay del nuevo modal.
 
-### Ola 4 - Menu "Mis Procesos" dinamico + editor
-- `MenuNode`: soporte de grupo dinamico "muestra actividades tipo proceso"; `ConfiguracionMenu`
-  gana la opcion para marcar el grupo. `NavMenu` expande ese grupo con categorias/subcategorias
-  (proceso) desde `IActividadCatalogoService`. Al clic: carga el tablero del concepto + abre el
-  modal con categoria/subcategoria fijadas.
-- **Aceptacion**: en el menu aparece Mis Procesos -> categoria -> subcategoria (dinamico, como la
-  imagen); al entrar carga el tablero correcto y el modal no vuelve a pedir categoria/subcategoria;
-  la poda por permisos sigue funcionando.
+### Ola 4 - Menu "Mis Procesos" dinamico + editor  -- HECHA 2026-07-11 (commit `8de3521`)
+- El marcado del grupo (`MenuNode.IsProcessGroup` + checkbox en `ConfiguracionMenu`) ya venia de
+  PRE-5. Aqui `NavMenu` EXPANDE ese grupo con el arbol dinamico categoria -> subcategoria TIPO
+  PROCESO (las que tienen `WorkflowDefinitionId`) desde `IActividadCatalogoService`, cargado en el
+  mismo scope aislado que el menu. Cada subcategoria linkea a `crear-actividad?sub=<id>`;
+  `CrearActividad` lee `?sub=` y abre el wizard con la categoria/subcategoria FIJADAS
+  (`OpenAsync(presetSubcategoriaId)`).
+- **Aceptacion CUMPLIDA** (validado en Chrome): bajo "Mis Procesos" aparece el grupo dinamico
+  "Comercial (1)" -> subcategoria-proceso "Cotizacion de equipos"; navegar al link abre el wizard
+  con Tipo=Comercial y Actividad=Cotizacion de equipos preseleccionadas (no las vuelve a pedir); la
+  poda por permisos del menu sigue intacta (el arbol dinamico es aditivo bajo una seccion visible).
+  NOTA: "carga el tablero del concepto" -> el wizard deriva el tablero del concepto al crear (Ola 1);
+  el link no abre una vista de tablero especifica (refinamiento menor).
 
-### Ola 5 - Arranque form-first (si entra en v1)
-- Paso "Formulario" del wizard: si la subcategoria tiene `IniciaModulo` + `FormDefinitionId`,
-  renderizar `DynamicFormRenderer` (Fill) + `FormResponseService` (draft->submit); enlazar la
-  respuesta a la tarea/paso.
-- **Aceptacion**: una subcategoria "inicia modulo" abre el formulario al crear; al enviar, la
-  tarea queda creada con la respuesta y el flujo continua.
+### Ola 5 - Arranque form-first  -- HECHA 2026-07-11 (commit `16bf824`)
+- Cuando el concepto tiene `IniciaModulo` + `FormDefinitionId`, al pasar al paso "Formulario" el
+  wizard CREA la tarea (arranca su flujo, Ola 2) y renderiza el `DynamicFormRenderer` (Fill)
+  referenciando el numero de la tarea. El "Enviar" del formulario valida en servidor, persiste la
+  `FormResponse` enlazada (reference = numero de tarea) y, si el paso del flujo tiene formulario,
+  lo completa (`FormResponseService`). "Diligenciar luego" deja la tarea creada con el formulario
+  pendiente. El footer del wizard se adapta (sin Guardar en el paso del formulario).
+- **Aceptacion CUMPLIDA** (validado en Chrome): concepto form-first "Requerimiento infraestructura"
+  (FRM-001) -> al entrar al paso Formulario se creo la tarea **T00210** y el formulario "Solicitud
+  de cotizacion" renderizo con ref T00210; valido en servidor (bloqueo por campo obligatorio) y al
+  completar quedo **Submitted** enlazado a la tarea (reference=T00210).
 
 ### Ola 6 - Tableros, tabs y tiempo real
 - Tabs No Asignados/Asignados/Todos/Kanban con conteos vivos por SignalR; drag&drop kanban;
