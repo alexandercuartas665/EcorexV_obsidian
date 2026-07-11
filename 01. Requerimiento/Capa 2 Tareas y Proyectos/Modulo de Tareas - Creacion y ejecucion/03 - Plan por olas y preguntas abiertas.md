@@ -236,12 +236,19 @@ Se corren DESPUES de la base de actividades (o en paralelo por un sub-agente dis
 ya que Proyectos toca entidades propias `PROYECTOS_*`/`DOC_PROYECTOS_*`). Plano del ETL legacy en
 [[Tareas y Proyectos - paginas basicas]] seccion 2 (~20 tablas) y destino en su seccion 0.
 
-### Ola P1 - Dominio + cabecera de proyecto
-- Modelar las tablas legacy `DOC_PROYECTOS` (cabecera) + `PROYECTOS_HITO`, `PROYECTOS_PRESUPUESTO`,
-  `PROYECTOS_COS` (costos), `PROYECTOS_DOFA`, `PROYECTOS_RES` (ACL) como entidades EF Core
-  `ITenantScoped`; migracion dual. Servicio + DTOs de proyecto.
-- **Aceptacion**: CRUD de proyecto (cabecera + hitos + presupuesto) tenant-scoped, con soft-delete
-  y auditoria; migracion aplica en PG y SQL Server.
+### Ola P1 - Dominio + cabecera de proyecto  -- HECHA 2026-07-11 (commit `1dd1b90`)
+- **Ya existia** (commit AddTaskCore): entidad `Project` (Code/Name/Status/fechas/owner/soft-archive/
+  Version) + `ProjectMember` (ACL owner+miembros CanEdit) + `ProjectService` (CRUD + miembros +
+  CheckAccess) + UI `Proyectos.razor` (lista+CRUD) y `ProyectoDetalle.razor` (detalle+miembros+kanban
+  embebido) + seed `PRJ-001`. => la "cabecera de proyecto" estaba COMPLETA.
+- **Nuevo (esta ola): HITOS.** Entidad `ProjectMilestone` (tenant-scoped: ProjectId/Name/DueDate?/
+  SortOrder/IsCompleted), migracion `AddProjectMilestones` (PG local); `ProjectService` List/Add/
+  Update/SetCompleted/RemoveMilestone (+ `ProjectMilestoneDto` con TaskCount); panel de hitos en
+  `ProyectoDetalle` (agregar con fecha / completar / quitar / conteo de actividades); seed de 2 hitos
+  para PRJ-001. **DIFERIDO a backlog**: presupuesto/costos (`PROYECTOS_COS`), DOFA (`PROYECTOS_DOFA`)
+  -- no se modelaron (fuera del alcance minimo P1/P3).
+- **Aceptacion CUMPLIDA**: CRUD de proyecto + hitos tenant-scoped; migracion aplica en PG (SqlServer
+  sigue en backlog DAL-dual). Validado en Chrome.
 
 ### Ola P2 - UI Proyecto (ProyectoDetalle) + ACL por proyecto
 - `Proyectos.razor` (lista/filtro) + `ProyectoDetalle.razor` (cabecera Estado/Asignados/Fecha/
@@ -251,11 +258,18 @@ ya que Proyectos toca entidades propias `PROYECTOS_*`/`DOC_PROYECTOS_*`). Plano 
 - **Aceptacion**: ver/editar/borrar respeta el ACL por proyecto; el tablero del proyecto muestra
   sus tareas; borrar sin FLAG_ED se bloquea.
 
-### Ola P3 - Integracion Actividades <-> Proyectos + tiempo real
-- Vincular actividades a proyecto e hito (paso 2 del wizard: Proyecto / Hito del proyecto);
-  conteos/tableros del proyecto por SignalR; timeline/calendario.
-- **Aceptacion**: crear una actividad dentro de un proyecto la enlaza a su hito y aparece en el
-  tablero del proyecto en tiempo real.
+### Ola P3 - Integracion Actividades <-> Proyectos + tiempo real  -- HECHA 2026-07-11 (commit `1dd1b90`)
+- `TaskItem.MilestoneId` (FK nullable a `ProjectMilestone`, Restrict) + DTOs; `TaskItemService` valida
+  que el hito pertenezca al proyecto (Invalid si es de otro) y lo persiste; filtro por hito; summary con
+  `MilestoneName`. El wizard (paso Contacto) tiene selector **Proyecto -> Hito** que carga los hitos al
+  elegir proyecto (`OnProjectChanged`) y pasa `MilestoneId` al crear. La actividad aparece en el
+  **tablero del proyecto** (kanban filtrado por ProjectId, ya existente; SignalR `TaskHub` ya vivo) y
+  suma al **conteo de actividades del hito**.
+- **Aceptacion CUMPLIDA** (test integracion `CreateActivity_LinkedToProjectMilestone...` verde en PG +
+  validado en Chrome): T00212 creada por el wizard con PRJ-001 + hito "Kickoff y alcance" aparece en el
+  tablero del proyecto y el hito muestra "1 act."; un hito de otro proyecto es rechazado.
+- NOTA: timeline/calendario del proyecto = refinamiento menor (el detalle ya reusa el kanban; las vistas
+  Lista/Calendario/Gantt existen a nivel de tablero de actividades).
 
 ## C. Backlog (post v1)
 - Catalogo de Sedes/Empresa-cliente adicional (mas alla de Areas del tenant), si se necesita.
