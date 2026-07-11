@@ -6,6 +6,42 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 
 # 03 - Plan por olas y preguntas abiertas
 
+## ESTADO GENERAL (2026-07-11)
+
+> [!success] DESPLEGADO A PRODUCCION 2026-07-11
+> **Actividades (Olas 1-7) y Proyectos (P1 hitos + P3 enlace) estan CONSTRUIDOS y DESPLEGADOS a prod**
+> (`root@10.0.0.3`, http://10.0.0.3:5480). Se aplicaron las 6 migraciones pendientes en el arranque:
+> `AddEntidadConfig`, `AddEntidadKind`, `AddJefeMemberAndProcessGroupMenu`, `TaskItemConceptoBridge`,
+> `AddNotifications`, `AddProjectMilestones` (backup previo `ecorex-2026-07-11-1631.sql.gz`). App sana
+> (HTTP 200 /login). Codigo en `fase-0/clon-backbone` @ `877baa4`.
+
+### Terminado (en local Y prod)
+- **Prerequisitos PRE-1..PRE-5** (Empresa/Area, mapa de consumidores, backfill, jefe/responsable, flag de menu).
+- **Olas 1-7 de Actividades**: puente concepto<->tarea, alta que consume el concepto (flujo+auto-titulo+
+  notif), wizard 4 pasos milimetrico, menu Mis Procesos dinamico, form-first, tableros, y endurecimiento
+  (policies compuestas por vista + entrega real de notificaciones in-app).
+- **Proyectos P1 (hitos) + P3 (enlace actividad<->proyecto/hito)**. La cabecera + UI de proyecto (P2) ya existia.
+
+### INVENTARIO DE PENDIENTES (al 2026-07-11)
+1. **Config demo en prod via editor de Conceptos** (NO por SQL): en prod los Conceptos aun no tienen
+   flujo/formulario/tablero vinculados (eso se hizo por BD en local; el seed demo NO corre en prod).
+   Hay que cablearlos desde el editor de Conceptos para que el alta por concepto arranque flujos/forms alli.
+2. **Vistas de menu de los usuarios reales**: el tenant BITCODE de prod se creo sin vistas; se asigno
+   "Completo" a `acuartas@bitcode.com.co`, pero los otros 12 usuarios siguen sin vista (falta un
+   seed/reconcile que garantice una vista Completo IsDefault por cada tenant real).
+3. **DAL-dual SQL Server**: las migraciones se generan solo en PostgreSQL; `Ecorex.Infrastructure.SqlServer`
+   esta rezagado (regla inviolable: la matriz dual es condicion de merge). Backlog abierto desde 2026-07-08.
+4. **Backlog de endurecimiento (Ola 7)**: canal EMAIL de notificaciones con plantilla (IEmailSender ya
+   existe); refresco EN VIVO del badge de la campana por SignalR; policies de gobierno
+   (AdmUsuarios/RolesPermisos/ConfiguracionMenu -> Owner/Admin) y Conceptos.Editar/Dependencias.Ver.
+5. **Backlog de Proyectos**: presupuesto/costos (`PROYECTOS_COS`) y DOFA (`PROYECTOS_DOFA`) -- entidad+UI;
+   timeline/calendario propios del proyecto (hoy reusa el kanban).
+6. **Refinamientos menores**: Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica);
+   Ola 6 (auto-abrir el modal preset al cargar el tablero, diferido por concurrencia de DbContext).
+7. **Backlog post-v1 (seccion C)**: catalogo de Sedes/Empresa-cliente adicional; controles multimedia del
+   formulario (foto/firma/GPS/archivo/barcode, hoy placeholder); vista de tareas para cliente final
+   (solo lectura); modulos satelite legacy (PQR, encuesta, visitas).
+
 ## A. Decisiones tomadas (usuario, 2026-07-11)
 
 - **[D1] Unificacion de tipos = PIVOTAR A CONCEPTOS.** `TaskItem` referencia
@@ -37,9 +73,8 @@ Tareas previas, cada una verificable, que desbloquean el modulo:
       (`EntidadFieldDefinition`, mismo patron que las fichas del Directorio). El servicio
       **`IEntidadService.ListOptionsAsync()`** (devuelve `EntidadOptionDto { Id, Label }`) es la
       fuente lista-para-combo del selector "Empresa/Area" del alta.
-      - **PENDIENTE de despliegue:** las migraciones `AddEntidadConfig` + `AddEntidadKind` estan
-        aplicadas SOLO en local; hay que desplegarlas a prod antes de que el modulo de Tareas las
-        consuma en produccion.
+      - **Despliegue: HECHO 2026-07-11** -- `AddEntidadConfig` + `AddEntidadKind` ya aplicadas en prod
+        (ver ESTADO GENERAL arriba).
       - **Reconciliacion (clave para la Ola 1):** existen DOS conceptos de "area" y se quedan
         SEPARADOS a proposito:
         - **(a) `Entidad.Kind=Area`** = area/agencia/sede organizativa de la cuenta. Es el ORIGEN
@@ -228,7 +263,7 @@ faltante y verifico el resto con tests de integracion (4/4 verdes en PG):
   (ConceptNotice), en la misma transaccion. Campana del topbar = badge real con conteo -> pagina
   `/notificaciones` (marcar leida / todas / abrir). Test integracion verde + validado en Chrome
   (badge 2, marcar leida -> 1). Backlog: canal EMAIL con plantilla (IEmailSender ya existe) y refresco
-  en vivo del badge por SignalR. Pendiente operativo: desplegar `AddNotifications` a prod.
+  en vivo del badge por SignalR. `AddNotifications` DESPLEGADA a prod 2026-07-11.
 
 ## B2. Olas de PROYECTOS (en alcance por decision del usuario)
 
@@ -247,8 +282,8 @@ ya que Proyectos toca entidades propias `PROYECTOS_*`/`DOC_PROYECTOS_*`). Plano 
   `ProyectoDetalle` (agregar con fecha / completar / quitar / conteo de actividades); seed de 2 hitos
   para PRJ-001. **DIFERIDO a backlog**: presupuesto/costos (`PROYECTOS_COS`), DOFA (`PROYECTOS_DOFA`)
   -- no se modelaron (fuera del alcance minimo P1/P3).
-- **Aceptacion CUMPLIDA**: CRUD de proyecto + hitos tenant-scoped; migracion aplica en PG (SqlServer
-  sigue en backlog DAL-dual). Validado en Chrome.
+- **Aceptacion CUMPLIDA**: CRUD de proyecto + hitos tenant-scoped; `AddProjectMilestones` DESPLEGADA a
+  prod 2026-07-11 (SqlServer sigue en backlog DAL-dual). Validado en Chrome.
 
 ### Ola P2 - UI Proyecto (ProyectoDetalle) + ACL por proyecto
 - `Proyectos.razor` (lista/filtro) + `ProyectoDetalle.razor` (cabecera Estado/Asignados/Fecha/

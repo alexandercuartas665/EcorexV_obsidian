@@ -2,7 +2,7 @@
 tipo: indice-proyecto
 proyecto: Modulo de Tareas - Creacion y ejecucion de actividades
 modulos_web: /actividades (000636), /crear-actividad (000038), /proyectos (000042), /conceptos (000270), /dependencias (000850), /flujos (000291), /formularios (000131), /configuracion-menu (000194)
-estado: PUENTE CONSTRUIDO - Olas 1-7 HECHAS (2026-07-11); pendiente desplegar a prod
+estado: DESPLEGADO A PROD (2026-07-11) - Actividades Olas 1-7 + Proyectos P1/P3
 fecha: 2026-07-11
 autor: documentado por agente IA (4 exploradores read-only sobre el codigo real) a partir de la dictado del usuario + prototipo + Capa 2
 ---
@@ -14,17 +14,17 @@ autor: documentado por agente IA (4 exploradores read-only sobre el codigo real)
 > **consuma el concepto** (categoria/subcategoria) para arrancar su flujo, su formulario y su
 > tablero, con la asignacion por cargo. Los motores ya existian; **el puente YA SE CONSTRUYO**.
 
-> [!success] ESTADO 2026-07-11: EL PUENTE ESTA CONSTRUIDO (Olas 1-7 HECHAS)
-> Los 5 prerequisitos (PRE-1..PRE-5) y las 7 olas estan implementadas, con tests de integracion
-> verdes (PG) y validacion en Chrome (tareas T00207-T00211). El detalle por ola, commits y lo
-> DIFERIDO estan en [[03 - Plan por olas y preguntas abiertas]] (fuente de verdad del avance).
-> La seccion 2 de este doc describe las brechas TAL COMO ESTABAN al inicio; cada una lleva ahora
-> su marca de resuelta.
-> **Unico pendiente operativo grande**: desplegar a prod lo acumulado (migraciones
-> `AddEntidadConfig`/`AddEntidadKind`/`AddJefeMemberAndProcessGroupMenu`/`TaskItemConceptoBridge` +
-> olas 1-7, hoy solo local) y rehacer la config demo (flujo/form/tablero por subcategoria) via el
-> editor de Conceptos en prod. **DIFERIDO de endurecimiento**: policies compuestas por vista y la
-> entrega real de notificaciones (canal + plantilla).
+> [!success] ESTADO 2026-07-11: DESPLEGADO A PROD (Olas 1-7 + Proyectos P1/P3)
+> Los 5 prerequisitos (PRE-1..PRE-5), las 7 olas de Actividades y Proyectos P1 (hitos) + P3 (enlace
+> actividad<->hito) estan implementados y **DESPLEGADOS a prod** (http://10.0.0.3:5480; 6 migraciones
+> aplicadas el 2026-07-11, backup previo). Tests de integracion verdes (PG) + validacion en Chrome. El
+> detalle por ola/P, commits y el INVENTARIO DE PENDIENTES estan en
+> [[03 - Plan por olas y preguntas abiertas]] (fuente de verdad del avance). La seccion 2 de este doc
+> describe las brechas TAL COMO ESTABAN al inicio; cada una lleva ahora su marca de resuelta.
+> **Pendientes principales** (ver inventario en doc 03): (1) cablear la config de Conceptos en prod via
+> el editor (flujo/form/tablero por subcategoria); (2) vistas de menu de los demas usuarios reales;
+> (3) DAL-dual SQL Server; (4) backlog de endurecimiento (email+plantilla, badge en vivo, policies de
+> gobierno) y de Proyectos (finanzas/DOFA, timeline).
 
 ## 1. Hallazgo central (auditoria del codigo real, 2026-07-11)
 
