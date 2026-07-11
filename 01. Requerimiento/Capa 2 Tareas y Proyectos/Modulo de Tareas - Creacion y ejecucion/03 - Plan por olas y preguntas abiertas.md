@@ -19,8 +19,9 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 - **[Form-first] = SI, EN V1.** El paso "Formulario" del wizard se cablea con `DynamicFormRenderer`.
 - **[Alcance] = ACTIVIDADES + PROYECTOS JUNTOS.** El modulo Proyectos (000042) entra en esta gran
   tarea (ver olas P1-P3). Es un alcance grande; olas separadas para no mezclar riesgos.
-- **[Encargado]** (a decidir al construir, no bloqueante): usar `OrgUnit.ResponsibleTenantUserId`
-  por defecto; evaluar flag "principal" por miembro si el usuario lo pide.
+- **[Encargado]** El usuario SI quiere la marca de jefe/responsable por miembro -> ahora es
+  **PRE-4** (ya no "no bloqueante"). Usar ese flag como Encargado por defecto y reconciliar con
+  `OrgUnit.ResponsibleTenantUserId`.
 
 ## A2. Prerequisitos - checklist (resolver ANTES de las olas del modal)
 
@@ -57,6 +58,25 @@ Tareas previas, cada una verificable, que desbloquean el modulo:
 - [ ] **PRE-3 Backfill de tareas existentes.** Plan de migracion de `TaskItem.ActivityTypeId` ->
       `SubcategoriaId` (mapear o dejar null) sin perder datos. Aceptacion: script/plan de backfill
       revisado.
+- [ ] **PRE-4 Marca de "jefe / responsable" por miembro en Dependencias (000850).** HOY NO EXISTE:
+      `OrgUnitMember` solo tiene `Role` (texto libre) y a nivel de unidad esta
+      `OrgUnit.ResponsibleTenantUserId` (un unico responsable por unidad, no por miembro). El paso
+      "Encargado" del modal (cascada cargos -> encargado) necesita un default claro de QUIEN es el
+      responsable. Agregar un flag por miembro (p.ej. `OrgUnitMember.IsResponsible` / "es jefe"),
+      exponerlo en `Dependencias.razor`, y usarlo como Encargado propuesto por defecto en el alta.
+      Reconciliar con `ResponsibleTenantUserId` (mantener uno de los dos como fuente de verdad).
+      Aceptacion: se puede marcar a un miembro como jefe/responsable de su unidad; el selector
+      "Encargado" del alta lo propone por defecto. (Antes estaba como deuda "no bloqueante"; se sube
+      a prerequisito porque el modal lo consume.)
+- [ ] **PRE-5 Item de menu "despliega procesos" (grupo dinamico) - fundamento de datos.** HOY NO
+      EXISTE: `MenuNodeKind` es {QuickLink, Section, Subgroup, Item} (todo estatico) y `MenuNode` no
+      tiene ninguna marca de "fuente dinamica". Para el menu "Mis Procesos" dinamico (D3 / Ola 4)
+      hace falta primero poder MARCAR un nodo como "este grupo muestra las actividades tipo proceso":
+      agregar un `MenuNodeKind` nuevo (p.ej. `DynamicProcesses`) o un flag/fuente en `MenuNode`, y la
+      opcion en el editor `ConfiguracionMenu.razor` para activarlo. El renderizado (expandir con
+      categorias/subcategorias de proceso via `IActividadCatalogoService`) es la Ola 4; este PRE es
+      solo el esquema + editor. Aceptacion: en el editor de menu se puede marcar un grupo como
+      "procesos" y queda persistido; `NavMenu` sabe distinguirlo de un grupo normal.
 
 ## B. Plan por olas (cada una entregable y verificable)
 

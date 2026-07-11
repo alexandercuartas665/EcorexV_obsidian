@@ -47,13 +47,16 @@ al menu:
 4. **El menu "Mis Procesos" es estatico**, sembrado en `menu_nodes` (DatabaseSeeder ~2551). El
    objetivo (Mis Procesos -> categoria -> subcategoria -> tablero, generado desde Conceptos) es
    un **menu dinamico nuevo**, mas la opcion en el editor de menu para elegir "que grupo muestra
-   las actividades tipo proceso".
+   las actividades tipo proceso". OJO: hoy `MenuNodeKind` es todo estatico (QuickLink/Section/
+   Subgroup/Item) y `MenuNode` no tiene marca de fuente dinamica -> hace falta el flag/kind nuevo
+   primero (**PRE-5**), luego el render (Ola 4).
 5. **Fidelidad del modal.** El prototipo tiene un wizard de **4 pasos** (Informacion / Contacto /
    Formulario / Documentos) con columna de resumen; el actual es de 3 sin formulario ni
    documentos. Hay que replicarlo (ver [[02 - UX y fidelidad (modal, menu, tableros)]]).
-6. **Encargado (deuda tecnica de Dependencias).** El "encargado principal" existe como
-   `OrgUnit.ResponsibleTenantUserId` (a nivel de unidad), no como flag por miembro. El selector
-   "cargos primero, luego encargado" debe apoyarse en eso.
+6. **Encargado: marca de jefe/responsable por miembro (Dependencias) = PRE-4.** Hoy solo existe
+   `OrgUnit.ResponsibleTenantUserId` (a nivel de unidad); `OrgUnitMember` NO tiene flag de jefe.
+   El usuario pidio la marca por miembro: agregarla y usarla como Encargado por defecto del alta
+   (ver PRE-4 en doc 03).
 
 ## 3. Los dos caminos de creacion (segun el dictado)
 
