@@ -132,14 +132,23 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   Pending (lo de `/mis-pasos`); la actividad simple NO crea instancia; y queda la traza de
   notificacion. Sin cambios de esquema (Ola 2 es solo comportamiento).
 
-### Ola 3 - Modal wizard 4 pasos (fidelidad prototipo)
-- Reescribir `TaskWizard.razor` al wizard de 4 pasos del prototipo: Informacion (Empresa/Area ->
-  Tipo -> Actividad -> Encargado -> Fecha + Descripcion + Prioridad + Etiquetas), Contacto,
-  Formulario (condicional, ver Ola 5), Documentos; columna de resumen; footer con "Guardar y crear
-  otra" (reusar patron del Contenedor de datos).
-- Cascada real: Tipo(categoria) -> Actividad(subcategoria) -> Encargado (cargos + responsable).
-- **Aceptacion**: el modal se ve milimetrico al prototipo (validacion visual contra el HTML), la
-  cascada funciona, crea la actividad por ambos caminos, "Guardar y crear otra" no cierra.
+### Ola 3 - Modal wizard 4 pasos (fidelidad prototipo)  -- HECHA 2026-07-11 (commit `9af2202`)
+- `TaskWizard.razor` reescrito al wizard de 4 pasos del prototipo (`ECOREX.dc.html` ~4280-4438):
+  dos columnas (contenido 1100px + aside de resumen 280px), steps nav (Informacion / Contacto /
+  Formulario / Documentos), cards con los tokens exactos (`--surface`/`--ink`/`--t-*`/`--sh-*`),
+  footer con Limpiar + "Guardar y crear otra" + Siguiente/Guardar.
+- Cascada real: **Empresa/Area (`Entidad`) -> Proceso/Tipo (`ActividadCategoria`) -> Actividad
+  (`ActividadSubcategoria`) -> Encargado** (usuarios derivados de los cargos del concepto via
+  `IActividadCatalogoService.ListEncargadoUserIdsAsync`, fallback a todos). Crea por CONCEPTO
+  (`SubcategoriaId` + `EntidadId`, `ActivityTypeId` null). Paso 3 = estado del formulario (render
+  dinamico = Ola 5); paso 4 = dropzone (adjuntar desde el detalle). Preselccion opcional de
+  concepto/entidad para el camino Mis Procesos.
+- **Aceptacion CUMPLIDA** (validado en Chrome): modal 1100px centrado milimetrico; la cascada real
+  funciona (entidades + categorias de Conceptos reales); crea por concepto (T00208 "Cotizacion de
+  equipos"/Agencia Norte y T00209 "Mantenimiento preventivo"/Operaciones Logisticas, ambas con
+  `activity_type_id` null); "Guardar y crear otra" deja el modal abierto con el titulo limpio y el
+  concepto conservado. Fix incluido: se elimino la regla CSS obsoleta `.tk-wizard{max-width:620px}`
+  que aplastaba el overlay del nuevo modal.
 
 ### Ola 4 - Menu "Mis Procesos" dinamico + editor
 - `MenuNode`: soporte de grupo dinamico "muestra actividades tipo proceso"; `ConfiguracionMenu`
