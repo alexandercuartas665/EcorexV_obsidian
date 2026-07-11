@@ -215,12 +215,20 @@ faltante y verifico el resto con tests de integracion (4/4 verdes en PG):
   Test `Assign_RecordsNotificationTrace_ForAssignee` (verde). La ENTREGA real (email/in-app con
   plantilla) queda como backlog.
 
-**DIFERIDO (endurecimiento mayor, su propio esfuerzo):**
-- **Policies COMPUESTAS por vista** (multi-permiso del legacy derivado del Module Registry): hoy
-  las paginas de tareas usan policies placeholder (`Tareas.Ver` == claim `tenant_id`). Derivar los
-  permisos reales por vista/accion es un refactor de auth con riesgo de romper acceso -> pasada aparte.
-- **Entrega de notificaciones con plantilla**: hoy solo queda la traza en el historial; falta el
-  canal real (email / in-app) y la plantilla configurable.
+**Diferidos de Ola 7 -- RESUELTOS 2026-07-11 (commits `f9ea27b` + `ef9ef06`):**
+- **Policies COMPUESTAS por vista -- HECHO** (`f9ea27b`): el motor `Perm:{modulo}:{accion}` (ADR-0033)
+  ahora soporta AND multi-permiso (`Perm:m1:a1+m2:a2` = varios `PermissionRequirement`). La familia
+  Tareas dejo de ser placeholder: `Tareas.Ver`/`Proyectos.Ver`/`Flujos.Ver` exigen el permiso real y
+  `Formularios.Disenar` es COMPUESTA (ver+editar). Sin tocar paginas. 26/26 tests unitarios verdes.
+  Aun placeholder (documentado): policies de gobierno (AdmUsuarios/RolesPermisos/ConfiguracionMenu a
+  Owner/Admin) y Conceptos.Editar/Dependencias.Ver/MisPasos.Ver.
+- **Entrega REAL de notificaciones in-app -- HECHO** (`ef9ef06`): entidad `Notification` (tenant-scoped,
+  por usuario, leido/no leido) + `INotificationService` + migracion `AddNotifications` (PG local).
+  `AssignAsync` ENTREGA una notificacion al encargado (TaskAssigned) y a los destinatarios del concepto
+  (ConceptNotice), en la misma transaccion. Campana del topbar = badge real con conteo -> pagina
+  `/notificaciones` (marcar leida / todas / abrir). Test integracion verde + validado en Chrome
+  (badge 2, marcar leida -> 1). Backlog: canal EMAIL con plantilla (IEmailSender ya existe) y refresco
+  en vivo del badge por SignalR. Pendiente operativo: desplegar `AddNotifications` a prod.
 
 ## B2. Olas de PROYECTOS (en alcance por decision del usuario)
 
