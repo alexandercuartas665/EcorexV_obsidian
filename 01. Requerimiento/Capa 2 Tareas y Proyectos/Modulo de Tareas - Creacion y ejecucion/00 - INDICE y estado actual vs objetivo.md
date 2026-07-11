@@ -2,7 +2,7 @@
 tipo: indice-proyecto
 proyecto: Modulo de Tareas - Creacion y ejecucion de actividades
 modulos_web: /actividades (000636), /crear-actividad (000038), /proyectos (000042), /conceptos (000270), /dependencias (000850), /flujos (000291), /formularios (000131), /configuracion-menu (000194)
-estado: especificacion (por construir el "puente")
+estado: PUENTE CONSTRUIDO - Olas 1-7 HECHAS (2026-07-11); pendiente desplegar a prod
 fecha: 2026-07-11
 autor: documentado por agente IA (4 exploradores read-only sobre el codigo real) a partir de la dictado del usuario + prototipo + Capa 2
 ---
@@ -12,7 +12,19 @@ autor: documentado por agente IA (4 exploradores read-only sobre el codigo real)
 > Capitulo de construccion. El objetivo es que crear una actividad quede **milimetricamente
 > igual al prototipo** (`01. Requerimiento/Prototipo/ECOREX.dc.html`) y que la actividad
 > **consuma el concepto** (categoria/subcategoria) para arrancar su flujo, su formulario y su
-> tablero, con la asignacion por cargo. Los motores ya existen; **falta el puente**.
+> tablero, con la asignacion por cargo. Los motores ya existian; **el puente YA SE CONSTRUYO**.
+
+> [!success] ESTADO 2026-07-11: EL PUENTE ESTA CONSTRUIDO (Olas 1-7 HECHAS)
+> Los 5 prerequisitos (PRE-1..PRE-5) y las 7 olas estan implementadas, con tests de integracion
+> verdes (PG) y validacion en Chrome (tareas T00207-T00211). El detalle por ola, commits y lo
+> DIFERIDO estan en [[03 - Plan por olas y preguntas abiertas]] (fuente de verdad del avance).
+> La seccion 2 de este doc describe las brechas TAL COMO ESTABAN al inicio; cada una lleva ahora
+> su marca de resuelta.
+> **Unico pendiente operativo grande**: desplegar a prod lo acumulado (migraciones
+> `AddEntidadConfig`/`AddEntidadKind`/`AddJefeMemberAndProcessGroupMenu`/`TaskItemConceptoBridge` +
+> olas 1-7, hoy solo local) y rehacer la config demo (flujo/form/tablero por subcategoria) via el
+> editor de Conceptos en prod. **DIFERIDO de endurecimiento**: policies compuestas por vista y la
+> entrega real de notificaciones (canal + plantilla).
 
 ## 1. Hallazgo central (auditoria del codigo real, 2026-07-11)
 
@@ -27,36 +39,28 @@ al menu:
 | Motor de Formularios dinamicos (definir/render/guardar; submit completa paso de flujo) | **Construido y usable** (14+ tipos; multimedia/firma/GPS son placeholders) | `FormDefinition/Response.cs`, `FormResponseService.cs`, `DynamicFormRenderer.razor`, `FormDesigner.razor` |
 | Menu lateral (vistas/nodos por tenant, editor, poda por permiso) | **Construido, data-driven** | `MenuConfigService.cs`, `MenuTreeBuilder.cs`, `MenuPermissionFilter.cs`, `NavMenu.razor`, `ConfiguracionMenu.razor`; entidades `MenuView.cs`/`MenuNode.cs` |
 
-## 2. Las brechas (lo que hay que construir = "el puente")
+## 2. Las brechas (como estaban al inicio) -- TODAS CERRADAS 2026-07-11
 
-1. **DOS modelos de "tipo" desconectados.** La tarea (`TaskItem`) se clasifica hoy por
-   `ActivityType` (Categoria=texto + Nombre). El catalogo rico **`ActividadSubcategoria`
-   (Concepto)** existe pero **no interviene en la creacion de tareas**. Hay que decidir como
-   unificarlos (ver [[01 - Arquitectura, decisiones y consumo]] D1). Es LA decision que
-   gobierna todo el modulo.
-2. **El alta de tarea no consume el concepto.** `TaskWizard.razor` (3 pasos) no lee flags ni
-   FKs del concepto: no arranca el flujo (`WorkflowEngine.StartInstance`), no abre el
-   formulario (`IniciaModulo`), no asigna por cargo, no usa el tablero del concepto.
-3. **Empresa/Area del modal: fuente RESUELTA (PRE-1, 2026-07-11), falta cablearla.** El prototipo
-   pide un selector Empresa/Area; hoy el `TaskItem` no tiene FK (la "Categoria" es texto de
-   `ActivityType`). **La fuente ya existe**: el modulo "Configuracion de la entidad" (000616,
-   `/configuracion-entidad`) administra las `Entidad` del tenant con tipo `Sede` o `Area`, y
-   `IEntidadService.ListOptionsAsync()` las lista para el combo. Ojo: es distinto de
-   `OrgUnit.Kind=Area` (organigrama 000850), que se usa para asignar pasos por cargo, NO para el
-   selector. Pendiente: agregar `TaskItem.EntidadId` (Ola 1) y el combo en el modal (Ola 3).
-4. **El menu "Mis Procesos" es estatico**, sembrado en `menu_nodes` (DatabaseSeeder ~2551). El
-   objetivo (Mis Procesos -> categoria -> subcategoria -> tablero, generado desde Conceptos) es
-   un **menu dinamico nuevo**, mas la opcion en el editor de menu para elegir "que grupo muestra
-   las actividades tipo proceso". El fundamento (**PRE-5**) ya esta RESUELTO (2026-07-11, commit
-   `66bb60d`): `MenuNode.IsProcessGroup` + checkbox en el editor + badge "procesos" en el sidebar.
-   Falta solo el render dinamico (expandir con categorias/subcategorias) = **Ola 4**.
-5. **Fidelidad del modal.** El prototipo tiene un wizard de **4 pasos** (Informacion / Contacto /
-   Formulario / Documentos) con columna de resumen; el actual es de 3 sin formulario ni
-   documentos. Hay que replicarlo (ver [[02 - UX y fidelidad (modal, menu, tableros)]]).
-6. **Encargado: marca de jefe/responsable por miembro (Dependencias) = PRE-4. RESUELTO** (2026-07-11,
-   commit `66bb60d`): `OrgUnitMember.IsResponsible` (uno por unidad, sincroniza
-   `OrgUnit.ResponsibleTenantUserId`) + boton/badge en Dependencias. La Ola 3 lo usara como Encargado
-   por defecto del alta.
+> Se dejan descritas como estaban para trazabilidad; cada una lleva su marca de resuelta y el commit.
+
+1. ~~**DOS modelos de "tipo" desconectados.**~~ **RESUELTO (Ola 1, `a60252e`).** `TaskItem` pivota a
+   `SubcategoriaId` (concepto) + `EntidadId`; `ActivityTypeId` queda nullable/deprecado (D1). El alta
+   exige >=1 clasificacion.
+2. ~~**El alta de tarea no consume el concepto.**~~ **RESUELTO (Olas 2-3-5).** El nuevo `TaskWizard`
+   (4 pasos) lee flags/FKs del concepto: arranca el flujo (`WorkflowDefinitionId`, Ola 2), aplica
+   `TituloAuto`/`DetalleAuto` (Ola 2), asigna por cargo (`ListEncargadoUserIdsAsync`, Ola 3), abre el
+   formulario si `IniciaModulo` (form-first, Ola 5) y hereda el tablero del concepto (Ola 1/6).
+3. ~~**Empresa/Area del modal.**~~ **RESUELTO.** Fuente = `Entidad` (Sede/Area) de Config de la entidad
+   (000616), PRE-1 (`5590545`); FK `TaskItem.EntidadId` (Ola 1) + combo en el modal (Ola 3).
+4. ~~**El menu "Mis Procesos" es estatico.**~~ **RESUELTO (Ola 4, `8de3521`).** `NavMenu` expande el
+   grupo `IsProcessGroup` (PRE-5, `66bb60d`) con el arbol dinamico categoria->subcategoria-proceso
+   desde Conceptos; cada subcategoria linkea al tablero/alta con cat/sub fijadas.
+5. ~~**Fidelidad del modal.**~~ **RESUELTO (Ola 3, `9af2202`).** `TaskWizard.razor` reescrito al wizard
+   de 4 pasos (Informacion/Contacto/Formulario/Documentos + aside resumen), milimetrico a
+   `ECOREX.dc.html` (tokens `--surface/--ink/--t-*/--sh-*`).
+6. ~~**Encargado: marca de jefe/responsable.**~~ **RESUELTO** (PRE-4, `66bb60d`):
+   `OrgUnitMember.IsResponsible` (uno por unidad, sincroniza `OrgUnit.ResponsibleTenantUserId`); la Ola 3
+   lo usa como Encargado por defecto y la Ola 7 (`7111cbb`) notifica al asignar.
 
 ## 3. Los dos caminos de creacion (segun el dictado)
 
@@ -92,12 +96,11 @@ Detalle de ambos en [[02 - UX y fidelidad (modal, menu, tableros)]].
 
 ## 6. Veredicto de delegacion
 
-Delegable a sub-agente **por olas** (ver doc 03). **Los 5 prerequisitos (PRE-1..PRE-5) ya estan
-RESUELTOS (2026-07-11)**, asi que el modulo esta listo para arrancar las olas; solo queda el
-pendiente operativo de desplegar a prod las migraciones acumuladas. Es un alcance grande
-(Actividades + Proyectos); conviene **un sub-agente por linea**
-(Actividades y Proyectos) en worktrees separados para minimizar conflictos, coordinados por el
-orquestador. Fidelidad: los tokens del `ECOREX.dc.html` mandan (modal ~4280-4438; menu "Mis
+**Actividades: TERMINADO en local (Olas 1-7 HECHAS 2026-07-11, ver doc 03).** Queda el pendiente
+operativo de **desplegar a prod** las migraciones acumuladas + la config demo via editor de Conceptos,
+y el **DIFERIDO de endurecimiento** (policies compuestas por vista + entrega real de notificaciones).
+**Proyectos: sin empezar** (olas P1-P3); conviene **un sub-agente** en worktree aparte para minimizar
+conflictos. Fidelidad: los tokens del `ECOREX.dc.html` mandan (modal ~4280-4438; menu "Mis
 Procesos"/groupDefs ~4711).
 
 Relacionado: [[Tareas y Proyectos - paginas basicas]], [[ctrTareasII - Spec para reconstruir en Claude Design]],
