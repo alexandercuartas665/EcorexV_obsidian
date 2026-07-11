@@ -1,0 +1,86 @@
+---
+tipo: indice-proyecto
+proyecto: Modulo de Tareas - Creacion y ejecucion de actividades
+modulos_web: /actividades (000636), /crear-actividad (000038), /proyectos (000042), /conceptos (000270), /dependencias (000850), /flujos (000291), /formularios (000131), /configuracion-menu (000194)
+estado: especificacion (por construir el "puente")
+fecha: 2026-07-11
+autor: documentado por agente IA (4 exploradores read-only sobre el codigo real) a partir de la dictado del usuario + prototipo + Capa 2
+---
+
+# Modulo de Tareas - Creacion y ejecucion de actividades
+
+> Capitulo de construccion. El objetivo es que crear una actividad quede **milimetricamente
+> igual al prototipo** (`01. Requerimiento/Prototipo/ECOREX.dc.html`) y que la actividad
+> **consuma el concepto** (categoria/subcategoria) para arrancar su flujo, su formulario y su
+> tablero, con la asignacion por cargo. Los motores ya existen; **falta el puente**.
+
+## 1. Hallazgo central (auditoria del codigo real, 2026-07-11)
+
+Los cimientos estan construidos y son solidos; lo que falta es CONECTARLOS al alta de tarea y
+al menu:
+
+| Cimiento | Estado real | Rutas |
+|----------|-------------|-------|
+| Conceptos 2 niveles (Categoria/Subcategoria) con FKs a flujo/formulario/tablero+columna y M:N a cargos/terceros/notifs + flags (`IniciaModulo`, `RequiereCliente`, `CierreManual`, `TituloAuto`, `DetalleAuto`) | **Construido** (config UI completa en Conceptos.razor) | `Ecorex.Domain/Entities/ActividadCategoria.cs`, `ActividadSubcategoria.cs`; `Ecorex.Application/Actividades/ActividadCatalogoService.cs`; `Components/Pages/Conceptos.razor` |
+| Runtime de flujos (nodo->cargo, cargo->usuarios, bandeja reclamar/atender/aprobar, motor Advance/Reject) | **Construido y maduro** | `WorkflowEngine.cs`, `WorkflowInboxService.cs`, `WorkflowNodePolicy.cs`, `OrgAssigneeTree.cs`, `INodeAssigneeResolver.cs`; embebido en `TaskDetailModal.razor` + pagina `/mis-pasos` |
+| Organigrama (Dependencia->Cargo->Funcionario, responsable de unidad) | **Construido** | `OrgUnit.cs` (`Classifier`, `TenantUserId`, `ResponsibleTenantUserId`), `OrgUnitService.cs`, `Dependencias.razor` |
+| Motor de Formularios dinamicos (definir/render/guardar; submit completa paso de flujo) | **Construido y usable** (14+ tipos; multimedia/firma/GPS son placeholders) | `FormDefinition/Response.cs`, `FormResponseService.cs`, `DynamicFormRenderer.razor`, `FormDesigner.razor` |
+| Menu lateral (vistas/nodos por tenant, editor, poda por permiso) | **Construido, data-driven** | `MenuConfigService.cs`, `MenuTreeBuilder.cs`, `MenuPermissionFilter.cs`, `NavMenu.razor`, `ConfiguracionMenu.razor`; entidades `MenuView.cs`/`MenuNode.cs` |
+
+## 2. Las brechas (lo que hay que construir = "el puente")
+
+1. **DOS modelos de "tipo" desconectados.** La tarea (`TaskItem`) se clasifica hoy por
+   `ActivityType` (Categoria=texto + Nombre). El catalogo rico **`ActividadSubcategoria`
+   (Concepto)** existe pero **no interviene en la creacion de tareas**. Hay que decidir como
+   unificarlos (ver [[01 - Arquitectura, decisiones y consumo]] D1). Es LA decision que
+   gobierna todo el modulo.
+2. **El alta de tarea no consume el concepto.** `TaskWizard.razor` (3 pasos) no lee flags ni
+   FKs del concepto: no arranca el flujo (`WorkflowEngine.StartInstance`), no abre el
+   formulario (`IniciaModulo`), no asigna por cargo, no usa el tablero del concepto.
+3. **Falta la entidad "Empresa/Area" en el modal.** El prototipo pide un selector Empresa/Area;
+   hoy no hay FK: la "Categoria" es texto de `ActivityType`. Las areas reales viven en el
+   organigrama (`OrgUnit` Kind=Area / Classifier=Dependencia), NO en "Configuracion de entidad"
+   (000615, que es config del tenant). Decidir la fuente (ver D2).
+4. **El menu "Mis Procesos" es estatico**, sembrado en `menu_nodes` (DatabaseSeeder ~2551). El
+   objetivo (Mis Procesos -> categoria -> subcategoria -> tablero, generado desde Conceptos) es
+   un **menu dinamico nuevo**, mas la opcion en el editor de menu para elegir "que grupo muestra
+   las actividades tipo proceso".
+5. **Fidelidad del modal.** El prototipo tiene un wizard de **4 pasos** (Informacion / Contacto /
+   Formulario / Documentos) con columna de resumen; el actual es de 3 sin formulario ni
+   documentos. Hay que replicarlo (ver [[02 - UX y fidelidad (modal, menu, tableros)]]).
+6. **Encargado (deuda tecnica de Dependencias).** El "encargado principal" existe como
+   `OrgUnit.ResponsibleTenantUserId` (a nivel de unidad), no como flag por miembro. El selector
+   "cargos primero, luego encargado" debe apoyarse en eso.
+
+## 3. Los dos caminos de creacion (segun el dictado)
+
+- **(A) Actividad-proceso**: la que tiene flujo vinculado en el concepto. Se llega desde el menu
+  **Mis Procesos -> categoria -> subcategoria**, que carga el **tablero especifico + el modal**
+  ya con categoria/subcategoria fijadas (no las vuelve a preguntar). Puede arrancar con un
+  **formulario** si la subcategoria tiene `IniciaModulo` (permiso, cotizacion...).
+- **(B) Actividad simple**: la que NO tiene flujo. Se crea desde un **tablero**, con el modal
+  **Empresa/Area -> Tipo (categoria) -> Actividad (subcategoria) -> Encargado -> descripcion**.
+  En el tablero/modal solo se listan las actividades (subcategorias) sin proceso.
+
+Detalle de ambos en [[02 - UX y fidelidad (modal, menu, tableros)]].
+
+## 4. Documentos del capitulo
+
+- [[01 - Arquitectura, decisiones y consumo]] - el puente: decisiones (unificacion de tipos,
+  empresa/area, menu dinamico), y como el alta consume el concepto (flujo + formulario + cargo).
+- [[02 - UX y fidelidad (modal, menu, tableros)]] - modal wizard 4 pasos (tokens del prototipo),
+  menu Mis Procesos dinamico, tableros y los 2 caminos.
+- [[03 - Plan por olas y preguntas abiertas]] - backlog verificable + decisiones a cerrar con el
+  usuario antes de delegar a un sub-agente.
+
+## 5. Veredicto de delegacion
+
+Es delegable a sub-agente **por olas**, PERO **no en crudo**: primero hay que **cerrar 3-4
+decisiones** (doc 03, seccion Preguntas) - sobre todo la unificacion `ActivityType` vs
+`ActividadSubcategoria` - porque gobiernan el esquema de datos. Con esas decisiones tomadas y la
+fidelidad extraida del prototipo, cada ola es un entregable claro. Referencias del prototipo:
+modal en lineas ~4280-4438; menu "Mis Procesos" (groupDefs) ~4711; los tokens de estilo del
+`ECOREX.dc.html` mandan (regla del proyecto: fidelidad milimetrica).
+
+Relacionado: [[Tareas y Proyectos - paginas basicas]], [[ctrTareasII - Spec para reconstruir en Claude Design]],
+[[ctrVertareasII - Spec para reconstruir en Claude Design]], [[AdmWorkflow - Motor de flujo de la tarea]].
