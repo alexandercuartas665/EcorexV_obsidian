@@ -6,9 +6,9 @@ usuario_demo: 1048064705 (GUADALUPE.LA)
 url_local: http://localhost:47640/GestionMovil/Formularios/Modulos/Login/LoginBitcode.aspx
 url_prod: https://app.bitcode.com.co/Formularios/Modulos/Login/LoginBitcode.aspx
 base_datos_dev: db3dev (sql.bitcode.com.co,44566)
-total_docs: 52
+total_docs: 56
 carpetas: 8
-fecha_ultima_actualizacion: 2026-07-07
+fecha_ultima_actualizacion: 2026-07-11
 estado: adaptado a la vision del sistema destino .NET 10 (ORIGEN preservado como referencia ETL)
 nivel_completitud: 90 por ciento
 ---
@@ -85,6 +85,11 @@ OBSIDIAN.tareas/
 - [[Esquema completo - Tablas y tipos de control]]
 - [[Motores y renderers - cl_FormCreator + crtCargaEncuestaII + cl_gestion_reglas]]
 - [[Visor por token - docu_viewform]]
+- **Ingenieria inversa del codigo real (`Documental/`)** — 61 archivos VB del motor vigente:
+  - [[Clases del nucleo de formularios (Documental)]] — las 9 clases `cl_*` (definicion EAV en `ENCUESTAS_MOV_*` + propiedades en `FORX_DATA`, motor de calculos por grafo `REG_ORIGEN->REG_DESTINO`, reglas por **reflexion**). Riesgo: secreto Azure embebido en `cl_Transcripcion_audio.vb`, SQL concatenado
+  - [[Controles del constructor y renderers (Documental)]] — los 38 `.ascx`: disenador `ctrFormCreator` (WYSIWYG) + renderer vigente `crtCargaEncuestaII` (dispatch oculto en `cl_gestion_formularios.AdornoDetalle`) + catalogo de controles por tipo de campo (Quill, firma canvas, audio+transcripcion, GPS, reCAPTCHA, grid detalle, tabla hija)
+  - [[FormCreatorMCP - Servidor MCP del constructor]] — endpoint `.ashx` que expone **20 herramientas** para que un agente de IA construya formularios de punta a punta; usa **Gemini 2.0 Flash Vision** (tool estrella `import_form_from_image`: imagen -> blueprint -> formulario). RPC JSON propietario (no MCP estandar). Riesgo: sin auth, CORS `*`, SQL por concatenacion
+  - [[Clases de Reglas del modulo Documental]] — las 11 clases `cl_*_reglas`: despacho por `Type.GetType`+`Activator`+`Invoke` de verbos `Ensamblado` (migrar a formulario, generar tareas, cotizador, Siigo, plantillas PDF->Blob, ChatGPT, WhatsApp). Riesgo: reflexion abierta = RCE de facto sin allow-list
 
 ### Capa 5 - Librerias Base
 - [[00 - Visión MotherData]] — DAL. Fichas: [[AdmDatos - Motor SQL Server]], [[AdmNpgsql - Motor PostgreSQL]], [[AdmCrypto - Cifrado simétrico]], [[CargaConfig - Decode Config.xml]], [[VariablesGlobales - Conexiones y Empresa]]
@@ -166,6 +171,25 @@ OBSIDIAN.tareas/
 ### Voy a planear la migracion
 1. [[HOJA DE RUTA DESARROLLO]] → 2. vault CUBOT.nails (esquema destino: DAL dual PostgreSQL/SQL Server + modulos base portados)
 
+## Novedades (2026-07-11)
+
+- **Ingenieria inversa profunda del motor de formularios (`Bootstrap/.../Documental/`)**:
+  se documentaron las 4 carpetas del codigo VB real que sostiene el constructor
+  (61 archivos, ~1.2 MB) en 4 notas nuevas de Capa 4, cada una con doble encuadre
+  ORIGEN/DESTINO: [[Clases del nucleo de formularios (Documental)]] (9 clases `cl_*`),
+  [[Controles del constructor y renderers (Documental)]] (38 `.ascx`),
+  [[FormCreatorMCP - Servidor MCP del constructor]] (20 herramientas de IA, Gemini
+  Vision) y [[Clases de Reglas del modulo Documental]] (11 clases de verbos `Ensamblado`).
+- **Hallazgo clave**: `FormCreatorMCP` permite construir un formulario **a partir de una
+  imagen** (foto -> blueprint -> formulario) via Gemini 2.0 Flash Vision; el motor de
+  reglas ejecuta verbos por **reflexion** (`Type.GetType`+`Activator`+`Invoke`) sin
+  allow-list. Ambos son insumo directo de las capas [[Agentes de IA - Arquitectura y Operacion]]
+  y del `RulesEngine` tipado del destino.
+- **Riesgos de seguridad del legacy anotados (no publicados verbatim)**: secreto Azure
+  embebido en `cl_Transcripcion_audio.vb`, SQL por concatenacion generalizado, endpoint
+  de IA sin auth con CORS `*`, reflexion abierta = RCE de facto. Refuerzan los 9 errores
+  a NO heredar de la [[Gestion de Empresas - Admin multi-tenant]].
+
 ## Novedades (2026-07-07)
 
 - **Hilo Usuarios -> Roles -> Enforcement** (ADR-0031/0032/0033, apoyo en el
@@ -211,7 +235,7 @@ OBSIDIAN.tareas/
 
 ## Estado
 
-- **Total notas**: 52 md (+ prototipo final HTML/`.dc`, 12 capturas, 1 .bpmn, 5 conceptos DC)
+- **Total notas**: 56 md (+ prototipo final HTML/`.dc`, 12 capturas, 1 .bpmn, 5 conceptos DC)
 - **Prototipo**: [[Visión y entorno|Prototipo Final ECOREX]] es la referencia visual oficial del proyecto
 - **Cobertura**: ~90 por ciento — el resto son TODOs listados en la [[HOJA DE RUTA DESARROLLO]]
 - **Convencion**: notas nuevas en ASCII; wikilinks por nombre de archivo (sin rutas)
