@@ -170,11 +170,11 @@ App de prod: `http://10.0.0.3:5480/login`
 
 Un usuario **validado** por tenant (los demas del tenant siguen la misma regla):
 
-| Tenant | Email (login) | Clave (cedula) | Rol |
-|---|---|---|---|
-| BITCODE | `acuartas@bitcode.com.co` | `80001976` | Owner |
-| SKY SYSTEM | `adriana.borrero@skysystem.com.co` | `51888215` | Owner |
-| agrometalicas | `calidad@agrometalicas.com` | `1116243150` | Owner |
+| Tenant        | Email (login)                      | Clave (cedula) | Rol   |
+| ------------- | ---------------------------------- | -------------- | ----- |
+| BITCODE       | `acuartas@bitcode.com.co`          | `80001976`     | Owner |
+| SKY SYSTEM    | `adriana.borrero@skysystem.com.co` | `51888215`     | Owner |
+| agrometalicas | `calidad@agrometalicas.com`        | `1116243150`   | Owner |
 
 Super Admin de plataforma (prod): `admin@ecorex.local` (la clave es el secreto
 `ECOREX_SEED_ADMIN_PASSWORD` del `.env` del server, **NO** se documenta aqui).

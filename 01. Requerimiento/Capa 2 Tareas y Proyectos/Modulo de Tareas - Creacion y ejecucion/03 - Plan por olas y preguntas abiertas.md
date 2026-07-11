@@ -196,10 +196,31 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   prototipo) quedo diferido por la concurrencia de DbContext compartido; el modal preset con cat/sub
   sigue disponible via `crear-actividad?sub=` (Ola 4).
 
-### Ola 7 - Endurecimiento
+### Ola 7 - Endurecimiento  -- HECHA 2026-07-11 (commit codigo 7111cbb)
 - Deuda del encargado (flag principal si se decidio), consecutivos transaccionales, notificaciones
   (plantilla), policies compuestas por vista (multi-permiso del legacy), auditoria.
 - **Aceptacion**: pruebas de permisos, concurrencia, y notificacion al asignar.
+
+**Resuelto.** La mayoria del endurecimiento ya venia de olas previas; Ola 7 cerro la pieza
+faltante y verifico el resto con tests de integracion (4/4 verdes en PG):
+- **Encargado**: flag jefe/responsable = PRE-4 (`OrgUnitMember.IsResponsible`, uno por unidad).
+- **Consecutivos transaccionales**: `CreateAsync` emite el correlativo T dentro de la transaccion
+  (test `ConcurrentCreates_YieldUniqueCorrelativeNumbers`).
+- **Concurrencia optimista**: rowversion/xmin (test `OptimisticConcurrency_SecondStaleUpdate_GetsTypedConflict`).
+- **Auditoria**: cada accion deja `TaskItemActivity` (historia inmutable de la tarea).
+- **Permisos**: aislamiento cross-tenant por filtro global (test `TaskItems_AreIsolatedBetweenTenants`).
+- **NUEVO - notificacion al asignar**: `AssignAsync` deja traza dirigida al encargado
+  ("notifico a X: le asignaron la tarea N") y, si la tarea tiene concepto, a los destinatarios
+  configurados (`ActividadSubcategoriaNotificacion`) via helper `AddConceptNotificationAsync`.
+  Test `Assign_RecordsNotificationTrace_ForAssignee` (verde). La ENTREGA real (email/in-app con
+  plantilla) queda como backlog.
+
+**DIFERIDO (endurecimiento mayor, su propio esfuerzo):**
+- **Policies COMPUESTAS por vista** (multi-permiso del legacy derivado del Module Registry): hoy
+  las paginas de tareas usan policies placeholder (`Tareas.Ver` == claim `tenant_id`). Derivar los
+  permisos reales por vista/accion es un refactor de auth con riesgo de romper acceso -> pasada aparte.
+- **Entrega de notificaciones con plantilla**: hoy solo queda la traza en el historial; falta el
+  canal real (email / in-app) y la plantilla configurable.
 
 ## B2. Olas de PROYECTOS (en alcance por decision del usuario)
 
