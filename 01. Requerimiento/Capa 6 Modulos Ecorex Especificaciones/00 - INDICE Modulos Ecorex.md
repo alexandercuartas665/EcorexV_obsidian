@@ -67,3 +67,17 @@ Se corrieron **2 subagentes en paralelo** para validar los 5 specs:
 - [[gen_reglas - Spec para reconstruir en Claude Design|Spec previa de gen_reglas]] (dentro de contexto Flujos; la de esta carpeta es auto-contenida)
 - [[ctrTareasII - Spec para reconstruir en Claude Design|Spec ctrTareasII]]
 - [[ctrVertareasII - Spec para reconstruir en Claude Design|Spec ctrVertareasII]]
+
+## Capitulo nuevo (2026-07-11) - Agente Conector On-Prem (Contenedor de datos)
+
+Proyecto NUEVO (no reconstruccion): un agente de escritorio VB.NET + WPF que se instala en la
+red del cliente y alimenta el modulo "Contenedor de datos" por WebSocket (SignalR), disparado
+por los horarios del sistema web o por refresco inmediato. Documentacion auto-contenida para
+que un sub-agente lo construya. Ver subcarpeta `Agente Conector On-Prem/`:
+
+- [[00 - INDICE - Agente Conector On-Prem|Indice del proyecto]]
+- [[01 - Vision, arquitectura y decisiones]]
+- [[02 - Protocolo SignalR (mensajes, handshake, secuencias)]]
+- [[03 - Servidor (Hub + Scheduler + Ingesta)]]
+- [[04 - Cliente VB.NET WPF (Servicio Windows + config)]]
+- [[05 - Plan de trabajo por olas (para sub-agente)]]
