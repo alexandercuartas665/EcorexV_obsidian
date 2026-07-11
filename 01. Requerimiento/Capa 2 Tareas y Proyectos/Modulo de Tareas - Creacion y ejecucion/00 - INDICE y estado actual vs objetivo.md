@@ -37,10 +37,13 @@ al menu:
 2. **El alta de tarea no consume el concepto.** `TaskWizard.razor` (3 pasos) no lee flags ni
    FKs del concepto: no arranca el flujo (`WorkflowEngine.StartInstance`), no abre el
    formulario (`IniciaModulo`), no asigna por cargo, no usa el tablero del concepto.
-3. **Falta la entidad "Empresa/Area" en el modal.** El prototipo pide un selector Empresa/Area;
-   hoy no hay FK: la "Categoria" es texto de `ActivityType`. Las areas reales viven en el
-   organigrama (`OrgUnit` Kind=Area / Classifier=Dependencia), NO en "Configuracion de entidad"
-   (000615, que es config del tenant). Decidir la fuente (ver D2).
+3. **Empresa/Area del modal: fuente RESUELTA (PRE-1, 2026-07-11), falta cablearla.** El prototipo
+   pide un selector Empresa/Area; hoy el `TaskItem` no tiene FK (la "Categoria" es texto de
+   `ActivityType`). **La fuente ya existe**: el modulo "Configuracion de la entidad" (000616,
+   `/configuracion-entidad`) administra las `Entidad` del tenant con tipo `Sede` o `Area`, y
+   `IEntidadService.ListOptionsAsync()` las lista para el combo. Ojo: es distinto de
+   `OrgUnit.Kind=Area` (organigrama 000850), que se usa para asignar pasos por cargo, NO para el
+   selector. Pendiente: agregar `TaskItem.EntidadId` (Ola 1) y el combo en el modal (Ola 3).
 4. **El menu "Mis Procesos" es estatico**, sembrado en `menu_nodes` (DatabaseSeeder ~2551). El
    objetivo (Mis Procesos -> categoria -> subcategoria -> tablero, generado desde Conceptos) es
    un **menu dinamico nuevo**, mas la opcion en el editor de menu para elegir "que grupo muestra
@@ -76,8 +79,9 @@ Detalle de ambos en [[02 - UX y fidelidad (modal, menu, tableros)]].
 ## 5. Decisiones tomadas (usuario, 2026-07-11) y alcance
 
 - **Pivotar la tarea a Conceptos** (deprecar `ActivityType`) - D1.
-- **Empresa/Area sale del modulo de configuracion de la EMPRESA** - D2; es un **PREREQUISITO**
-  (checklist PRE-1 en doc 03): hay que definir/exponer las Areas ahi antes de tocar el modal.
+- **Empresa/Area sale del modulo Configuracion de la entidad (000616)** - D2; **PRE-1 RESUELTO**
+  el 2026-07-11 (entidad `Entidad` con tipo Sede/Area + `ListOptionsAsync` para el combo; ver
+  doc 03). Falta desplegar sus migraciones a prod y cablear el FK + el combo en el modal.
 - **Menu Mis Procesos dinamico** desde Conceptos - D3.
 - **Form-first en v1** (arranque con formulario cuando `IniciaModulo`).
 - **Alcance = Actividades + Proyectos JUNTOS** (Proyectos en olas P1-P3 aparte para no mezclar

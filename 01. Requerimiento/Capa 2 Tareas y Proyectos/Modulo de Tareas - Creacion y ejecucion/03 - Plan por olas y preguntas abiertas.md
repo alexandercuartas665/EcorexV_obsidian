@@ -10,9 +10,10 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 
 - **[D1] Unificacion de tipos = PIVOTAR A CONCEPTOS.** `TaskItem` referencia
   `ActividadSubcategoria` (concepto) y se deprecia `ActivityType`. Requiere migracion + backfill.
-- **[D2] Empresa/Area = MODULO DE CONFIG DE LA EMPRESA.** El dato sale del modulo de configuracion
-  de la empresa (no del organigrama directamente). Es un **PREREQUISITO** a resolver primero (ver
-  seccion Prerequisitos).
+- **[D2] Empresa/Area = MODULO CONFIGURACION DE LA ENTIDAD (000616).** El dato sale del modulo de
+  configuracion de la entidad (no del organigrama directamente). Prerequisito **RESUELTO** el
+  2026-07-11 (ver PRE-1). La fuente concreta es la entidad `Entidad` via
+  `IEntidadService.ListOptionsAsync()`.
 - **[D3] Menu Mis Procesos = grupo dinamico** desde Conceptos (categoria->subcategoria con flujo),
   marcado en el editor de menu. "Actividad tipo proceso" = subcategoria con `WorkflowDefinitionId`.
 - **[Form-first] = SI, EN V1.** El paso "Formulario" del wizard se cablea con `DynamicFormRenderer`.
@@ -25,12 +26,30 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 
 Tareas previas, cada una verificable, que desbloquean el modulo:
 
-- [ ] **PRE-1 Areas en la config de la empresa (D2).** Definir/exponer las **Areas** (y sedes/
-      empresas si aplica) dentro del modulo de configuracion de la empresa, de modo que exista una
-      fuente de "Areas del tenant" que el selector "Empresa/Area" consuma. Reconciliar con lo que
-      hoy existe (`OrgUnit` Kind=Area vive en Dependencias 000850; `/configuracion` = Cuenta.razor
-      es config del tenant, no areas). Aceptacion: hay un CRUD/lista de Areas administrable desde la
-      config de la empresa y un servicio que las lista para combos.
+- [x] **PRE-1 Areas en la config de la empresa (D2). RESUELTO 2026-07-11** (commit `5590545`;
+      modulo "Configuracion de la entidad" 000616, pagina `/configuracion-entidad`). Se creo la
+      entidad `Entidad` (legacy SUCURSAL_R = agencias/areas/sedes del tenant, distinta del tenant
+      mismo = "Mi cuenta" = SUCURSAL) con un discriminador `EntidadKind { Sede, Area }`: el modal
+      **pregunta primero el tipo** y adapta los campos (Sede = identidad legal + ubicacion + logo +
+      config; Area = solo nombre / sigla / responsable / contacto + config). CRUD administrable
+      (crear / editar / archivar / marcar principal) + **campos dinamicos por tenant**
+      (`EntidadFieldDefinition`, mismo patron que las fichas del Directorio). El servicio
+      **`IEntidadService.ListOptionsAsync()`** (devuelve `EntidadOptionDto { Id, Label }`) es la
+      fuente lista-para-combo del selector "Empresa/Area" del alta.
+      - **PENDIENTE de despliegue:** las migraciones `AddEntidadConfig` + `AddEntidadKind` estan
+        aplicadas SOLO en local; hay que desplegarlas a prod antes de que el modulo de Tareas las
+        consuma en produccion.
+      - **Reconciliacion (clave para la Ola 1):** existen DOS conceptos de "area" y se quedan
+        SEPARADOS a proposito:
+        - **(a) `Entidad.Kind=Area`** = area/agencia/sede organizativa de la cuenta. Es el ORIGEN
+          del selector "Empresa/Area" del alta de actividades. El FK del `TaskItem` apunta aqui
+          (`EntidadId -> Entidad`).
+        - **(b) `OrgUnit.Kind=Area`** (Dependencias / organigrama 000850) = nodo del organigrama
+          para **asignar los pasos por cargo -> funcionario**. NO es lo que elige el usuario en el
+          alta; lo consume el runtime del flujo del concepto.
+        => **Correccion al plan de la Ola 1:** el FK nuevo del `TaskItem` es **`EntidadId -> Entidad`**
+        (NO `AreaOrgUnitId -> OrgUnit`, como decia el borrador). La asignacion de responsables de
+        pasos sigue saliendo del organigrama a traves del flujo, no de este FK.
 - [ ] **PRE-2 Consumidor de los flags/FKs del concepto.** Confirmar que nada mas lee hoy
       `IniciaModulo`/`WorkflowDefinitionId` del concepto (auditoria dijo que se guardan pero no se
       consumen); este modulo sera el primer consumidor. Aceptacion: mapa de lectores actual (vacio
@@ -51,9 +70,10 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   menu. **Aceptacion**: decisiones firmadas + hoja de tokens.
 
 ### Ola 1 - Datos: puente Concepto <-> Tarea
-- `TaskItem`: agregar `SubcategoriaId` (FK ActividadSubcategoria) + `AreaOrgUnitId` (FK OrgUnit);
-  migracion EF + backfill de tareas existentes. Ajustar `TaskItemService.CreateAsync` para aceptar
-  subcategoria y derivar board/columna/flujo/flags del concepto.
+- `TaskItem`: agregar `SubcategoriaId` (FK ActividadSubcategoria) + `EntidadId` (FK `Entidad`, la
+  Empresa/Area de la config -- ver PRE-1 reconciliacion; **NO** `OrgUnit`); migracion EF + backfill
+  de tareas existentes. Ajustar `TaskItemService.CreateAsync` para aceptar subcategoria + entidad y
+  derivar board/columna/flujo/flags del concepto.
 - **Aceptacion**: se puede crear un TaskItem ligado a una subcategoria; el board/columna se toman
   del concepto; tests unit del servicio verdes; migracion aplica en PG y SQL Server.
 
