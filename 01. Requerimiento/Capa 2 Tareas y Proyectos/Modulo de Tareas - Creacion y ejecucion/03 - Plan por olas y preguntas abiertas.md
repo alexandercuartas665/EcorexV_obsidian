@@ -176,11 +176,25 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   de cotizacion" renderizo con ref T00210; valido en servidor (bloqueo por campo obligatorio) y al
   completar quedo **Submitted** enlazado a la tarea (reference=T00210).
 
-### Ola 6 - Tableros, tabs y tiempo real
-- Tabs No Asignados/Asignados/Todos/Kanban con conteos vivos por SignalR; drag&drop kanban;
-  preseleccion `?cat=&sub=`; lista de "crear desde tablero" solo con actividades sin proceso.
-- **Aceptacion**: mover una tarjeta se propaga a otros clientes al instante; los conteos son
-  vivos; los filtros/preseleccion funcionan.
+### Ola 6 - Tableros, tabs y tiempo real  -- HECHA 2026-07-11 (commit `4e17144`)
+- **Grueso ya construido (ADR-0020):** indice `/actividades` (`ActivityBoardsIndex`) + detalle
+  (`ActivityBoardDetail`) con Kanban; alcances "Todas del equipo / Pendientes mios / No asignados"
+  con conteos (`ScopeCounters`); vistas Tablero/Lista/Calendario/Gantt; drag&drop
+  (`ActivityBoardService.MoveTaskAsync`); filtros usuario/etiqueta; SignalR (`TaskHub` +
+  `SignalRTaskBroadcaster`). El tablero se configura en la subcategoria del concepto
+  (`TaskBoardId` + columna terminal) y Ola 1 lo hereda al crear.
+- **Cerrados los 3 pendientes:** (1) SignalR VIVO -> el detalle se suscribe a `TaskHub.TaskChanged`
+  y recarga (ya existia; verificado). (2) `?sub=` -> `/actividades?sub={subcategoriaId}` resuelve el
+  `TaskBoardId` del concepto (scope aislado) y CARGA ese tablero; el menu "Mis Procesos" apunta a
+  `actividades?sub=`. Fix de concurrencia: mientras resuelve NO pinta el indice (chocaban las cargas
+  en el DbContext del circuito). (3) crear-desde-tablero ofrece SOLO conceptos SIN proceso
+  (subcategorias sin flujo) y clasifica por concepto (`QuickCreateTaskRequest.SubcategoriaId`).
+- **Aceptacion CUMPLIDA** (validado en Chrome): conteos vivos + alcances OK; `?sub=` carga
+  "Comercial - Requerimiento Infraestructura"; el crear rapido lista 7 conceptos sin proceso
+  (excluye "Cotizacion de equipos" que tiene flujo) y T00211 se creo por concepto.
+- NOTA: el auto-abrir del modal preset AL cargar el tablero (`carga tablero + abre modal` del
+  prototipo) quedo diferido por la concurrencia de DbContext compartido; el modal preset con cat/sub
+  sigue disponible via `crear-actividad?sub=` (Ola 4).
 
 ### Ola 7 - Endurecimiento
 - Deuda del encargado (flag principal si se decidio), consecutivos transaccionales, notificaciones
