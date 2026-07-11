@@ -6,22 +6,38 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 
 # 03 - Plan por olas y preguntas abiertas
 
-## A. Preguntas / decisiones a cerrar ANTES de delegar (bloqueantes)
+## A. Decisiones tomadas (usuario, 2026-07-11)
 
-1. **[D1] Unificacion de tipos.** Confirmar: pivotar `TaskItem` a `ActividadSubcategoria`
-   (concepto) y deprecar `ActivityType`? (recomendado). Define el esquema de todo el modulo.
-2. **[D2] Empresa/Area.** Confirmar: el selector "Empresa/Area" sale del organigrama `OrgUnit`
-   (Kind=Area/Dependencia) (recomendado), y no de "Configuracion de entidad" (000615). Si se
-   quiere un catalogo de sedes propio, es alcance extra.
-3. **[D3] Menu Mis Procesos.** Confirmar: grupo dinamico marcado en el editor de menu que expande
-   categorias/subcategorias (proceso) desde Conceptos (recomendado), y "actividad tipo proceso" =
-   subcategoria con `WorkflowDefinitionId != null`.
-4. **[Encargado]** Basta con `OrgUnit.ResponsibleTenantUserId` (encargado por unidad), o se quiere
-   un flag "principal" por miembro en `OrgUnitMember`?
-5. **[Alcance v1]** El arranque form-first (`IniciaModulo`) entra en v1 o backlog? (el motor de
-   formularios existe; falta cablearlo al wizard).
-6. **[Proyectos]** El modulo Proyectos (000042, ~20 tablas legacy) se aborda en este capitulo o
-   aparte? (recomendado: aparte; aqui foco en actividades).
+- **[D1] Unificacion de tipos = PIVOTAR A CONCEPTOS.** `TaskItem` referencia
+  `ActividadSubcategoria` (concepto) y se deprecia `ActivityType`. Requiere migracion + backfill.
+- **[D2] Empresa/Area = MODULO DE CONFIG DE LA EMPRESA.** El dato sale del modulo de configuracion
+  de la empresa (no del organigrama directamente). Es un **PREREQUISITO** a resolver primero (ver
+  seccion Prerequisitos).
+- **[D3] Menu Mis Procesos = grupo dinamico** desde Conceptos (categoria->subcategoria con flujo),
+  marcado en el editor de menu. "Actividad tipo proceso" = subcategoria con `WorkflowDefinitionId`.
+- **[Form-first] = SI, EN V1.** El paso "Formulario" del wizard se cablea con `DynamicFormRenderer`.
+- **[Alcance] = ACTIVIDADES + PROYECTOS JUNTOS.** El modulo Proyectos (000042) entra en esta gran
+  tarea (ver olas P1-P3). Es un alcance grande; olas separadas para no mezclar riesgos.
+- **[Encargado]** (a decidir al construir, no bloqueante): usar `OrgUnit.ResponsibleTenantUserId`
+  por defecto; evaluar flag "principal" por miembro si el usuario lo pide.
+
+## A2. Prerequisitos - checklist (resolver ANTES de las olas del modal)
+
+Tareas previas, cada una verificable, que desbloquean el modulo:
+
+- [ ] **PRE-1 Areas en la config de la empresa (D2).** Definir/exponer las **Areas** (y sedes/
+      empresas si aplica) dentro del modulo de configuracion de la empresa, de modo que exista una
+      fuente de "Areas del tenant" que el selector "Empresa/Area" consuma. Reconciliar con lo que
+      hoy existe (`OrgUnit` Kind=Area vive en Dependencias 000850; `/configuracion` = Cuenta.razor
+      es config del tenant, no areas). Aceptacion: hay un CRUD/lista de Areas administrable desde la
+      config de la empresa y un servicio que las lista para combos.
+- [ ] **PRE-2 Consumidor de los flags/FKs del concepto.** Confirmar que nada mas lee hoy
+      `IniciaModulo`/`WorkflowDefinitionId` del concepto (auditoria dijo que se guardan pero no se
+      consumen); este modulo sera el primer consumidor. Aceptacion: mapa de lectores actual (vacio
+      esperado) para no romper nada.
+- [ ] **PRE-3 Backfill de tareas existentes.** Plan de migracion de `TaskItem.ActivityTypeId` ->
+      `SubcategoriaId` (mapear o dejar null) sin perder datos. Aceptacion: script/plan de backfill
+      revisado.
 
 ## B. Plan por olas (cada una entregable y verificable)
 
@@ -85,11 +101,38 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   (plantilla), policies compuestas por vista (multi-permiso del legacy), auditoria.
 - **Aceptacion**: pruebas de permisos, concurrencia, y notificacion al asignar.
 
+## B2. Olas de PROYECTOS (en alcance por decision del usuario)
+
+Se corren DESPUES de la base de actividades (o en paralelo por un sub-agente distinto en worktree,
+ya que Proyectos toca entidades propias `PROYECTOS_*`/`DOC_PROYECTOS_*`). Plano del ETL legacy en
+[[Tareas y Proyectos - paginas basicas]] seccion 2 (~20 tablas) y destino en su seccion 0.
+
+### Ola P1 - Dominio + cabecera de proyecto
+- Modelar las tablas legacy `DOC_PROYECTOS` (cabecera) + `PROYECTOS_HITO`, `PROYECTOS_PRESUPUESTO`,
+  `PROYECTOS_COS` (costos), `PROYECTOS_DOFA`, `PROYECTOS_RES` (ACL) como entidades EF Core
+  `ITenantScoped`; migracion dual. Servicio + DTOs de proyecto.
+- **Aceptacion**: CRUD de proyecto (cabecera + hitos + presupuesto) tenant-scoped, con soft-delete
+  y auditoria; migracion aplica en PG y SQL Server.
+
+### Ola P2 - UI Proyecto (ProyectoDetalle) + ACL por proyecto
+- `Proyectos.razor` (lista/filtro) + `ProyectoDetalle.razor` (cabecera Estado/Asignados/Fecha/
+  Etiquetas + tabs Vista Tablero / Timeline / Calendario, fidelidad prototipo). ACL por proyecto
+  via authorization handler por recurso (`PROYECTOS_RES.FLAG_ED/FLAG_VER` -> policy por recurso),
+  NO chequeo ad-hoc. Las tareas del proyecto son `TaskItem` con `ProjectId`.
+- **Aceptacion**: ver/editar/borrar respeta el ACL por proyecto; el tablero del proyecto muestra
+  sus tareas; borrar sin FLAG_ED se bloquea.
+
+### Ola P3 - Integracion Actividades <-> Proyectos + tiempo real
+- Vincular actividades a proyecto e hito (paso 2 del wizard: Proyecto / Hito del proyecto);
+  conteos/tableros del proyecto por SignalR; timeline/calendario.
+- **Aceptacion**: crear una actividad dentro de un proyecto la enlaza a su hito y aparece en el
+  tablero del proyecto en tiempo real.
+
 ## C. Backlog (post v1)
-- Modulo Proyectos (000042) completo (cabecera, hitos, presupuesto, ACL por proyecto).
-- Catalogo de Sedes/Empresa-cliente propio (si se decide en D2).
+- Catalogo de Sedes/Empresa-cliente adicional (mas alla de Areas del tenant), si se necesita.
 - Tipos de control multimedia del formulario (foto/firma/GPS/archivo/barcode) hoy placeholder.
-- Vista calendario / Gantt de actividades; vista de tareas para cliente final.
+- Vista de tareas para cliente final (interfaz simplificada de solo lectura).
+- Modulos satelite del legacy (PQR, encuesta de servicio, visitas) si aplican al negocio.
 
 ## D. Riesgos
 - **Migracion `ActivityType` -> Subcategoria**: hay tareas existentes con `ActivityTypeId`;

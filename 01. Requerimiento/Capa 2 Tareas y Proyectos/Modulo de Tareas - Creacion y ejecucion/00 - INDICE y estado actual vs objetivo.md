@@ -73,14 +73,23 @@ Detalle de ambos en [[02 - UX y fidelidad (modal, menu, tableros)]].
 - [[03 - Plan por olas y preguntas abiertas]] - backlog verificable + decisiones a cerrar con el
   usuario antes de delegar a un sub-agente.
 
-## 5. Veredicto de delegacion
+## 5. Decisiones tomadas (usuario, 2026-07-11) y alcance
 
-Es delegable a sub-agente **por olas**, PERO **no en crudo**: primero hay que **cerrar 3-4
-decisiones** (doc 03, seccion Preguntas) - sobre todo la unificacion `ActivityType` vs
-`ActividadSubcategoria` - porque gobiernan el esquema de datos. Con esas decisiones tomadas y la
-fidelidad extraida del prototipo, cada ola es un entregable claro. Referencias del prototipo:
-modal en lineas ~4280-4438; menu "Mis Procesos" (groupDefs) ~4711; los tokens de estilo del
-`ECOREX.dc.html` mandan (regla del proyecto: fidelidad milimetrica).
+- **Pivotar la tarea a Conceptos** (deprecar `ActivityType`) - D1.
+- **Empresa/Area sale del modulo de configuracion de la EMPRESA** - D2; es un **PREREQUISITO**
+  (checklist PRE-1 en doc 03): hay que definir/exponer las Areas ahi antes de tocar el modal.
+- **Menu Mis Procesos dinamico** desde Conceptos - D3.
+- **Form-first en v1** (arranque con formulario cuando `IniciaModulo`).
+- **Alcance = Actividades + Proyectos JUNTOS** (Proyectos en olas P1-P3 aparte para no mezclar
+  riesgos). Plano del ETL de Proyectos: [[Tareas y Proyectos - paginas basicas]] s.2.
+
+## 6. Veredicto de delegacion
+
+Delegable a sub-agente **por olas** (ver doc 03), tras resolver los **prerequisitos** (sobre todo
+PRE-1 Areas). Es un alcance grande (Actividades + Proyectos); conviene **un sub-agente por linea**
+(Actividades y Proyectos) en worktrees separados para minimizar conflictos, coordinados por el
+orquestador. Fidelidad: los tokens del `ECOREX.dc.html` mandan (modal ~4280-4438; menu "Mis
+Procesos"/groupDefs ~4711).
 
 Relacionado: [[Tareas y Proyectos - paginas basicas]], [[ctrTareasII - Spec para reconstruir en Claude Design]],
 [[ctrVertareasII - Spec para reconstruir en Claude Design]], [[AdmWorkflow - Motor de flujo de la tarea]].

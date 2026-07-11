@@ -24,20 +24,29 @@ Opciones:
 
 Recomendacion: **(a)**. El resto de este doc asume (a).
 
-### D2 - Fuente de "Empresa / Area"
-El prototipo pide un selector "Empresa / Area". Realidad del codigo:
-- Las **areas** viven en el organigrama: `OrgUnit` con `Kind=Area` (o `Classifier=Dependencia`).
-- "Empresa" como entidad = el **Tenant** (no se elige al crear una tarea del propio tenant).
-- El concepto ya tiene M:N a **cargos** (OrgUnit=Cargo) y una lista de **Sedes** (texto libre).
+### D2 - Fuente de "Empresa / Area"  (DECISION DEL USUARIO: modulo de config de la empresa)
+El prototipo pide un selector "Empresa / Area". **Decision del usuario:** el dato de Empresa/Area
+debe salir del **modulo de configuracion de la EMPRESA misma** (la configuracion del tenant/empresa,
+no del organigrama). Esto se marca como un **PREREQUISITO a resolver ANTES** de tocar el modal (ver
+[[03 - Plan por olas y preguntas abiertas]] seccion "Prerequisitos - checklist").
 
-Opciones para el selector:
-- **(a) Area = `OrgUnit` (Kind=Area/Dependencia) del tenant (recomendado).** Es lo que existe.
-- (b) "Sedes" del concepto (texto libre) - inconsistente, sin catalogo.
-- (c) Crear un catalogo de Sedes/Empresa-cliente propio (mas alcance).
+Realidad del codigo hoy (a reconciliar):
+- La ruta "Configuracion de entidad" (000615, `/configuracion`) resuelve a `Cuenta.razor`, que es
+  config del **tenant** (plan/facturas/API); **NO** define areas.
+- Las **areas** hoy existen solo en el organigrama (`OrgUnit` Kind=Area/Classifier=Dependencia,
+  modulo Dependencias 000850).
+- "Empresa" como entidad = el **Tenant**.
 
-Recomendacion: **(a)** para v1; evaluar catalogo de sedes en backlog. Nota: el usuario cree que
-sale de "Configuracion de entidad" (000615), pero ese modulo es config del tenant, no areas;
-alinear expectativa.
+Por tanto el prerequisito es: **definir/exponer las Areas (y, si aplica, sedes/empresas) dentro del
+modulo de configuracion de la empresa**, de forma que el selector "Empresa/Area" del modal las
+consuma. Opciones de implementacion del prerequisito (a decidir al resolverlo):
+- (a) Que el modulo de config de empresa **administre y exponga las areas** (nueva entidad `Area`
+  a nivel tenant, o reusando `OrgUnit` Kind=Area presentado desde ese modulo).
+- (b) Unificar: "Area" del negocio = `OrgUnit` Kind=Area, pero **administrado/visible desde la
+  config de la empresa** (no solo desde Dependencias).
+
+El resto del spec asume que, resuelto el prerequisito, existe una fuente de "Areas del tenant" que
+el modal consume; hasta entonces, el paso 1 del wizard queda bloqueado en ese selector.
 
 ### D3 - Menu "Mis Procesos": dinamico desde Conceptos
 El menu es data-driven (`menu_nodes`), y "Mis Procesos" hoy es estatico. Objetivo: que
