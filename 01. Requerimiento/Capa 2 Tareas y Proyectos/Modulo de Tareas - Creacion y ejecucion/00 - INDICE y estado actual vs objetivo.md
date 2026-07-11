@@ -92,8 +92,10 @@ Detalle de ambos en [[02 - UX y fidelidad (modal, menu, tableros)]].
 
 ## 6. Veredicto de delegacion
 
-Delegable a sub-agente **por olas** (ver doc 03), tras resolver los **prerequisitos** (sobre todo
-PRE-1 Areas). Es un alcance grande (Actividades + Proyectos); conviene **un sub-agente por linea**
+Delegable a sub-agente **por olas** (ver doc 03). **Los 5 prerequisitos (PRE-1..PRE-5) ya estan
+RESUELTOS (2026-07-11)**, asi que el modulo esta listo para arrancar las olas; solo queda el
+pendiente operativo de desplegar a prod las migraciones acumuladas. Es un alcance grande
+(Actividades + Proyectos); conviene **un sub-agente por linea**
 (Actividades y Proyectos) en worktrees separados para minimizar conflictos, coordinados por el
 orquestador. Fidelidad: los tokens del `ECOREX.dc.html` mandan (modal ~4280-4438; menu "Mis
 Procesos"/groupDefs ~4711).

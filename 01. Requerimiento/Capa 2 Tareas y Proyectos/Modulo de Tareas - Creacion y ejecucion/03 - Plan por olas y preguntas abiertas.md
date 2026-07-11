@@ -51,13 +51,30 @@ Tareas previas, cada una verificable, que desbloquean el modulo:
         => **Correccion al plan de la Ola 1:** el FK nuevo del `TaskItem` es **`EntidadId -> Entidad`**
         (NO `AreaOrgUnitId -> OrgUnit`, como decia el borrador). La asignacion de responsables de
         pasos sigue saliendo del organigrama a traves del flujo, no de este FK.
-- [ ] **PRE-2 Consumidor de los flags/FKs del concepto.** Confirmar que nada mas lee hoy
-      `IniciaModulo`/`WorkflowDefinitionId` del concepto (auditoria dijo que se guardan pero no se
-      consumen); este modulo sera el primer consumidor. Aceptacion: mapa de lectores actual (vacio
-      esperado) para no romper nada.
-- [ ] **PRE-3 Backfill de tareas existentes.** Plan de migracion de `TaskItem.ActivityTypeId` ->
-      `SubcategoriaId` (mapear o dejar null) sin perder datos. Aceptacion: script/plan de backfill
-      revisado.
+- [x] **PRE-2 Consumidor de los flags/FKs del concepto. RESUELTO 2026-07-11 -> mapa de lectores VACIO.**
+      Auditoria de codigo: los flags/FKs de `ActividadSubcategoria` (`IniciaModulo`, `TituloAuto`,
+      `DetalleAuto`, `RequiereCliente`, `CierreManual`, `WorkflowDefinitionId`, `FormDefinitionId`,
+      `TaskBoardId`, `TaskBoardColumnId`, `Sedes`, `Cargos`, `Terceros`, `Notificaciones`) solo se
+      leen/escriben en el **modulo de config** (`Conceptos.razor` <-> `ActividadCatalogoService` +
+      `ActividadDtos`) y en el snapshot/migraciones EF. **`TaskItemService` NO referencia el concepto**
+      (el unico hit de "Subcategoria" en `TerceroService` es un string de nota de contacto, no el
+      concepto). Confirmado en Chrome: el alta (`TaskWizard`) clasifica por **ActivityType** -- el
+      selector "Categoria" ofrece "Direccion Comercial / Direccion General / Gestion Humana"
+      (categorias de ActivityType), NO las del concepto -- y no ofrece subcategorias. => Este modulo
+      sera el PRIMER consumidor; no hay nada que romper.
+- [x] **PRE-3 Backfill de tareas existentes. RESUELTO 2026-07-11 -> plan revisado.** Datos reales
+      (BD demo local): **206 tareas, todas con `ActivityTypeId`** (FK NOT NULL). 4 tipos en uso:
+      Gestion Humana/Solicitud (116), Direccion Comercial/Cotizacion (88), Direccion Comercial/
+      Seguimiento (1), Direccion General/Requerimiento (1). Catalogo de Conceptos: 4 categorias
+      (Comercial / Operaciones / Gestion Humana / Financiera) + 8 subcategorias, **ninguna con flujo
+      aun**. **Match exacto (Category,Name) -> (Categoria,Subcategoria) = 0 de 206**: los dos seeds
+      divergieron ("Direccion Comercial" != "Comercial"; "Cotizacion" != "Cotizacion de equipos";
+      "Solicitud" no tiene equivalente). **DECISION de backfill:** `TaskItem.SubcategoriaId` NULLABLE;
+      las tareas existentes -> **NULL** (NO fabricar mapeo sobre datos demo divergentes). Conservar
+      `ActivityTypeId` durante la transicion (deprecar, no dropear, en Ola 1). Migracion no
+      destructiva; las tareas nuevas (post Ola 3) reciben `SubcategoriaId` real. Si en PROD hubiera
+      datos reales que ameriten clasificar la historia, se hara un **mapa curado manual** (tabla de
+      equivalencias), nunca automatico por nombre.
 - [x] **PRE-4 Marca de "jefe / responsable" por miembro en Dependencias (000850). RESUELTO
       2026-07-11** (commit `66bb60d`). Se agrego `OrgUnitMember.IsResponsible`: a lo sumo un jefe por
       unidad; al marcarlo se sincroniza `OrgUnit.ResponsibleTenantUserId` con ese usuario, al
@@ -89,9 +106,10 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
 
 ### Ola 1 - Datos: puente Concepto <-> Tarea
 - `TaskItem`: agregar `SubcategoriaId` (FK ActividadSubcategoria) + `EntidadId` (FK `Entidad`, la
-  Empresa/Area de la config -- ver PRE-1 reconciliacion; **NO** `OrgUnit`); migracion EF + backfill
-  de tareas existentes. Ajustar `TaskItemService.CreateAsync` para aceptar subcategoria + entidad y
-  derivar board/columna/flujo/flags del concepto.
+  Empresa/Area de la config -- ver PRE-1 reconciliacion; **NO** `OrgUnit`); migracion EF. Backfill
+  segun PRE-3: `SubcategoriaId` nullable, tareas existentes en NULL, se conserva `ActivityTypeId`.
+  Ajustar `TaskItemService.CreateAsync` para aceptar subcategoria + entidad y derivar board/columna/
+  flujo/flags del concepto.
 - **Aceptacion**: se puede crear un TaskItem ligado a una subcategoria; el board/columna se toman
   del concepto; tests unit del servicio verdes; migracion aplica en PG y SQL Server.
 
@@ -173,8 +191,9 @@ ya que Proyectos toca entidades propias `PROYECTOS_*`/`DOC_PROYECTOS_*`). Plano 
 - Modulos satelite del legacy (PQR, encuesta de servicio, visitas) si aplican al negocio.
 
 ## D. Riesgos
-- **Migracion `ActivityType` -> Subcategoria**: hay tareas existentes con `ActivityTypeId`;
-  definir el backfill (mapear o dejar null) para no perder datos.
+- **Migracion `ActivityType` -> Subcategoria**: RESUELTO por PRE-3 -> `SubcategoriaId` nullable, las
+  206 tareas existentes quedan en NULL (0 auto-match real), se conserva `ActivityTypeId` en la
+  transicion. Sin perdida de datos.
 - **Doble modelo si no se decide D1**: mantener ambos "tipos" a la vez genera inconsistencias.
 - **Fidelidad**: sin extraer tokens exactos del prototipo, un sub-agente puede desviarse; la Ola 0
   (hoja de tokens) mitiga.
