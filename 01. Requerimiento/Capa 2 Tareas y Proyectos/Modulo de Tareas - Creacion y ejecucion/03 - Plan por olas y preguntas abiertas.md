@@ -119,13 +119,18 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   legacy por ActivityType sigue creando tareas (T00207). Migracion aplicada en local (falta prod +
   SqlServer). NOTA: el alta por concepto aun no tiene UI (llega en la Ola 3, el modal).
 
-### Ola 2 - Alta que CONSUME el concepto (sin UI nueva aun)
-- En `CreateAsync` (transaccional): si la subcategoria tiene `WorkflowDefinitionId`, llamar
-  `WorkflowEngine.StartInstance`; aplicar `TituloAuto/DetalleAuto`; disparar notificaciones a
-  `Subcategoria.Notificaciones`.
-- **Aceptacion**: crear una actividad-proceso arranca su `WorkflowInstance` con el primer paso
-  pendiente asignado por cargo (visible en `/mis-pasos`); una simple no crea instancia. Test de
-  integracion del alta + StartInstance en la misma transaccion.
+### Ola 2 - Alta que CONSUME el concepto (sin UI nueva aun)  -- HECHA 2026-07-11 (commit `c95c5f5`)
+- En `CreateAsync` (transaccional): arranca el `WorkflowInstance` desde el flujo PUBLICADO del
+  CONCEPTO (`subcategoria.WorkflowDefinitionId`), preferente sobre el del ActivityType legacy;
+  aplica `TituloAuto/DetalleAuto` cuando el alta no los trae (el titulo puede venir vacio si hay
+  TituloAuto), con tokens basicos (`@cliente` -> solicitante); dispara notificaciones dejando
+  **traza en el historial** de la tarea con los destinatarios (`ActividadSubcategoriaNotificacion`).
+- **NOTA:** la ENTREGA real de notificaciones (email/in-app con plantilla) queda para la **Ola 7**
+  (no hay infra de entrega hoy). El set completo de tokens de TituloAuto llega con el modal (Ola 3).
+- **Aceptacion CUMPLIDA**: tests de integracion (matriz dual, verdes en PG) -- la actividad-proceso
+  arranca su `WorkflowInstance` (Running) con TituloAuto/DetalleAuto aplicados y el primer paso
+  Pending (lo de `/mis-pasos`); la actividad simple NO crea instancia; y queda la traza de
+  notificacion. Sin cambios de esquema (Ola 2 es solo comportamiento).
 
 ### Ola 3 - Modal wizard 4 pasos (fidelidad prototipo)
 - Reescribir `TaskWizard.razor` al wizard de 4 pasos del prototipo: Informacion (Empresa/Area ->
