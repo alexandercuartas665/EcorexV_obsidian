@@ -201,6 +201,31 @@ equipo. Tocar un nodo salta a ese paso; su menu (`...`) permite ANOTAR o "Dar po
 **Invariante:** descubrir = el tablero ("mis pendientes", que incluye los pasos ruteados por cargo);
 ejecutar = la tarea y su RUTA de flujo. No existe la bandeja "Mis pasos" (ADR-0038).
 
+### 5.2 De donde salen los procesos: el menu "Mis Procesos" (flag `IsProcessGroup`)
+
+El menu "Mis Procesos" NO es una lista fija: se **activa con una marca de seleccion** -- el flag
+**`IsProcessGroup`** sobre una **Seccion** del menu (se marca en el editor de menu / ConfiguracionMenu;
+la UI le pinta un badge "procesos", `NavMenu.razor` ~102). Al marcarlo, la seccion se vuelve DINAMICA
+(Ola 4): en vez de items estaticos, despliega el arbol **Categoria -> Subcategorias TIPO PROCESO**,
+filtrando SOLO las subcategorias (conceptos) con `WorkflowDefinitionId != null` y no archivadas
+(`NavMenu` ~383-391). Es decir, un **concepto-actividad se vuelve un "proceso" (caso especial)
+precisamente por tener un flujo agregado**; los conceptos SIN flujo (actividad simple) no aparecen aqui.
+
+```
+Mis Procesos                 <- Seccion con IsProcessGroup = true  (badge "procesos")
+  Compras
+    Solicitud de compra [proc] -> crear-actividad?sub=<id>  (al crear, DISPARA el flujo)
+  Comercial
+    Cotizacion          [proc] -> crear-actividad?sub=<id>
+```
+
+- Cada hoja lleva el badge `proc` ("Actividad tipo proceso") y enlaza a `crear-actividad?sub=<id>`:
+  el modal llega con categoria/subcategoria fijadas y, al guardar, arranca la `WorkflowInstance` (§5.A).
+- Si el tenant no tiene ningun concepto con flujo, la seccion muestra: "Sin actividades tipo proceso.
+  Vincula un flujo a una subcategoria en Conceptos."
+- Resumen de la cadena: **marca `IsProcessGroup` (menu) -> lista los conceptos con `WorkflowDefinitionId`
+  (Conceptos) -> crear desde ahi dispara el flujo -> se ejecuta DENTRO de la tarea (RUTA, §5.1)**.
+
 ## 6. Reglas transversales (del proyecto, obligatorias)
 
 - Multi-tenant real (`HasQueryFilter` + RLS); imposible ver/crear cross-tenant.
