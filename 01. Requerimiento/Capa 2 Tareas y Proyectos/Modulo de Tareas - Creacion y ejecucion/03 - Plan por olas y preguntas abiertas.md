@@ -47,14 +47,23 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
    porque prod solo tiene 2 flujos PUBLICADOS (Cotizacion Comercial, Visita tecnica de instalacion); para
    mas procesos hay que PUBLICAR mas flujos en el editor BPMN. El resto de sub-categorias siguen sin proceso
    a proposito.
-2. **Vistas de menu de los usuarios reales**: el tenant BITCODE de prod se creo sin vistas; se asigno
-   "Completo" a `acuartas@bitcode.com.co`, pero los otros 12 usuarios siguen sin vista (falta un
-   seed/reconcile que garantice una vista Completo IsDefault por cada tenant real).
-3. **DAL-dual SQL Server**: las migraciones se generan solo en PostgreSQL; `Ecorex.Infrastructure.SqlServer`
-   esta rezagado (regla inviolable: la matriz dual es condicion de merge). Backlog abierto desde 2026-07-08.
-4. **Backlog de endurecimiento (Ola 7)**: canal EMAIL de notificaciones con plantilla (IEmailSender ya
-   existe); refresco EN VIVO del badge de la campana por SignalR; policies de gobierno
-   (AdmUsuarios/RolesPermisos/ConfiguracionMenu -> Owner/Admin) y Conceptos.Editar/Dependencias.Ver.
+2. ~~**Vistas de menu de los usuarios reales**~~ **RESUELTO 2026-07-12** (`b5964b4`): los 12 usuarios BITCODE
+   sin vista YA heredan la "Completo" clonada por el fallback de resolucion; ademas se mejoro ese fallback
+   para elegir la vista con MAS nodos visibles cuando el tenant no tiene ninguna IsDefault. Test verde.
+   (El seed sistematico de una Completo por cada tenant nuevo sigue como mejora futura.)
+3. ~~**DAL-dual SQL Server**~~ **RESUELTO 2026-07-12** (`2a228b1`): `Ecorex.Infrastructure.SqlServer` estaba
+   ~14 migraciones atras; migracion catch-up (SqlServerCatchUp20260712) que APLICA de punta a punta contra
+   un SQL Server real. Destapo un problema DAL-dual PREEXISTENTE en varios modulos (Contenedor de datos,
+   Gestor): cascadas validas en PG pero prohibidas en SQL Server (ciclos por auto-referencia / rutas de
+   cascada multiples, error 1785); corregidas provider-condicional (Restrict en SQL Server, Cascade/SetNull
+   en PG -> prod=PG sin cambio). Tests SQL Server (Testcontainers 2022): TaskCore 12/12 + 21/21 en aislamiento.
+4. **Endurecimiento (Ola 7): PARCIAL 2026-07-12.**
+   - ~~Canal EMAIL de notificaciones~~ **HECHO** (`9c86ec9`): AssignAsync entrega por email (best-effort via
+     IEmailSender) al encargado y destinatarios del concepto, fuera de la transaccion. Test verde.
+   - ~~Policies de gobierno~~ **HECHO** (`fe2626e`): ConfiguracionMenu (editor de menu) restringido a
+     Owner/Admin (tenant_role); AdmUsuarios/RolesPermisos ya enforced por el motor Perm:.
+   - PENDIENTE: refresco EN VIVO del badge por SignalR (hub + push + suscripcion cliente) + plantilla de
+     correo configurable por tenant.
 5. **Backlog de Proyectos**: presupuesto/costos (`PROYECTOS_COS`) y DOFA (`PROYECTOS_DOFA`) -- entidad+UI;
    timeline/calendario propios del proyecto (hoy reusa el kanban).
 6. **Refinamientos menores**: Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica);
