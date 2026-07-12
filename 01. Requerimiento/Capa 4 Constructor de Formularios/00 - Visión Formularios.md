@@ -164,6 +164,8 @@ y [[Reglas - Quien invoca realmente (cierre)]].
 - [[Motores y renderers - cl_FormCreator + crtCargaEncuestaII + cl_gestion_reglas]] -- motores del origen -> destino
 - [[Visor por token - docu_viewform]] -- publicacion por token
 - [[00 - Visión Flujos]] -- union formulario-flujo (BPMN)
+- [[00 - INDICE y objetivo (Formularios avanzados)]] -- PROPUESTA: propiedades avanzadas
+  (formulario como modulo + tabla de hechos, lookups de datos, calculo/totales, filtros)
 
 ---
 

@@ -90,6 +90,7 @@ OBSIDIAN.tareas/
   - [[Controles del constructor y renderers (Documental)]] — los 38 `.ascx`: disenador `ctrFormCreator` (WYSIWYG) + renderer vigente `crtCargaEncuestaII` (dispatch oculto en `cl_gestion_formularios.AdornoDetalle`) + catalogo de controles por tipo de campo (Quill, firma canvas, audio+transcripcion, GPS, reCAPTCHA, grid detalle, tabla hija)
   - [[FormCreatorMCP - Servidor MCP del constructor]] — endpoint `.ashx` que expone **20 herramientas** para que un agente de IA construya formularios de punta a punta; usa **Gemini 2.0 Flash Vision** (tool estrella `import_form_from_image`: imagen -> blueprint -> formulario). RPC JSON propietario (no MCP estandar). Riesgo: sin auth, CORS `*`, SQL por concatenacion
   - [[Clases de Reglas del modulo Documental]] — las 11 clases `cl_*_reglas`: despacho por `Type.GetType`+`Activator`+`Invoke` de verbos `Ensamblado` (migrar a formulario, generar tareas, cotizador, Siigo, plantillas PDF->Blob, ChatGPT, WhatsApp). Riesgo: reflexion abierta = RCE de facto sin allow-list
+- **Propiedades avanzadas (PROPUESTA, capitulo de 4 docs)** — el salto del motor a dato transaccional gobernado: [[00 - INDICE y objetivo (Formularios avanzados)]] (estado real + objetivo), [[01 - Arquitectura, decisiones y datos (Formularios avanzados)]] (formulario-modulo, transaccionalidad/consecutivo, lookups de datos con dominio del tenant, calculo/totales), [[02 - UX y paneles de propiedades (Formularios avanzados)]] y [[03 - Plan por olas y preguntas abiertas (Formularios avanzados)]]. Reutiliza infra existente (`TenantSequence`, `DataContainer`, Directorio, Inventario)
 
 ### Capa 5 - Librerias Base
 - [[00 - Visión MotherData]] — DAL. Fichas: [[AdmDatos - Motor SQL Server]], [[AdmNpgsql - Motor PostgreSQL]], [[AdmCrypto - Cifrado simétrico]], [[CargaConfig - Decode Config.xml]], [[VariablesGlobales - Conexiones y Empresa]]
@@ -173,6 +174,16 @@ OBSIDIAN.tareas/
 
 ## Novedades (2026-07-11)
 
+- **Capitulo nuevo en Capa 4 - "Propiedades avanzadas: Formulario como modulo y tabla de
+  hechos" (PROPUESTA)**: a partir del dictado del usuario y de una validacion read-only del
+  codigo real, se documento el salto del motor de formularios a **dato transaccional
+  gobernado** en 4 docs (mismo esquema que el capitulo de Tareas): formulario promovido a
+  **modulo** (menu+permisos+bandeja), **transaccionalidad** (registro con estado/fecha e
+  identidad por **consecutivo** -reusa `TenantSequence`/`ISequenceService`- o **clave natural**
+  tipo SKU/tercero), **campos con datos** (autocompletado desde `DataContainer`/Directorio/
+  Inventario con autollenado), **calculo** (formulas, totales de tabla, roll-up) y **filtros/
+  KPIs**. Entrada: [[00 - INDICE y objetivo (Formularios avanzados)]]. Nada construido aun;
+  plan por olas F1..F6 + preguntas abiertas en el doc 03.
 - **Ingenieria inversa profunda del motor de formularios (`Bootstrap/.../Documental/`)**:
   se documentaron las 4 carpetas del codigo VB real que sostiene el constructor
   (61 archivos, ~1.2 MB) en 4 notas nuevas de Capa 4, cada una con doble encuadre
