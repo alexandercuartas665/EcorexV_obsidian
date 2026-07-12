@@ -78,6 +78,7 @@ OBSIDIAN.tareas/
 - [[Portabilidad BPMN - prueba en bpmn.io]] (+ `ejemplo-bpmn-flujo-00001.bpmn`)
 - [[Reglas - Motor y discrepancia]] / [[Reglas - Catalogo real y verbos Ensamblado]] / [[Reglas - Quien invoca realmente (cierre)]]
 - [[gen_reglas - Spec para reconstruir en Claude Design]]
+- [[Clases de Reglas del modulo Documental]] — las 11 clases `cl_*_reglas`: despacho por `Type.GetType`+`Activator`+`Invoke` de verbos `Ensamblado` (migrar a formulario, generar tareas, cotizador, Siigo, plantillas PDF->Blob, ChatGPT, WhatsApp). Riesgo: reflexion abierta = RCE de facto sin allow-list. (Movida desde Capa 4: es el motor de Reglas, no el constructor/ejecutor de formularios; su cara form-specific `cl_form_reglas_formularios` se referencia desde [[00 - Visión Formularios]])
 
 ### Capa 4 - Constructor de Formularios (mod 000131)
 - [[00 - Visión Formularios]]
@@ -88,8 +89,7 @@ OBSIDIAN.tareas/
 - **Ingenieria inversa del codigo real (`Documental/`)** — 61 archivos VB del motor vigente:
   - [[Clases del nucleo de formularios (Documental)]] — las 9 clases `cl_*` (definicion EAV en `ENCUESTAS_MOV_*` + propiedades en `FORX_DATA`, motor de calculos por grafo `REG_ORIGEN->REG_DESTINO`, reglas por **reflexion**). Riesgo: secreto Azure embebido en `cl_Transcripcion_audio.vb`, SQL concatenado
   - [[Controles del constructor y renderers (Documental)]] — los 38 `.ascx`: disenador `ctrFormCreator` (WYSIWYG) + renderer vigente `crtCargaEncuestaII` (dispatch oculto en `cl_gestion_formularios.AdornoDetalle`) + catalogo de controles por tipo de campo (Quill, firma canvas, audio+transcripcion, GPS, reCAPTCHA, grid detalle, tabla hija)
-  - [[FormCreatorMCP - Servidor MCP del constructor]] — endpoint `.ashx` que expone **20 herramientas** para que un agente de IA construya formularios de punta a punta; usa **Gemini 2.0 Flash Vision** (tool estrella `import_form_from_image`: imagen -> blueprint -> formulario). RPC JSON propietario (no MCP estandar). Riesgo: sin auth, CORS `*`, SQL por concatenacion
-  - [[Clases de Reglas del modulo Documental]] — las 11 clases `cl_*_reglas`: despacho por `Type.GetType`+`Activator`+`Invoke` de verbos `Ensamblado` (migrar a formulario, generar tareas, cotizador, Siigo, plantillas PDF->Blob, ChatGPT, WhatsApp). Riesgo: reflexion abierta = RCE de facto sin allow-list
+  - [[FormCreatorMCP - Servidor MCP del constructor]] — endpoint `.ashx` que expone **20 herramientas** para que un agente de IA construya formularios de punta a punta; usa **Gemini 2.0 Flash Vision** (tool estrella `import_form_from_image`: imagen -> blueprint -> formulario). RPC JSON propietario (no MCP estandar). Vive en Capa 4 (construye formularios); su evolucion destino es el Copiloto de Configuracion de [[Agentes de IA - Arquitectura y Operacion|Capa 7]]. Riesgo: sin auth, CORS `*`, SQL por concatenacion
 - **Propiedades avanzadas (PROPUESTA, capitulo de 4 docs)** — el salto del motor a dato transaccional gobernado: [[00 - INDICE y objetivo (Formularios avanzados)]] (estado real + objetivo), [[01 - Arquitectura, decisiones y datos (Formularios avanzados)]] (formulario-modulo, transaccionalidad/consecutivo, lookups de datos con dominio del tenant, calculo/totales), [[02 - UX y paneles de propiedades (Formularios avanzados)]] y [[03 - Plan por olas y preguntas abiertas (Formularios avanzados)]]. Reutiliza infra existente (`TenantSequence`, `DataContainer`, Directorio, Inventario)
 
 ### Capa 5 - Librerias Base
@@ -174,6 +174,13 @@ OBSIDIAN.tareas/
 
 ## Novedades (2026-07-11)
 
+- **Higiene de alcance de Capa 4 (formularios)**: se auditaron las notas de Capa 4 para dejarla
+  acotada al **constructor** + **ejecutor** de formularios. `Clases de Reglas del modulo
+  Documental` (los 11 verbos `Ensamblado`: Siigo, WhatsApp, PDF, IA, SQL crudo, migracion entre
+  formularios) **se movio a Capa 3 (Reglas)** por ser el motor de Reglas, no el constructor.
+  `FormCreatorMCP` **se queda en Capa 4** (construye formularios) con cross-link reforzado a
+  [[Agentes de IA - Arquitectura y Operacion|Capa 7]] como su evolucion destino. Los wikilinks
+  son por nombre, asi que el movimiento no rompe enlaces.
 - **Capitulo nuevo en Capa 4 - "Propiedades avanzadas: Formulario como modulo y tabla de
   hechos" (PROPUESTA)**: a partir del dictado del usuario y de una validacion read-only del
   codigo real, se documento el salto del motor de formularios a **dato transaccional

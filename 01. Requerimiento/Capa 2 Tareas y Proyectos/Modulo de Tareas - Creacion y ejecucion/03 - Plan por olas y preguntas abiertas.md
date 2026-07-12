@@ -28,11 +28,15 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
    - **Cotizacion de equipos** -> flujo "Cotizacion Comercial" (publicado) + tablero "Comercial -
      Requerimiento Infraestructura".
    - **Requerimiento infraestructura** -> formulario "Solicitud de cotizacion" (form-first).
-   Verificado en la BD de prod. El resto de sub-categorias siguen sin proceso a proposito.
-   **PENDIENTE menor asociado:** marcar en el EDITOR DE MENU (ConfiguracionMenu) un grupo como "despliega
-   procesos" (`IsProcessGroup`) en el tenant de prod, para que el menu dinamico "Mis Procesos" expanda el
-   concepto-proceso (hoy ningun nodo de prod lo tiene marcado; el alta por concepto ya funciona igual via
-   tableros / crear-actividad).
+   Verificado en la BD de prod.
+   **Ampliacion 2026-07-11 (por el editor):** se ligo tambien **Operaciones / Visita tecnica** -> flujo
+   "Visita tecnica de instalacion" + tablero "Soporte - Mesa de ayuda" (2do concepto-proceso). Y se marco
+   en el EDITOR DE MENU el nodo "Mis Procesos" de la vista **Completo** como `IsProcessGroup=true`, de modo
+   que el menu dinamico "Mis Procesos" ahora EXPANDE los procesos (verificado: sidebar muestra links
+   `actividades?sub=` a "Cotizacion de equipos" y "Visita tecnica"). Tope actual = 2 conceptos-proceso
+   porque prod solo tiene 2 flujos PUBLICADOS (Cotizacion Comercial, Visita tecnica de instalacion); para
+   mas procesos hay que PUBLICAR mas flujos en el editor BPMN. El resto de sub-categorias siguen sin proceso
+   a proposito.
 2. **Vistas de menu de los usuarios reales**: el tenant BITCODE de prod se creo sin vistas; se asigno
    "Completo" a `acuartas@bitcode.com.co`, pero los otros 12 usuarios siguen sin vista (falta un
    seed/reconcile que garantice una vista Completo IsDefault por cada tenant real).

@@ -1,7 +1,7 @@
 ---
-capa: 4
-tema: Constructor de Formularios
-subtema: Subsistema de Reglas (Ensamblados)
+capa: 3
+tema: Flujos de Tareas BPMN - Reglas
+subtema: Subsistema de Reglas (verbos Ensamblado)
 tipo: ingenieria-inversa
 origen: Bootstrap/Formularios/Modulos/Documental/Reglas
 destino_net: .NET 10 RulesEngine con verbos tipados en DI
