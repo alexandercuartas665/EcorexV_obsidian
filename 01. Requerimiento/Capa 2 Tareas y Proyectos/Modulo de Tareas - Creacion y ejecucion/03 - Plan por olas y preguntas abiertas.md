@@ -70,8 +70,10 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
    - PENDIENTE menor: plantilla de correo configurable por tenant (hoy plantilla HTML fija).
 5. **Backlog de Proyectos**: presupuesto/costos (`PROYECTOS_COS`) y DOFA (`PROYECTOS_DOFA`) -- entidad+UI;
    timeline/calendario propios del proyecto (hoy reusa el kanban).
-6. **Refinamientos menores**: Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica);
-   Ola 6 (auto-abrir el modal preset al cargar el tablero, diferido por concurrencia de DbContext).
+6. **Refinamientos menores**: ~~Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica)~~
+   YA RESUELTO en Ola 6 (el link `actividades?sub=` resuelve y carga el tablero del concepto). QUEDA:
+   Ola 6 (auto-abrir el modal preset AL cargar el tablero via `?sub=`, diferido por concurrencia de
+   DbContext compartido; el modal preset sigue disponible via `crear-actividad?sub=`).
 7. **Backlog post-v1 (seccion C)**: catalogo de Sedes/Empresa-cliente adicional; controles multimedia del
    formulario (foto/firma/GPS/archivo/barcode, hoy placeholder); vista de tareas para cliente final
    (solo lectura); modulos satelite legacy (PQR, encuesta, visitas).
