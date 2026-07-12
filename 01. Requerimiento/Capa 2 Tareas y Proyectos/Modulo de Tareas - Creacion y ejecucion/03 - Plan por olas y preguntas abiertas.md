@@ -15,6 +15,14 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 > `AddNotifications`, `AddProjectMilestones` (backup previo `ecorex-2026-07-11-1631.sql.gz`). App sana
 > (HTTP 200 /login). Codigo en `fase-0/clon-backbone` @ `877baa4`.
 
+> [!note] QA VISUAL 2026-07-11 (desktop + movil 375px)
+> Se valido como se VE el modulo (estilos/layout/overflow, no solo BD) en desktop y movil. OK: panel de
+> Hitos, pagina `/notificaciones` y badge de la campana (desktop y movil, sin overflow). **Se encontro y
+> ARREGLO 1 problema**: el wizard de alta (2 columnas + grids) no colapsaba en movil (~37px de overflow);
+> ahora apila contenido+resumen y colapsa los grids a 1 columna (<=700px), desktop intacto (commit `e6636d8`).
+> El kanban embebido scrollea dentro de su propio contenedor (correcto). **Pendiente: redeploy a prod** para
+> llevar `e6636d8` (prod aun corre el wizard sin el fix movil).
+
 ### Terminado (en local Y prod)
 - **Prerequisitos PRE-1..PRE-5** (Empresa/Area, mapa de consumidores, backfill, jefe/responsable, flag de menu).
 - **Olas 1-7 de Actividades**: puente concepto<->tarea, alta que consume el concepto (flujo+auto-titulo+
@@ -52,6 +60,10 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 7. **Backlog post-v1 (seccion C)**: catalogo de Sedes/Empresa-cliente adicional; controles multimedia del
    formulario (foto/firma/GPS/archivo/barcode, hoy placeholder); vista de tareas para cliente final
    (solo lectura); modulos satelite legacy (PQR, encuesta, visitas).
+8. **Redeploy a prod del fix movil del wizard** (commit `e6636d8`, 2026-07-11): prod aun corre el wizard
+   sin el colapso responsive; hacer `build --no-cache` + `up -d` para llevarlo (no requiere migracion).
+9. **Mas conceptos-proceso en prod** (opcional): hoy hay 2 (Cotizacion de equipos, Visita tecnica) porque
+   prod solo tiene 2 flujos PUBLICADOS; para mas hay que PUBLICAR mas flujos en el editor BPMN.
 
 ## A. Decisiones tomadas (usuario, 2026-07-11)
 
