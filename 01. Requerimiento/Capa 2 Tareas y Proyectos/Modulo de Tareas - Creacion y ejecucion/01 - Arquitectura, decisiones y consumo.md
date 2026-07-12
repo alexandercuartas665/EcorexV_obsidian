@@ -129,6 +129,39 @@ Al confirmar la creacion de una actividad ligada a una subcategoria, dentro de U
   pide Empresa/Area -> Tipo(categoria) -> Actividad(subcategoria) -> Encargado. Crea TaskItem sin
   instancia de flujo; vive en el tablero.
 
+### 5.1 Historia de usuario (el SISTEMA tambien es actor) -- ADR-0038
+
+> Ejemplo canonico: actividad de compras gobernada por flujo. Actores humanos: **Solicitante**,
+> **Jefe de Compras**, **Comprador**. Actor no humano: **ECOREX (el sistema)**, que encamina el
+> trabajo. La clave del modelo: el usuario nunca va a una bandeja "Mis pasos"; entra a la TAREA.
+
+- **Como Solicitante**, quiero levantar la actividad desde el concepto de compra, **para que el
+  sistema la encamine** por el proceso sin que yo sepa quien aprueba ni donde esta cada paso.
+- **Como Jefe de Compras / Comprador**, quiero que los pasos que me tocan **por mi cargo** aparezcan
+  en mi tablero ("mis pendientes"), para atenderlos DENTRO de la propia tarea (seccion "Flujo").
+- **Como ECOREX (el sistema)**, arranco el flujo, ruteo cada paso al cargo correcto, hago visible el
+  pendiente en el tablero de cada candidato, avanzo por la compuerta segun la decision y cierro el
+  caso -- sin pantalla intermedia.
+
+**Escenario (actor -> accion):**
+
+1. *Solicitante* crea la actividad "Compra ..." desde su concepto (Mis Procesos).
+2. **Sistema**: en UNA transaccion crea la TaskItem, arranca la `WorkflowInstance` (Running) y deja
+   el primer paso Pending **ruteado al cargo** del nodo (p.ej. "Aprobacion jefe de compras" ->
+   Aprobador). Sin bandeja: el paso NO va a una pantalla aparte.
+3. **Sistema**: resuelve los candidatos del cargo por el organigrama (`INodeAssigneeResolver`) y hace
+   aparecer la tarea en **"mis pendientes" del TABLERO** de cada candidato; ademas notifica.
+4. *Jefe de Compras* ve la tarea en su tablero, la abre y **atiende el paso en la seccion "Flujo"**
+   del detalle (Tomar -> Completar / decision Aprobada|Rechazada).
+5. **Sistema**: registra la decision, **auto-resuelve la compuerta** (ADR-0037) y encamina al
+   siguiente cargo (Comprador); deja el nuevo paso Pending y lo publica en su tablero.
+6. *Comprador* atiende su paso en la tarea (emite la orden de compra).
+7. **Sistema**: completa el ultimo paso, **cierra el caso** (tarea Done / instancia Completed) sin
+   estancarse y deja la traza en la historia de la tarea.
+
+**Invariante de la historia:** descubrir = el tablero ("mis pendientes", que incluye los pasos
+ruteados por cargo); ejecutar = la tarea (seccion "Flujo"). No existe la bandeja "Mis pasos".
+
 ## 6. Reglas transversales (del proyecto, obligatorias)
 
 - Multi-tenant real (`HasQueryFilter` + RLS); imposible ver/crear cross-tenant.
