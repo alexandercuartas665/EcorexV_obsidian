@@ -62,8 +62,12 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
      IEmailSender) al encargado y destinatarios del concepto, fuera de la transaccion. Test verde.
    - ~~Policies de gobierno~~ **HECHO** (`fe2626e`): ConfiguracionMenu (editor de menu) restringido a
      Owner/Admin (tenant_role); AdmUsuarios/RolesPermisos ya enforced por el motor Perm:.
-   - PENDIENTE: refresco EN VIVO del badge por SignalR (hub + push + suscripcion cliente) + plantilla de
-     correo configurable por tenant.
+   - ~~Badge de notificaciones EN VIVO (SignalR)~~ **HECHO** (`ce78c42`): NotificationHub (/hubs/notifications)
+     + broadcaster + MainLayout suscrito; AssignAsync difunde al encargado y destinatarios; la campana
+     refresca el conteo sin recargar. Verificado por componente (endpoint negocia WebSockets, badge
+     renderiza, assign tests verdes); infra espejo del TaskHub del kanban.
+   - Con esto el **endurecimiento de notificaciones (Ola 7) queda COMPLETO**: in-app + email + badge en vivo.
+   - PENDIENTE menor: plantilla de correo configurable por tenant (hoy plantilla HTML fija).
 5. **Backlog de Proyectos**: presupuesto/costos (`PROYECTOS_COS`) y DOFA (`PROYECTOS_DOFA`) -- entidad+UI;
    timeline/calendario propios del proyecto (hoy reusa el kanban).
 6. **Refinamientos menores**: Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica);
