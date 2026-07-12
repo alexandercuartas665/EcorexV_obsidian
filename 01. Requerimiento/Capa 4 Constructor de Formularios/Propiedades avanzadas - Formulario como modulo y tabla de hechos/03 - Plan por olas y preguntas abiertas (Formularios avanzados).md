@@ -86,35 +86,43 @@ Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebi
 **Identidad y transaccionalidad**
 1. Por defecto, un formulario transaccional, cual modo de identidad usa: consecutivo del
    sistema o clave natural? Hay formularios sin numero pero si transaccionales (solo estado)?
+R/ Debe ser indicado una propiedad que indica como el formulario produce la identidad tambien existe el formulario solido que no tiene identidad.
 2. El consecutivo debe poder ser **por entidad** (una numeracion por sede/area) desde el inicio,
    o una sola por tenant basta para v1?
+R/Una sola por tenant y por id de formulario
 3. Se permite **editar** un registro ya Confirmado (con auditoria) o solo se puede **anular** y
    crear uno nuevo?
+R:/Algunos eventos pueden generar el cierre pero tambien debe ser parametrizable, por ejemplo si se agrega un componente firma eso produce el cierre
 4. La fecha de transaccion la fija el sistema (hoy) o el usuario puede backdatearla (con permiso)?
+R:/ por sistema pero es interna del sistema si existen campos fecha agregados al formulario dependen de lo que llene un usuaio
 
 **Datos / lookups**
-5. Que fuentes priorizar en F1: Directorio (clientes), Inventario (items), Contenedor de datos
+1. Que fuentes priorizar en F1: Directorio (clientes), Inventario (items), Contenedor de datos
    generico... en que orden?
-6. El autollenado copia el valor (foto del dato al momento) o guarda solo el id y resuelve en
+R:/ Todas las tablas del sistema mas datos de cotenedores.
+2. El autollenado copia el valor (foto del dato al momento) o guarda solo el id y resuelve en
    lectura? (Copiar preserva historia; referenciar refleja cambios.) Recomendacion: guardar id +
    copiar los campos que importan al hecho (ej. precio pactado).
-7. El buscador debe permitir **crear al vuelo** un dato que no existe (ej. cliente nuevo desde el
+R:/Mejor es copiar
+3. El buscador debe permitir **crear al vuelo** un dato que no existe (ej. cliente nuevo desde el
    formulario) o solo seleccionar existentes?
-
+R:/ Permite ir al modulo de creacion si falta el dato 
 **Calculo**
 8. Alcance de las formulas en v1: aritmetica + condicional + fechas basta, o se necesitan
    funciones de texto/busqueda desde el inicio?
+R:/ Saca la artilleria pesada en estos calculos
 9. Los totales de tabla y roll-ups, se recalculan tambien en reportes/BI, o solo en captura?
-
+R:/si recalculo
 **Formulario-modulo**
 10. "Convertir en modulo" lo hace el configurador (Andres) por si mismo, o requiere aprobacion
     de un admin (porque crea menu + permisos globales)?
+R:/ Convertir en modulo es una opcion de configuracin del formulario es opcional
 11. Los KPIs de la bandeja son fijos (cantidad, suma, %) o configurables por el usuario?
-
+r:/ configurables
 **Gobierno / alcance**
 12. Prioridad real del usuario: cual de F1..F6 resuelve el dolor mas inmediato (por lo dictado
     parece F1 lookups + F2 calculo para cotizaciones)? Confirmar para ordenar la primera entrega.
-
+R:/ si este es uno de los conceptos que debemos llevar pero formularios no es rigido
 ## C. Riesgos
 
 - **Formulas/expresiones**: tentacion de permitir codigo arbitrario (el legacy cayo en RCE por

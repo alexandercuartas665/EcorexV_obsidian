@@ -23,9 +23,16 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 - **Proyectos P1 (hitos) + P3 (enlace actividad<->proyecto/hito)**. La cabecera + UI de proyecto (P2) ya existia.
 
 ### INVENTARIO DE PENDIENTES (al 2026-07-11)
-1. **Config demo en prod via editor de Conceptos** (NO por SQL): en prod los Conceptos aun no tienen
-   flujo/formulario/tablero vinculados (eso se hizo por BD en local; el seed demo NO corre en prod).
-   Hay que cablearlos desde el editor de Conceptos para que el alta por concepto arranque flujos/forms alli.
+1. **Config de Conceptos en prod -- HECHO 2026-07-11 (por el editor).** Se cablearon en prod (SKY SYSTEM)
+   via el editor de Conceptos, apuntando el dev local (localhost, sin bloqueo) a la BD de prod por el tunel:
+   - **Cotizacion de equipos** -> flujo "Cotizacion Comercial" (publicado) + tablero "Comercial -
+     Requerimiento Infraestructura".
+   - **Requerimiento infraestructura** -> formulario "Solicitud de cotizacion" (form-first).
+   Verificado en la BD de prod. El resto de sub-categorias siguen sin proceso a proposito.
+   **PENDIENTE menor asociado:** marcar en el EDITOR DE MENU (ConfiguracionMenu) un grupo como "despliega
+   procesos" (`IsProcessGroup`) en el tenant de prod, para que el menu dinamico "Mis Procesos" expanda el
+   concepto-proceso (hoy ningun nodo de prod lo tiene marcado; el alta por concepto ya funciona igual via
+   tableros / crear-actividad).
 2. **Vistas de menu de los usuarios reales**: el tenant BITCODE de prod se creo sin vistas; se asigno
    "Completo" a `acuartas@bitcode.com.co`, pero los otros 12 usuarios siguen sin vista (falta un
    seed/reconcile que garantice una vista Completo IsDefault por cada tenant real).
