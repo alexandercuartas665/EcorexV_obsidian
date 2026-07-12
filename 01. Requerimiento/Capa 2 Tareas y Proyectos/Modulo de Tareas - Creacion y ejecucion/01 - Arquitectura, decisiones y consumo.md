@@ -122,7 +122,9 @@ Al confirmar la creacion de una actividad ligada a una subcategoria, dentro de U
 
 - **(A) Proceso**: subcategoria con `WorkflowDefinitionId != null`. Entra por Mis Procesos (D3),
   el modal llega con categoria/subcategoria fijadas, crea TaskItem + StartInstance (+ Formulario
-  si `IniciaModulo`). Se ve en el tablero del concepto y en las bandejas de los asignados.
+  si `IniciaModulo`). Se ve en el tablero del concepto y en el TABLERO de cada asignado (alcance
+  "mis pendientes"); el paso se atiende DENTRO del detalle de la tarea (seccion Flujo). NO hay
+  bandeja/pagina "Mis pasos" aparte (ADR-0038).
 - **(B) Simple**: subcategoria con `WorkflowDefinitionId == null`. Entra por un tablero, el modal
   pide Empresa/Area -> Tipo(categoria) -> Actividad(subcategoria) -> Encargado. Crea TaskItem sin
   instancia de flujo; vive en el tablero.
@@ -133,5 +135,6 @@ Al confirmar la creacion de una actividad ligada a una subcategoria, dentro de U
 - DAL dual (PG/SQL Server) via `IEcorexDbContext`; SQL parametrizado.
 - Transaccion para crear-tarea + instancia-flujo + formulario + notificacion (todo o nada).
 - Soft-delete + auditoria; concurrencia optimista (`Version`).
-- Tiempo real por SignalR (tableros/conteos/bandeja).
+- Tiempo real por SignalR (tableros/conteos). El runtime de flujos se atiende en el detalle de la
+  tarea; los pasos pendientes se descubren en el tablero ("mis pendientes"), sin bandeja aparte (ADR-0038).
 - Permisos como policies (`[Authorize(Policy=...)]`), no chequeos ad-hoc.

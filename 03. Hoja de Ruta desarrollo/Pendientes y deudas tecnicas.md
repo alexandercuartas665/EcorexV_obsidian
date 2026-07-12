@@ -2,7 +2,7 @@
 tipo: backlog
 proposito: Registro vivo de lo PENDIENTE y las deudas tecnicas del sistema destino ECOREX Tareas (.NET 10), para no perder el hilo entre sesiones
 estado: vivo
-fecha_ultima_actualizacion: 2026-07-07
+fecha_ultima_actualizacion: 2026-07-12
 ---
 
 # Pendientes y deudas tecnicas
@@ -32,6 +32,17 @@ fecha_ultima_actualizacion: 2026-07-07
       enforcement de roles.
 - [ ] Ruta/slug de Seccion/Subgrupo no editable en el panel de propiedades.
 - [ ] "Guardar" del editor es confirmacion (cada accion persiste al vuelo).
+
+### Runtime de flujos: retirar la bandeja "Mis pasos" (ADR-0038)
+- [ ] **Extender el alcance "Pendientes mios" del tablero** (`ActivityBoardService.ApplyScope`)
+      para incluir tareas cuyo PASO ACTUAL del flujo esta ruteado al usuario (por
+      `AssignedToTenantUserId` directo o por CARGO del nodo, `INodeAssigneeResolver`). Asi el
+      tablero se vuelve la bandeja: el paso que cae en tu cargo aparece en tus pendientes.
+- [ ] **Retirar** la pagina/ruta `/mis-pasos` (`MisPasos.razor`), el item de menu 000637
+      "Mis pasos" (seed + tenants ya sembrados) y la policy `MisPasos.Ver`. Conservar
+      `IWorkflowInboxService` (lo consumen el detalle de la tarea y el filtro del tablero).
+- Decision: los flujos se ejecutan DENTRO de la tarea (seccion "Flujo" de `TaskDetailModal`);
+      no hay bandeja/pagina aparte. Ver ADR-0038 (repo) y Capa 2 docs 00/01/03.
 
 ## 2. Deudas de modulos anteriores
 - **Inventario (ADR-0027):** imagenes por URL (sin upload de archivo); sin

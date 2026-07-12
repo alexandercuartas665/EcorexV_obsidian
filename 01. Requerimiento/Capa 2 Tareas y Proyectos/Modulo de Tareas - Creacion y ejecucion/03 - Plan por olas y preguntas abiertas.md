@@ -209,7 +209,8 @@ para tiempo real; permisos como policies; ASCII en archivos nuevos; PROGRESO.md 
   (no hay infra de entrega hoy). El set completo de tokens de TituloAuto llega con el modal (Ola 3).
 - **Aceptacion CUMPLIDA**: tests de integracion (matriz dual, verdes en PG) -- la actividad-proceso
   arranca su `WorkflowInstance` (Running) con TituloAuto/DetalleAuto aplicados y el primer paso
-  Pending (lo de `/mis-pasos`); la actividad simple NO crea instancia; y queda la traza de
+  Pending (se descubre en el TABLERO, alcance "mis pendientes", y se atiende en el detalle de la
+  tarea; sin bandeja "Mis pasos" -- ADR-0038); la actividad simple NO crea instancia; y queda la traza de
   notificacion. Sin cambios de esquema (Ola 2 es solo comportamiento).
 
 ### Ola 3 - Modal wizard 4 pasos (fidelidad prototipo)  -- HECHA 2026-07-11 (commit `9af2202`)
@@ -301,7 +302,8 @@ faltante y verifico el resto con tests de integracion (4/4 verdes en PG):
   Tareas dejo de ser placeholder: `Tareas.Ver`/`Proyectos.Ver`/`Flujos.Ver` exigen el permiso real y
   `Formularios.Disenar` es COMPUESTA (ver+editar). Sin tocar paginas. 26/26 tests unitarios verdes.
   Aun placeholder (documentado): policies de gobierno (AdmUsuarios/RolesPermisos/ConfiguracionMenu a
-  Owner/Admin) y Conceptos.Editar/Dependencias.Ver/MisPasos.Ver.
+  Owner/Admin) y Conceptos.Editar/Dependencias.Ver. (`MisPasos.Ver` queda RETIRADA con la pagina
+  `/mis-pasos` -- ADR-0038.)
 - **Entrega REAL de notificaciones in-app -- HECHO** (`ef9ef06`): entidad `Notification` (tenant-scoped,
   por usuario, leido/no leido) + `INotificationService` + migracion `AddNotifications` (PG local).
   `AssignAsync` ENTREGA una notificacion al encargado (TaskAssigned) y a los destinatarios del concepto
