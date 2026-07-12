@@ -68,15 +68,18 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
      renderiza, assign tests verdes); infra espejo del TaskHub del kanban.
    - Con esto el **endurecimiento de notificaciones (Ola 7) queda COMPLETO**: in-app + email + badge en vivo.
    - PENDIENTE menor: plantilla de correo configurable por tenant (hoy plantilla HTML fija).
-5. **Backlog de Proyectos**: presupuesto/costos (`PROYECTOS_COS`) y DOFA (`PROYECTOS_DOFA`) -- entidad+UI;
-   timeline/calendario propios del proyecto (hoy reusa el kanban).
-6. **Refinamientos menores**: ~~Ola 4 (el link de Mis Procesos no abre una vista de tablero especifica)~~
-   YA RESUELTO en Ola 6 (el link `actividades?sub=` resuelve y carga el tablero del concepto). QUEDA:
-   Ola 6 (auto-abrir el modal preset AL cargar el tablero via `?sub=`, diferido por concurrencia de
-   DbContext compartido; el modal preset sigue disponible via `crear-actividad?sub=`).
-7. **Backlog post-v1 (seccion C)**: catalogo de Sedes/Empresa-cliente adicional; controles multimedia del
-   formulario (foto/firma/GPS/archivo/barcode, hoy placeholder); vista de tareas para cliente final
-   (solo lectura); modulos satelite legacy (PQR, encuesta, visitas).
+5. **Proyectos: PARCIAL -> casi completo 2026-07-12** (`8f978e8`): ~~presupuesto/costos (`PROYECTOS_COS`)
+   + DOFA (`PROYECTOS_DOFA`)~~ **HECHO** (entidades ProjectBudgetItem/ProjectDofa + servicio + paneles en
+   ProyectoDetalle + timeline de hitos; migracion DUAL PG+SqlServer; tests dual 4/4; validado desktop+movil;
+   DESPLEGADO a prod). QUEDA (backlog): vistas **calendario/gantt propias** mas ricas del proyecto (hoy el
+   detalle reusa el kanban del tablero y muestra timeline de hitos).
+6. **Refinamientos menores**: ~~Ola 4 (link Mis Procesos->tablero)~~ YA RESUELTO en Ola 6. ~~Ola 6 (auto-abrir
+   el modal preset AL cargar el tablero via `?sub=`)~~ **DIFERIDO a la fase del modulo de formularios avanzado**
+   (decision del usuario 2026-07-12); el modal preset sigue disponible via `crear-actividad?sub=`.
+7. **Backlog post-v1 -- DIFERIDO a la fase del modulo de formularios avanzado** (decision del usuario
+   2026-07-12; se afinan cuando el constructor de formularios este mas maduro): controles multimedia del
+   formulario (foto/firma/GPS/archivo/barcode, hoy placeholder); vista de tareas para cliente final (solo
+   lectura); modulos satelite legacy (PQR, encuesta, visitas); catalogo de Sedes/Empresa-cliente adicional.
 8. ~~**Redeploy a prod del fix movil del wizard**~~ **HECHO 2026-07-12** (`e6636d8`, build-from-git + up -d,
    backup `ecorex-2026-07-12-0510.sql.gz`, CSS verificado en prod). Prod ya tiene el wizard responsive.
 9. **Mas conceptos-proceso en prod** (opcional): hoy hay 2 (Cotizacion de equipos, Visita tecnica) porque
