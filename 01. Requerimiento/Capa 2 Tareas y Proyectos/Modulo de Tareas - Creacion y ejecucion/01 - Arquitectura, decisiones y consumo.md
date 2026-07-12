@@ -129,38 +129,77 @@ Al confirmar la creacion de una actividad ligada a una subcategoria, dentro de U
   pide Empresa/Area -> Tipo(categoria) -> Actividad(subcategoria) -> Encargado. Crea TaskItem sin
   instancia de flujo; vive en el tablero.
 
-### 5.1 Historia de usuario (el SISTEMA tambien es actor) -- ADR-0038
+### 5.1 Historia de usuario detallada (el SISTEMA tambien es actor) -- ADR-0038
 
-> Ejemplo canonico: actividad de compras gobernada por flujo. Actores humanos: **Solicitante**,
-> **Jefe de Compras**, **Comprador**. Actor no humano: **ECOREX (el sistema)**, que encamina el
-> trabajo. La clave del modelo: el usuario nunca va a una bandeja "Mis pasos"; entra a la TAREA.
+> **Contexto visual** (prototipo `ECOREX.dc.html`, seccion "FLUJO DEL PROCESO" ~3478): al abrir una
+> tarea-proceso desde el tablero, el modal muestra la **RUTA del flujo** -- un grafo de nodos con el
+> paso ACTUAL resaltado, los nodos CERRADOS en verde, QUIEN atiende cada uno (por cargo), badge
+> Manual/Automatico, y las compuertas de decision. **Esa ruta ES el resultado vivo de la ejecucion**
+> de la tarea. Actores humanos: Solicitante, Jefe de Compras, Comprador. Actor no humano: **ECOREX
+> (el sistema)**, que enciende, rutea, avanza y cierra.
 
-- **Como Solicitante**, quiero levantar la actividad desde el concepto de compra, **para que el
-  sistema la encamine** por el proceso sin que yo sepa quien aprueba ni donde esta cada paso.
-- **Como Jefe de Compras / Comprador**, quiero que los pasos que me tocan **por mi cargo** aparezcan
-  en mi tablero ("mis pendientes"), para atenderlos DENTRO de la propia tarea (seccion "Flujo").
-- **Como ECOREX (el sistema)**, arranco el flujo, ruteo cada paso al cargo correcto, hago visible el
-  pendiente en el tablero de cada candidato, avanzo por la compuerta segun la decision y cierro el
-  caso -- sin pantalla intermedia.
+**Lo que ve el usuario al abrir la tarjeta de la tarea (la RUTA):**
 
-**Escenario (actor -> accion):**
+```
+FLUJO DE COMPRAS                         [ A = Automatico   M = Manual ]
 
-1. *Solicitante* crea la actividad "Compra ..." desde su concepto (Mis Procesos).
-2. **Sistema**: en UNA transaccion crea la TaskItem, arranca la `WorkflowInstance` (Running) y deja
-   el primer paso Pending **ruteado al cargo** del nodo (p.ej. "Aprobacion jefe de compras" ->
-   Aprobador). Sin bandeja: el paso NO va a una pantalla aparte.
+   [*] Solicitud de compra       (M - Solicitante)    CERRADO  (nota)
+        |
+        v
+   [>] Aprobacion jefe compras   (M - Jefe Compras)   <=== PASO ACTUAL
+        |
+        v
+      < ?Aprobada? >   (compuerta / decision)
+       /            \
+     Si              No
+      |               |
+      v               v
+   [ ] Generar OC     [x] Rechazada
+       (Comprador)        (Fin)
+        |
+        v
+   [*] Fin (Compra OK)
+```
+
+Leyenda: `[*]` inicio/fin  ·  `[>]` paso ACTUAL (resaltado)  ·  `[ ]` pendiente  ·  `[x]` fin
+alterno  ·  `< ? >` compuerta  ·  `CERRADO` nodo terminado (verde)  ·  `(nota)` anotacion del
+equipo. Tocar un nodo salta a ese paso; su menu (`...`) permite ANOTAR o "Dar por terminado".
+
+**La historia, paso a paso (actor -> accion), leyendo la ruta:**
+
+1. *Solicitante* crea la actividad de compra desde su concepto (Mis Procesos).
+2. **Sistema**: en UNA transaccion crea la tarea, arranca la instancia de flujo y ENCIENDE el primer
+   nodo real ("Aprobacion jefe de compras") como PASO ACTUAL, ruteado al cargo Aprobador. En la
+   ruta, "Solicitud" queda CERRADO y "Aprobacion" resaltado.
 3. **Sistema**: resuelve los candidatos del cargo por el organigrama (`INodeAssigneeResolver`) y hace
-   aparecer la tarea en **"mis pendientes" del TABLERO** de cada candidato; ademas notifica.
-4. *Jefe de Compras* ve la tarea en su tablero, la abre y **atiende el paso en la seccion "Flujo"**
-   del detalle (Tomar -> Completar / decision Aprobada|Rechazada).
-5. **Sistema**: registra la decision, **auto-resuelve la compuerta** (ADR-0037) y encamina al
-   siguiente cargo (Comprador); deja el nuevo paso Pending y lo publica en su tablero.
-6. *Comprador* atiende su paso en la tarea (emite la orden de compra).
-7. **Sistema**: completa el ultimo paso, **cierra el caso** (tarea Done / instancia Completed) sin
-   estancarse y deja la traza en la historia de la tarea.
+   que la tarea aparezca en **"mis pendientes" del TABLERO** de cada candidato (Jefe de Compras);
+   ademas notifica.
+4. *Jefe de Compras* ve la tarjeta en su tablero, la abre y en la RUTA ve su paso resaltado. Lo toma,
+   deja una anotacion si hace falta y en la compuerta "?Aprobada?" elige la ruta: Si o No.
+5. **Sistema**: registra la decision, AUTO-RESUELVE la compuerta (ADR-0037) por la ruta elegida y
+   MUEVE el paso actual: si "Si" -> "Generar OC" (cargo Comprador); si "No" -> "Rechazada" (Fin). El
+   nodo atendido queda CERRADO (verde) en la ruta.
+6. *Comprador* (si se aprobo) ve la tarea en SU tablero, la abre, atiende "Generar OC" y emite la
+   orden de compra.
+7. **Sistema**: cierra el ultimo nodo y marca el caso como terminado (tarea Done / instancia
+   Completed) sin estancarse; la ruta queda toda en verde hasta "Fin (Compra OK)".
 
-**Invariante de la historia:** descubrir = el tablero ("mis pendientes", que incluye los pasos
-ruteados por cargo); ejecutar = la tarea (seccion "Flujo"). No existe la bandeja "Mis pasos".
+**Donde vive cada cosa (descubrir vs. ejecutar):**
+
+```
+   DESCUBRIR                      EJECUTAR
+   (el TABLERO)                   (DENTRO de la tarea)
+
+   +--------------------+  abrir  +----------------------------------+
+   | Tablero            | ------> | Modal de la tarea                |
+   | "mis pendientes"   |         |  +-- RUTA DEL FLUJO (paso actual) |
+   |  * tarea A (mi paso)|        |  +-- anotar / cerrar nodo / ruta  |
+   |  * tarea B (mi paso)|        |  +-- registro, subtareas, adjuntos|
+   +--------------------+         +----------------------------------+
+```
+
+**Invariante:** descubrir = el tablero ("mis pendientes", que incluye los pasos ruteados por cargo);
+ejecutar = la tarea y su RUTA de flujo. No existe la bandeja "Mis pasos" (ADR-0038).
 
 ## 6. Reglas transversales (del proyecto, obligatorias)
 
