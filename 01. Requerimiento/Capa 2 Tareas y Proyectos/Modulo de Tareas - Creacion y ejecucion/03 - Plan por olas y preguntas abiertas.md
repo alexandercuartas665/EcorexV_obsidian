@@ -82,8 +82,10 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
    lectura); modulos satelite legacy (PQR, encuesta, visitas); catalogo de Sedes/Empresa-cliente adicional.
 8. ~~**Redeploy a prod del fix movil del wizard**~~ **HECHO 2026-07-12** (`e6636d8`, build-from-git + up -d,
    backup `ecorex-2026-07-12-0510.sql.gz`, CSS verificado en prod). Prod ya tiene el wizard responsive.
-9. **Mas conceptos-proceso en prod** (opcional): hoy hay 2 (Cotizacion de equipos, Visita tecnica) porque
-   prod solo tiene 2 flujos PUBLICADOS; para mas hay que PUBLICAR mas flujos en el editor BPMN.
+9. ~~**Mas conceptos-proceso en prod**~~ **HECHO 2026-07-12**: se publico el flujo "Mantenimiento y soporte"
+   (FLW-001) en el editor BPMN y se ligo "Mantenimiento preventivo" (Operaciones) -> flujo + tablero
+   "Soporte - Mesa de ayuda". Ahora hay **3 conceptos-proceso** en prod: Cotizacion de equipos (Comercial),
+   Visita tecnica y Mantenimiento preventivo (Operaciones). Para mas, publicar mas flujos y ligar.
 
 ## A. Decisiones tomadas (usuario, 2026-07-11)
 
