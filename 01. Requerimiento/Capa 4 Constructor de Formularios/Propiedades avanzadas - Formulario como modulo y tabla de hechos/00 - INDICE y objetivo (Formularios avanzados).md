@@ -94,14 +94,14 @@ encima. Base ya construida:
 
 **Extras creativos propuestos (lo que ademas hace falta para "el mejor sistema"):**
 
-- **Maestro-detalle entre formularios** (cabecera/detalle: cotizacion -> items). D7.
-- **Valores por defecto dinamicos** (usuario actual, fecha hoy, entidad del contexto).
-- **Mascaras y formato** (moneda, telefono, documento, %).
-- **Permisos a nivel de campo** (ver/editar por rol).
-- **Impresion / PDF con plantilla** del registro (sucesor de las plantillas PDF->Blob legacy).
-- **Webhooks / eventos al guardar** (integraciones: Siigo, WhatsApp, correo).
-- **Adjuntos Tier 2** (foto, firma, GPS, archivo, codigo de barras: hoy placeholder).
-- **Import de formulario desde imagen (IA)** (sucesor de FormCreatorMCP; encaja en Capa 7).
+- **Maestro-detalle entre formularios** (cabecera/detalle: cotizacion -> items). D7. **HECHO (F5)**.
+- **Valores por defecto dinamicos** (usuario actual, fecha hoy, entidad del contexto). **HECHO (F6)**.
+- **Mascaras y formato** (moneda, telefono, documento, %). **HECHO (F6)**.
+- **Permisos a nivel de campo** (ver/editar por rol). **HECHO (F6)**.
+- **Adjuntos Tier 2** (foto, firma, GPS, archivo). **HECHO (F6, inline)**; `barcode`/`audio` + object storage **diferidos**.
+- **Impresion / PDF con plantilla** del registro (sucesor de las plantillas PDF->Blob legacy). **DIFERIDO**.
+- **Webhooks / eventos al guardar** (integraciones: Siigo, WhatsApp, correo). **DIFERIDO** (via botones -> verbos tipados; usuario analiza doc).
+- **Import de formulario desde imagen (IA)** (sucesor de FormCreatorMCP; encaja en Capa 7). **No iniciado** (fuera del alcance F1..F6).
 
 Detalle y recomendaciones en D8.
 
@@ -109,12 +109,14 @@ Detalle y recomendaciones en D8.
 
 | Brecha | Hoy | Objetivo |
 |---|---|---|
-| El formulario no es "registro" | 1 respuesta = 1 fila JSON sin identidad de negocio ni estado transaccional | Registro con numero, estado (Borrador/Confirmado/Anulado), fecha de transaccion |
-| Sin identidad configurable | No hay modo de identidad en la definicion | `IdentityMode { None, NaturalKey, Sequence }` + config |
+| ~~El formulario no es "registro"~~ **HECHO (F3)** | Registro con numero, estado (Borrador/Confirmado/Anulado) y fecha de transaccion | Construido y verificado (FRM-021-000001) |
+| ~~Sin identidad configurable~~ **HECHO (F3)** | `IdentityMode { None, NaturalKey, Sequence }` + panel de config en el designer | Construido y verificado |
 | ~~Campos solo con opciones fijas~~ **HECHO (F1)** | Origen de datos + typeahead + autollenado por copia (Contenedor/Directorio/Inventario) | Construido y verificado (commit `97d855d`) |
 | ~~Sin calculo~~ **HECHO (F2)** | Campo calculado (evaluador tipado cliente+servidor) + GridDetail (columna calculada por fila, fila de totales, roll-up) | Construido y verificado |
-| Sin modulo/bandeja | Solo el gestor generico `/formularios` | Promover a modulo + bandeja con filtros + KPIs + export |
-| Multimedia | Tier 2 son placeholders | Captura real + object storage |
+| ~~Sin modulo/bandeja~~ **HECHO (F4)** | Modulo con colocacion en el menu + bandeja con columnas/filtros configurables, KPIs, export CSV+Excel, en vivo por SignalR | Construido y verificado |
+| ~~Sin maestro-detalle~~ **HECHO (F5)** | Campo Subform + `FormRecordLink`; el hijo se llena anidado y queda enlazado | Construido y verificado |
+| ~~Multimedia (Tier 2 placeholders)~~ **HECHO (F6)** | Firma/GPS/foto/archivo con captura real inline (data-URI, tope 1 MB) | Construido y verificado; **object storage / barcode / audio = diferidos** |
+| Impresion PDF + webhooks/botones | No existe | **DIFERIDO**: PDF con plantilla (object storage) + botones con reglas -> verbos tipados (usuario analiza doc) |
 
 ## 4. Documentos del capitulo
 

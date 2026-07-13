@@ -25,9 +25,33 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 >   Tier 2 real (firma/GPS/archivo->data-URI inline) HECHOS y verificados E2E via Chrome (FRM-022).
 >   Diferido (integracion grande, NO construido): PDF/plantilla, webhooks/botones-con-reglas, object storage.
 >
-> Migraciones F1/F2/F3/F4 aplicadas en la BD local del worktree; **pendiente aplicarlas a prod**
-> (ver [[04 - Registro de tablas y cambios de esquema (Formularios avanzados)]]).
-> Las **preguntas abiertas** (seccion B) de las olas F5..F6 siguen vigentes antes de construirlas.
+> Migraciones F1..F5 aplicadas en la BD local del worktree; **pendiente aplicarlas a prod**
+> (ver [[04 - Registro de tablas y cambios de esquema (Formularios avanzados)]]). F6 no anade esquema.
+
+> [!todo] QUE FALTA DE VERDAD (backlog tras cerrar F1..F6) - inventario unico 2026-07-13
+> El **nucleo** de las 6 olas esta HECHO y verificado. Lo que resta son piezas de integracion o
+> refinamientos, ordenados por tipo:
+>
+> **A) Despliegue (no es codigo nuevo):**
+> - [ ] Aplicar a **prod** las migraciones F1..F5 (todo el esquema vive en la BD local del worktree).
+>       F6 (mascaras + Tier 2) NO lleva migracion: solo codigo.
+>
+> **B) En pausa por decision del usuario (NO construir hasta su senal):**
+> - [ ] **Botones con reglas de accion + integraciones** (Button -> FormFieldRule -> verbo tipado del
+>       RulesEngine -> Siigo/WhatsApp/correo). El usuario analiza la documentacion antes de delegarlo.
+> - [ ] **Impresion / PDF con plantilla** (requiere renderer PDF + object storage).
+>
+> **C) Incrementos de infraestructura (grandes, sin bloquear el nucleo):**
+> - [ ] **Object storage** para adjuntos grandes (hoy Tier 2 va inline en jsonb con tope de 1 MB).
+> - [ ] Captura real de **codigo de barras** y **audio** (hoy placeholder "proximamente").
+>
+> **D) Refinamientos finos (mejoran, no bloquean):**
+> - [ ] **KPIs configurables** por el usuario en la bandeja del modulo (hoy fijos: cantidad + % crecimiento).
+> - [ ] **Cierre por evento** parametrizable (p.ej. agregar una firma confirma/cierra el registro) - pregunta 3.
+> - [ ] **Indices de dimension** sobre las claves lookup mas consultadas (PG + SQL Server) para BI.
+> - [ ] **Policies tipadas** `Form.{code}.*` (hoy el acceso a la bandeja es por visibilidad del nodo de menu).
+> - [ ] **Test de aislamiento cross-tenant del lookup** en Integration.Tests (Testcontainers, dual) +
+>       adaptadores Item/DataContainer ejercitados en navegador (F1 dejo esto pendiente).
 
 ## A. Plan por olas (orden recomendado por valor / riesgo)
 
@@ -97,8 +121,10 @@ Objetivo: promover un formulario a modulo con su bandeja consultable.
       CSV/Excel incluye las columnas de datos configuradas = aplanado listo para BI).
 - Aceptacion: un formulario marcado como modulo aparece en el menu segun permiso; su bandeja
   filtra por sus campos; los KPIs muestran cantidad y % de crecimiento; export a Excel funciona.
-  > VERIFICADO 2026-07-13 (parcial): FRM-021 promovido -> aparece en el menu bajo Automatizacion ->
-  > `/m/FRM-021` lista el registro FRM-021-000001 (Confirmado). Falta filtros/KPIs/export.
+  > VERIFICADO 2026-07-13 (COMPLETO): FRM-021 promovido -> aparece en el menu bajo Automatizacion ->
+  > `/m/FRM-021` lista el registro FRM-021-000001 (Confirmado); columnas/filtros configurables, KPIs,
+  > export CSV+Excel y bandeja en vivo por SignalR verificados. **Refinamiento pendiente**: KPIs
+  > CONFIGURABLES por el usuario (hoy fijos: cantidad + % crecimiento; ver pregunta abierta 11).
 
 ### F5 - Maestro-detalle entre formularios  **HECHO (nucleo)**
 Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebido).
@@ -124,7 +150,9 @@ Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebi
       inline con tope 1 MB): `form-capture.js` + fragments en el renderer + estilos. VERIFICADO E2E Chrome
       (FRM-022, rol Advisor): firma (4358 chars), GPS (cableado OK, permiso denegado en sandbox), archivo
       PNG con preview; todo persiste en `form_responses.data`. **Object storage para adjuntos grandes = diferido.**
-- [ ] Impresion/PDF con plantilla (object storage) + webhooks tipados al confirmar (allow-list,
+- [x] Captura Tier 2 (firma, GPS, foto/archivo): HECHO e inline (data-URI, tope 1 MB). VERIFICADO Chrome.
+      **Diferido**: `barcode` y `audio` (hoy placeholder) + object storage para adjuntos grandes.
+- [ ] **DIFERIDO** - Impresion/PDF con plantilla (object storage) + webhooks tipados al confirmar (allow-list,
       no reflexion) hacia integraciones (Siigo, WhatsApp HSM, correo).
       > DECISION/NOTA (usuario 2026-07-13): el usuario quiere BOTONES en el formulario con reglas de accion
       > configurables (integraciones). El patron .NET correcto NO es reflexion abierta (Activator sobre texto,
@@ -133,11 +161,11 @@ Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebi
       > `IRuleVerb.Name`). MAPEO: boton (`FormControlType.Button`) -> `FormFieldRule` -> verbo tipado
       > (allow-list) -> integracion (Siigo/WhatsApp/correo). PENDIENTE de construir: el usuario analizara la
       > documentacion (esta nota + Clases de Reglas del modulo Documental) antes de delegarlo.
-- [ ] Captura real Tier 2 (foto, firma, GPS, archivo, barcode) + object storage.
-- Aceptacion: al confirmar se genera el PDF y se dispara el webhook configurado; una firma se
-  captura y se guarda; el precio de costo solo lo ve el rol autorizado.
-  > Nota: PDF/webhooks/Tier2 son piezas de INTEGRACION grandes (object storage, renderer PDF, cola de
-  > webhooks) -> incrementos siguientes; el nucleo de campo (defaults/formato) ya esta.
+- Aceptacion: al confirmar se genera el PDF y se dispara el webhook configurado (DIFERIDO); una firma se
+  captura y se guarda (HECHO); el precio de costo solo lo ve el rol autorizado (HECHO, permisos por campo).
+  > Nota: el nucleo de campo (defaults, formato, mascaras, permisos, captura Tier 2 inline) YA esta. Solo
+  > restan las piezas de INTEGRACION grandes (object storage, renderer PDF, cola de webhooks/botones) ->
+  > incrementos siguientes, en pausa por decision del usuario.
 
 ## B. Preguntas abiertas (cerrar antes de delegar)
 
