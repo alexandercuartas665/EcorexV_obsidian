@@ -39,7 +39,11 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 > **B) En pausa por decision del usuario (NO construir hasta su senal):**
 > - [ ] **Botones con reglas de accion + integraciones** (Button -> FormFieldRule -> verbo tipado del
 >       RulesEngine -> Siigo/WhatsApp/correo). El usuario analiza la documentacion antes de delegarlo.
-> - [ ] **Impresion / PDF con plantilla** (requiere renderer PDF + object storage).
+> - [x] **Impresion basica del registro: HECHO** (2026-07-13) - pagina `/formularios/imprimir/{id}` que
+>       arma un documento limpio de solo lectura y lanza el dialogo NATIVO del navegador (Imprimir /
+>       Guardar como PDF). Sin object storage ni renderer de servidor. Verificado E2E (FRM-022).
+> - [ ] **PDF con plantilla** (layout disenable + renderer PDF de servidor + object storage) - DIFERIDO,
+>       es la version avanzada de la impresion (guardar/adjuntar el PDF, plantilla con logo, etc.).
 >
 > **C) Incrementos de infraestructura (grandes, sin bloquear el nucleo):**
 > - [ ] **Object storage** para adjuntos grandes (hoy Tier 2 va inline en jsonb con tope de 1 MB).
@@ -152,8 +156,11 @@ Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebi
       PNG con preview; todo persiste en `form_responses.data`. **Object storage para adjuntos grandes = diferido.**
 - [x] Captura Tier 2 (firma, GPS, foto/archivo): HECHO e inline (data-URI, tope 1 MB). VERIFICADO Chrome.
       **Diferido**: `barcode` y `audio` (hoy placeholder) + object storage para adjuntos grandes.
-- [ ] **DIFERIDO** - Impresion/PDF con plantilla (object storage) + webhooks tipados al confirmar (allow-list,
-      no reflexion) hacia integraciones (Siigo, WhatsApp HSM, correo).
+- [x] **Impresion BASICA del registro: HECHO** (2026-07-13) - `/formularios/imprimir/{responseId}` +
+      boton "Imprimir" en el renderer -> documento limpio de solo lectura + dialogo nativo (Imprimir /
+      Guardar PDF). Verificado E2E Chrome (FRM-022): mascaras, fecha dd/MM/yyyy, firma e imagen inline OK.
+- [ ] **DIFERIDO** - PDF con PLANTILLA (renderer de servidor + object storage) + webhooks tipados al
+      confirmar (allow-list, no reflexion) hacia integraciones (Siigo, WhatsApp HSM, correo).
       > DECISION/NOTA (usuario 2026-07-13): el usuario quiere BOTONES en el formulario con reglas de accion
       > configurables (integraciones). El patron .NET correcto NO es reflexion abierta (Activator sobre texto,
       > el legacy cayo en RCE por eso); es un REGISTRO DE VERBOS TIPADOS resuelto por DI ("keyed handlers" /

@@ -99,7 +99,7 @@ encima. Base ya construida:
 - **Mascaras y formato** (moneda, telefono, documento, %). **HECHO (F6)**.
 - **Permisos a nivel de campo** (ver/editar por rol). **HECHO (F6)**.
 - **Adjuntos Tier 2** (foto, firma, GPS, archivo). **HECHO (F6, inline)**; `barcode`/`audio` + object storage **diferidos**.
-- **Impresion / PDF con plantilla** del registro (sucesor de las plantillas PDF->Blob legacy). **DIFERIDO**.
+- **Impresion / PDF** del registro. **Basico HECHO (F6)**: print nativo del navegador (Imprimir / Guardar PDF) desde un documento limpio. **DIFERIDO**: PDF con plantilla de servidor + object storage (sucesor de las plantillas PDF->Blob legacy).
 - **Webhooks / eventos al guardar** (integraciones: Siigo, WhatsApp, correo). **DIFERIDO** (via botones -> verbos tipados; usuario analiza doc).
 - **Import de formulario desde imagen (IA)** (sucesor de FormCreatorMCP; encaja en Capa 7). **No iniciado** (fuera del alcance F1..F6).
 
@@ -116,7 +116,7 @@ Detalle y recomendaciones en D8.
 | ~~Sin modulo/bandeja~~ **HECHO (F4)** | Modulo con colocacion en el menu + bandeja con columnas/filtros configurables, KPIs, export CSV+Excel, en vivo por SignalR | Construido y verificado |
 | ~~Sin maestro-detalle~~ **HECHO (F5)** | Campo Subform + `FormRecordLink`; el hijo se llena anidado y queda enlazado | Construido y verificado |
 | ~~Multimedia (Tier 2 placeholders)~~ **HECHO (F6)** | Firma/GPS/foto/archivo con captura real inline (data-URI, tope 1 MB) | Construido y verificado; **object storage / barcode / audio = diferidos** |
-| Impresion PDF + webhooks/botones | No existe | **DIFERIDO**: PDF con plantilla (object storage) + botones con reglas -> verbos tipados (usuario analiza doc) |
+| ~~Impresion~~ **BASICA HECHA (F6)** | Print nativo del navegador (Imprimir / Guardar PDF) desde documento limpio | **DIFERIDO**: PDF con plantilla (object storage) + webhooks/botones -> verbos tipados (usuario analiza doc) |
 
 ## 4. Documentos del capitulo
 
