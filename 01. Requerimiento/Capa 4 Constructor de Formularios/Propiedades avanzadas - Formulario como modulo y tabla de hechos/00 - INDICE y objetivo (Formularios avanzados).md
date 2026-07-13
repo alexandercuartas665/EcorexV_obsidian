@@ -3,8 +3,8 @@ tipo: indice-proyecto
 proyecto: Propiedades avanzadas del Constructor de Formularios
 capa: Capa 4 - Constructor de Formularios
 modulos_web: /formularios (000131) + /contenedor-datos + /directorio + /inventario
-estado: PROPUESTA / DISENIO (dictado del usuario 2026-07-11; motor base YA validado)
-fecha: 2026-07-11
+estado: F1..F6 HECHOS y verificados (2026-07-13, BD local worktree; pendiente aplicar a prod). Diferido: PDF/plantilla, webhooks, object storage
+fecha: 2026-07-11 (actualizado 2026-07-12)
 autor: documentado por agente IA (validacion read-only del codigo real + dictado del usuario)
 ---
 
@@ -19,11 +19,29 @@ autor: documentado por agente IA (validacion read-only del codigo real + dictado
 > (formulas, totales en tablas, filtros). Se apoya en [[00 - Visión Formularios]]
 > (vision del motor) y reutiliza infraestructura que YA existe en el codigo.
 
-> [!note] ESTADO 2026-07-11: PROPUESTA. El motor base esta CONSTRUIDO; esto es el salto siguiente.
-> El Constructor de Formularios ya define, renderiza, guarda (1 fila JSON), publica por
-> token, se une al flujo BPMN y dispara reglas (validado sobre el codigo real, ver seccion 1).
-> Lo de este capitulo es el **backlog de propiedades avanzadas** dictado por el usuario el
-> 2026-07-11, aun SIN construir. El plan por olas y las decisiones a cerrar estan en
+> [!success] ESTADO 2026-07-12: EN CONSTRUCCION. El motor base ya estaba CONSTRUIDO; el salto avanza.
+> - **F1 (lookups/autollenado): HECHO y verificado en navegador** (Directorio/Inventario/Contenedor;
+>   commit `97d855d`). 
+> - **F2 (calculo): HECHO** - campos calculados escalares + GridDetail (columna calculada por fila,
+>   fila de totales, roll-up al encabezado); evaluador tipado + recomputo cliente/servidor. Verificado
+>   en navegador (commits `1f98245` + GridDetail).
+> - **F3 (transaccionalidad): HECHO** - confirmar/anular + identidad + panel de config + boton Anular;
+>   verificado (FRM-021-000001).
+> - **F4 (formulario-modulo): HECHO** - modulo con colocacion dinamica en el menu + bandeja con
+>   columnas/filtros configurables, KPIs, export CSV+Excel, en vivo por SignalR, aplanado BI y policy por
+>   menu; verificado. (Refinamiento opcional: policies tipadas.)
+> - **F5 (maestro-detalle): HECHO** - campo Subform + FormRecordLink; el hijo se llena anidado y queda
+>   enlazado; configurable en el designer; verificado.
+> - **F6 (transversales): HECHO** - defaults dinamicos (Today/CurrentUser), formato (moneda/%/entero),
+>   **permisos por campo** (ocultar/solo-lectura por rol), **mascaras de entrada** (phone/document) y
+>   **captura Tier 2 real** (firma en canvas, GPS, archivo/foto->data-URI inline, tope 1 MB): TODO HECHO y
+>   verificado E2E via Chrome (FRM-022, rol Advisor). **Diferido (integracion grande, NO construido)**:
+>   PDF con plantilla, webhooks/botones-con-reglas (el usuario analiza la doc), object storage para
+>   adjuntos grandes.
+>
+> Las migraciones de F1/F2/F3/F4 estan aplicadas en la BD LOCAL del worktree; **pendiente aplicarlas a
+> prod** (protocolo y registro en [[04 - Registro de tablas y cambios de esquema (Formularios avanzados)]]).
+> El plan por olas y las decisiones estan en
 > [[03 - Plan por olas y preguntas abiertas (Formularios avanzados)]].
 
 ## 1. Estado actual del motor (validacion del codigo real, 2026-07-11)
@@ -93,8 +111,8 @@ Detalle y recomendaciones en D8.
 |---|---|---|
 | El formulario no es "registro" | 1 respuesta = 1 fila JSON sin identidad de negocio ni estado transaccional | Registro con numero, estado (Borrador/Confirmado/Anulado), fecha de transaccion |
 | Sin identidad configurable | No hay modo de identidad en la definicion | `IdentityMode { None, NaturalKey, Sequence }` + config |
-| Campos solo con opciones fijas | `OptionsJson` estatico en Select/Radio/MultiCheck | Origen de datos (Contenedor/Directorio/Inventario) + typeahead + autollenado |
-| Sin calculo | No hay campo calculado ni totales de tabla | Formula tipada + agregados de columna + roll-up |
+| ~~Campos solo con opciones fijas~~ **HECHO (F1)** | Origen de datos + typeahead + autollenado por copia (Contenedor/Directorio/Inventario) | Construido y verificado (commit `97d855d`) |
+| ~~Sin calculo~~ **HECHO (F2)** | Campo calculado (evaluador tipado cliente+servidor) + GridDetail (columna calculada por fila, fila de totales, roll-up) | Construido y verificado |
 | Sin modulo/bandeja | Solo el gestor generico `/formularios` | Promover a modulo + bandeja con filtros + KPIs + export |
 | Multimedia | Tier 2 son placeholders | Captura real + object storage |
 

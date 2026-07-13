@@ -6,14 +6,28 @@ proposito: Backlog por olas con criterios de aceptacion + las decisiones a cerra
 
 # 03 - Plan por olas y preguntas abiertas (Formularios avanzados)
 
-## ESTADO GENERAL (2026-07-11)
+## ESTADO GENERAL (actualizado 2026-07-13)
 
-> [!note] PROPUESTA - NO CONSTRUIDO
-> El motor base esta construido y validado (ver
-> [[00 - INDICE y objetivo (Formularios avanzados)]] seccion 1). Este capitulo es el backlog
-> del **salto a propiedades avanzadas** dictado por el usuario el 2026-07-11. Nada de esto
-> esta implementado aun; las olas F1..F6 son la ruta propuesta. Antes de delegar a un
-> sub-agente hay que cerrar las **preguntas abiertas** de la seccion B.
+> [!success] EN CONSTRUCCION
+> - **F1 (lookups/autollenado): HECHO** y verificado en navegador (commit `97d855d`).
+> - **F2 (calculo): HECHO** - campos calculados + GridDetail (totales, roll-up); evaluador tipado
+>   cliente+servidor. Verificado.
+> - **F3 (transaccionalidad): HECHO** - confirmar/anular + identidad + panel de config + boton Anular;
+>   verificado (FRM-021-000001). Pendiente fino: cierre por evento (firma), indices de dimension.
+> - **F4 (formulario-modulo): HECHO** - promover a modulo con **colocacion dinamica en el menu** (vista +
+>   grupo) + bandeja con **columnas/filtros configurables**, KPIs, **export CSV+Excel**, **en vivo por
+>   SignalR**, aplanado BI y policy por visibilidad de menu. Verificado en navegador. (Refinamiento
+>   opcional: policies tipadas `Form.{code}.*`.)
+> - **F5 (maestro-detalle): HECHO** - campo Subform + `FormRecordLink`; el hijo se llena ANIDADO y queda
+>   enlazado; **configurable en el designer** (paleta + selector de formulario hijo). Verificado.
+> - **F6 (transversales): HECHO** - defaults dinamicos (Today/CurrentUser), formato (moneda/%/entero),
+>   permisos por campo (ocultar/solo-lectura por rol), mascaras de entrada (phone/document) y captura
+>   Tier 2 real (firma/GPS/archivo->data-URI inline) HECHOS y verificados E2E via Chrome (FRM-022).
+>   Diferido (integracion grande, NO construido): PDF/plantilla, webhooks/botones-con-reglas, object storage.
+>
+> Migraciones F1/F2/F3/F4 aplicadas en la BD local del worktree; **pendiente aplicarlas a prod**
+> (ver [[04 - Registro de tablas y cambios de esquema (Formularios avanzados)]]).
+> Las **preguntas abiertas** (seccion B) de las olas F5..F6 siguen vigentes antes de construirlas.
 
 ## A. Plan por olas (orden recomendado por valor / riesgo)
 
@@ -24,62 +38,106 @@ concepto de registro/modulo y conviene montarlos sobre F1/F2 ya firmes.
 ### F1 - Lookups / autocompletado (datos con dominio del tenant)
 Objetivo: un campo se llena desde una tabla de datos del tenant (cliente, item, lista) con
 autollenado de campos dependientes.
-- [ ] `FormQuestion` gana `SourceKind/SourceRef/DisplayField/ValueField/FilterJson/AutofillMapJson/Presentation`.
-- [ ] Servicio de busqueda server-side, parametrizado y paginado, sobre `DataContainerService`,
-      `TerceroService` e `ItemService` (filtro por tenant garantizado).
-- [ ] `DynamicFormRenderer`: control de autocompletar/lista/buscador; al elegir, aplica el
+- [x] `FormQuestion` gana `SourceKind/SourceRef/DisplayField/ValueField/FilterJson/AutofillMapJson/Presentation`. (migracion dual `AddFormLookupFields`; ver doc 04)
+- [x] Servicio de busqueda server-side, parametrizado y paginado, sobre `DataContainerService`,
+      `TerceroService` e `ItemService` (filtro por tenant garantizado). (`IFormLookupService` + 3 adaptadores en `Application/Forms/Lookups`)
+- [x] `DynamicFormRenderer`: control de autocompletar/lista/buscador; al elegir, aplica el
       autollenado (incluye campos dinamicos de `TerceroFieldService`/`ItemFieldService`).
-- [ ] `FormDesigner`: bloque "Origen de datos" en el tab Datos (doc 02 seccion 2).
+- [x] `FormDesigner`: bloque "Origen de datos" en el tab Datos (doc 02 seccion 2).
 - Aceptacion: elegir un cliente autocompletando trae su NIT/direccion; el valor guardado es el
   id; imposible ver datos de otro tenant; test de aislamiento cross-tenant del lookup.
+  > VERIFICADO 2026-07-12 en navegador (BD local `ecorex_forms`, copia de prod): campo Cliente
+  > (Directorio, Autocompletar) -> escribir "a" trae 5 terceros reales -> elegir "ANDINA S.A.S"
+  > autollena NIT=901.111.222 y Ciudad=Bogota. Designer muestra Origen/Presentacion/Mostrar
+  > (con fichas dinamicas)/Filtro/mapa de autollenado. Unit del dispatcher verde (4/4). PENDIENTE:
+  > test de aislamiento cross-tenant en Integration.Tests (Testcontainers, dual) + adaptadores Item/DataContainer en navegador.
 
 ### F2 - Calculo y agregacion (formulas, totales de tabla)
 Objetivo: campos calculados, totales de columna en GridDetail y roll-up al encabezado.
-- [ ] `FormQuestion.CalcExpression` + `Aggregate`; evaluador de expresiones **tipado/sandbox**
-      compartido con el `RulesEngine` (cliente para UX + revalidacion en servidor).
-- [ ] GridDetail: columna calculada por fila + fila de totales + roll-up a campo del encabezado.
-- [ ] `FormFieldValidator`/`FormResponseService`: recalculo en servidor al guardar (no confiar
-      en el cliente para montos).
+- [x] `FormQuestion.CalcExpression` + `Aggregate`; evaluador de expresiones **tipado/sandbox**
+      (`FormExpressionEvaluator`, allow-list; 16 unit tests). Cliente (renderer) + servidor. (migracion `AddFormCalcFields`, doc 04)
+- [x] GridDetail: columna calculada por fila + fila de totales + roll-up a campo del encabezado.
+      (helper compartido `FormGridCalculator` cliente+servidor; 9 unit tests; VERIFICADO en navegador:
+      2x1500 + 3x1000 -> subtotales 3000/3000, fila de totales 6000, roll-up "Total general"=6000)
+- [x] `FormFieldValidator`/`FormResponseService`: recalculo en servidor al guardar (no confiar
+      en el cliente para montos). (recomputo en `FormResponseService.SaveAsync`, descarta el valor del cliente)
+  > VERIFICADO 2026-07-12 en navegador (`ecorex_forms`): Subtotal = `{cantidad} * {precio_item}` ->
+  > 3 x 540000 = 1620000 en vivo, solo lectura. Encadena F1->F2 (elegir item autollena precio -> subtotal).
 - Aceptacion: cotizacion con lineas item x cantidad = subtotal, total = suma; si el cliente
   manipula el total, el servidor lo corrige; sin expresiones arbitrarias (allow-list).
 
 ### F3 - Transaccionalidad (registro: identidad, estado, fecha)
 Objetivo: el envio confirmado se vuelve un registro/hecho con numero, estado y fecha.
-- [ ] `FormDefinition`: `IsTransactional`, `IdentityMode`, `IdentitySourceFieldCode`,
-      `UniqueKeyFieldCodes`, `SequenceId`.
-- [ ] `FormResponse`: `RecordNumber`, `Status(Draft/Confirmed/Voided)`, `TransactionDate`,
-      `VoidedAt/By/Reason`.
-- [ ] Confirmar: consume `ISequenceService` (modo Sequence) o valida unicidad (modo NaturalKey),
-      todo en la transaccion; anular no libera el numero; idempotente por `FormResponse.Id`.
-- [ ] Indices de dimension sobre las claves lookup mas consultadas (PG + SQL Server).
+- [x] `FormDefinition`: `IsTransactional`, `IdentityMode`, `IdentitySourceFieldCode`,
+      `UniqueKeyFieldsJson`, `SequenceId`. (migracion `AddFormTransactional`, doc 04)
+- [x] `FormResponse`: `RecordNumber`, `RecordStatus(Draft/Confirmed/Voided)` (APARTE del `Status`
+      de envio, decision del usuario), `TransactionDate`, `VoidedAt/By/Reason`. Indice unico filtrado por `record_number`.
+- [x] Confirmar: consume `ISequenceService` (Sequence) o valida unicidad (NaturalKey); identidad
+      resuelta antes de la tx; anular (`VoidAsync`) no libera el numero; idempotente.
+      VERIFICADO en navegador: FRM-021 (Sequence) -> Enviar -> **FRM-021-000001**, Confirmed, tx_date, secuencia consumida.
+- [ ] Indices de dimension sobre las claves lookup mas consultadas (PG + SQL Server). (para BI, F4/pendiente)
+- [x] UI de configuracion: panel "Propiedades del formulario" en el designer (boton Propiedades ->
+      IsTransactional + modo de identidad + campo clave) + boton Anular en el renderer. VERIFICADO en
+      navegador (lee Sequence, escribe NaturalKey campo=nit).
 - Aceptacion: guardar una cotizacion consume COT-2026-000124; reintento no duplica; anular deja
   el registro Voided con motivo; unicidad de clave natural rechaza duplicados.
 
 ### F4 - Formulario como modulo (menu, permisos, bandeja, filtros, KPIs)
 Objetivo: promover un formulario a modulo con su bandeja consultable.
-- [ ] `FormDefinition`: `IsModule/ModuleMenuNodeId/ModuleIcon/ListColumnsJson/FilterFieldsJson`.
-- [ ] Generacion de nodo de menu (`Kind=FormModule`) + policies `Form.{code}.*` (reusa
-      `MenuConfigService`/`MenuPermissionFilter`).
-- [ ] Ruta `/m/{code}`: bandeja con grid de registros, filtros dinamicos, KPIs, export, "en vivo"
-      por SignalR.
-- [ ] Vista aplanada (`data` + dimensiones) para BI/Power BI.
+- [x] `FormDefinition`: `IsModule/ModuleMenuNodeId/ModuleIcon/ListColumnsJson/FilterFieldsJson`. (migracion `AddFormModule`, doc 04)
+- [x] Generacion de nodo de menu (reusa `MenuConfigService.CreateNodeAsync`, Kind=Item, Route=/m/{code})
+      **EN LA VISTA + GRUPO que elige el usuario** (colocacion dinamica) + policy: la bandeja solo es
+      accesible si el nodo esta VISIBLE en el menu del usuario (reusa permisos de menu). VERIFICADO.
+      > Nota: policies tipadas `Form.{code}.*` con provider dinamico quedan como refinamiento (hoy el
+      > control de acceso es la visibilidad del nodo de menu, que ya es por permiso).
+- [x] Ruta `/m/{code}`: bandeja con grid + **columnas/filtros CONFIGURABLES** (checkboxes en el designer) +
+      **KPIs** + **export CSV y Excel (.xlsx ClosedXML)** + **EN VIVO por SignalR**. VERIFICADO en navegador
+      (columnas NIT/Ciudad con datos reales; filtro Ciudad "bog"->2; Excel exporta; bandeja 4->5 en vivo).
+- [x] Vista aplanada (`data` + dimensiones) para BI/Power BI. (los registros exponen `Fields` y el export
+      CSV/Excel incluye las columnas de datos configuradas = aplanado listo para BI).
 - Aceptacion: un formulario marcado como modulo aparece en el menu segun permiso; su bandeja
   filtra por sus campos; los KPIs muestran cantidad y % de crecimiento; export a Excel funciona.
+  > VERIFICADO 2026-07-13 (parcial): FRM-021 promovido -> aparece en el menu bajo Automatizacion ->
+  > `/m/FRM-021` lista el registro FRM-021-000001 (Confirmado). Falta filtros/KPIs/export.
 
-### F5 - Maestro-detalle entre formularios
+### F5 - Maestro-detalle entre formularios  **HECHO (nucleo)**
 Objetivo: el detalle son registros de otro formulario (no solo GridDetail embebido).
-- [ ] Campo `Subform`/relacion + `FormRecordLink` (padre-hijo).
+- [x] Campo `Subform` (`FormControlType.Subform` + `FormQuestion.SubformDefinitionId`) + tabla
+      `FormRecordLink` (padre-hijo). Servicio `ListChildren/AddChild/UnlinkChild`. Renderer: el campo
+      lista los hijos + "Agregar" -> formulario hijo ANIDADO (DynamicFormRenderer recursivo) -> al
+      enviar queda enlazado. Migracion dual `AddFormRecordLink` (doc 04).
 - Aceptacion: una cotizacion referencia N lineas que son registros hijos reportables aparte.
-- Nota: si F1..F4 cubren los casos reales con GridDetail, F5 puede diferirse.
+  > VERIFICADO 2026-07-13 en navegador: FRM-021 (padre) con Subform -> hijo FRM-002; Agregar -> form
+  > FRM-002 anidado (Bodega/Fecha) -> Enviar -> hijo FRM-002-000001 (Confirmado) enlazado; cada hijo es un
+  > FormResponse propio (reportable aparte). Campo Subform CREABLE/CONFIGURABLE en el designer (paleta
+  > "Subformulario" + selector de formulario hijo en el tab Datos). VERIFICADO 2026-07-13.
 
-### F6 - Transversales (defaults dinamicos, mascaras, PDF, webhooks, permisos de campo, Tier 2)
-- [ ] Defaults dinamicos (`CurrentUser/Today/CurrentEntidad`), mascaras/formato, permisos por
-      campo.
+### F6 - Transversales (defaults dinamicos, mascaras, PDF, webhooks, permisos de campo, Tier 2)  **HECHO**
+- [x] Defaults dinamicos (`Today`/`CurrentUser`) + **formato** (moneda/%/entero) + **permisos por campo**
+      (`FieldVisibilityJson`: ocultar/solo-lectura por rol) HECHOS (schema + renderer + designer).
+      VERIFICADO: Fecha Today -> hoy; subtotal currency -> "$ 1,620,000"; NIT hide=[Owner] no se pinta;
+      Ciudad readonly=[Owner] queda deshabilitado.
+- [x] **Mascaras de ENTRADA** (`DynamicFormRenderer.MaskInput`): en texto reformatea al perder foco.
+      `phone`->(300) 123-4567; `document`->900,123,456. El valor GUARDADO queda crudo (mascara solo
+      presentacion). Opciones agregadas al dropdown Formato del designer. VERIFICADO E2E Chrome (FRM-022).
+- [x] **Captura real Tier 2** (firma en canvas->dataURL PNG, GPS via geolocation, archivo/foto->data-URI
+      inline con tope 1 MB): `form-capture.js` + fragments en el renderer + estilos. VERIFICADO E2E Chrome
+      (FRM-022, rol Advisor): firma (4358 chars), GPS (cableado OK, permiso denegado en sandbox), archivo
+      PNG con preview; todo persiste en `form_responses.data`. **Object storage para adjuntos grandes = diferido.**
 - [ ] Impresion/PDF con plantilla (object storage) + webhooks tipados al confirmar (allow-list,
       no reflexion) hacia integraciones (Siigo, WhatsApp HSM, correo).
+      > DECISION/NOTA (usuario 2026-07-13): el usuario quiere BOTONES en el formulario con reglas de accion
+      > configurables (integraciones). El patron .NET correcto NO es reflexion abierta (Activator sobre texto,
+      > el legacy cayo en RCE por eso); es un REGISTRO DE VERBOS TIPADOS resuelto por DI ("keyed handlers" /
+      > command dispatch), que YA existe en ECOREX: el RulesEngine (`Ecorex.Application/Rules/Verbs/`,
+      > `IRuleVerb.Name`). MAPEO: boton (`FormControlType.Button`) -> `FormFieldRule` -> verbo tipado
+      > (allow-list) -> integracion (Siigo/WhatsApp/correo). PENDIENTE de construir: el usuario analizara la
+      > documentacion (esta nota + Clases de Reglas del modulo Documental) antes de delegarlo.
 - [ ] Captura real Tier 2 (foto, firma, GPS, archivo, barcode) + object storage.
 - Aceptacion: al confirmar se genera el PDF y se dispara el webhook configurado; una firma se
   captura y se guarda; el precio de costo solo lo ve el rol autorizado.
+  > Nota: PDF/webhooks/Tier2 son piezas de INTEGRACION grandes (object storage, renderer PDF, cola de
+  > webhooks) -> incrementos siguientes; el nucleo de campo (defaults/formato) ya esta.
 
 ## B. Preguntas abiertas (cerrar antes de delegar)
 
@@ -135,6 +193,61 @@ R:/ si este es uno de los conceptos que debemos llevar pero formularios no es ri
   SQL Server (condicion de merge del proyecto).
 - **Alcance**: F1..F6 es grande; conviene entregar por olas verificables y NO mezclar
   transaccionalidad (F3) con formulario-modulo (F4) en la misma ola.
+
+## D. Protocolo de trabajo agente-worktree con BD remota compartida (acordado 2026-07-12)
+
+> [!important] ANCLA DE CONTEXTO PARA EL AGENTE
+> Si el agente pierde contexto, este es el contrato de trabajo vigente. Volver aqui antes de
+> tocar esquema o memoria. Decidido con el usuario el 2026-07-12.
+
+**Contexto.** El desarrollo de formularios avanzados corre en un **git worktree dedicado**
+(`funny-bell-3f8562`, rama `claude/briefing-worktree-formularios-f50017`), en **paralelo** con
+la sesion principal. Ambas sesiones apuntan a la **MISMA BD remota (prod)**. Por eso el esquema
+es un recurso compartido y su cambio se coordina.
+
+**Loop de trabajo (por cada cambio de esquema):**
+1. El agente **codea todo**: entidad + configuracion EF + **migracion DUAL** (PostgreSQL y
+   SQL Server) + servicios + UI.
+2. **Valida la migracion en un Postgres local efimero** (Testcontainers / contenedor desechable),
+   NUNCA a ciegas contra la remota.
+3. **Para** y entrega al usuario: **(a)** el script de la tabla/columnas (la migracion) y
+   **(b)** para que la usa. El usuario le comenta a la sesion principal que ese cambio ocurre.
+4. Con el **"dale"** del usuario, la migracion se aplica a la remota y el agente continua con
+   lo que depende de ella.
+
+**Dos reglas de oro (romper una rompe todo):**
+- **Un solo dueno de la migracion = el agente del worktree.** La sesion principal NO genera su
+  propia migracion para las mismas columnas; solo se entera (por eso se le avisa) y, si su rama
+  las necesita, hace rebase / trae la del worktree. Dos migraciones para el mismo cambio =
+  snapshots divergentes + conflicto de git.
+- **La remota es compartida (prod): el apply es deliberado, no automatico.** En `Development` la
+  app aplica migraciones al arrancar; mientras la migracion este pendiente, el agente mantiene su
+  app apuntando al **local efimero**, no a la remota. Solo la apunta a la remota (y aplica)
+  **despues** del "dale" del paso 3.
+
+**Reporte de campos nuevos - F1 (borrador, pendiente de afinar tipos con doc 01 seccion D4):**
+
+Tabla `form_question`, 7 columnas nuevas (todas ADITIVAS, no alteran nada existente):
+
+| Columna | Tipo PG | Tipo SQL Server | Null | Default | Indice |
+|---|---|---|---|---|---|
+| `source_kind` | varchar(40) | nvarchar(40) | no | `'Options'` | no |
+| `source_ref` | varchar(200) | nvarchar(200) | si | - | no |
+| `display_field` | varchar(120) | nvarchar(120) | si | - | no |
+| `value_field` | varchar(120) | nvarchar(120) | si | - | no |
+| `filter_json` | jsonb | nvarchar(max) | si | - | no |
+| `autofill_map_json` | jsonb | nvarchar(max) | si | - | no |
+| `presentation` | varchar(40) | nvarchar(40) | no | `'Autocomplete'` | no |
+
+Enums nuevos (persistidos como string, registrar en `ConfigureConventions` con
+`HaveConversion<string>()` en `EcorexDbContext`):
+- `SourceKind` = `Options | DataContainer | Tercero | Item`
+- `Presentation` = `Autocomplete | Dropdown | Modal`
+
+> Nota de reconciliacion con el prompt de arranque F1: el prompt planteaba que la sesion
+> principal aplicara la migracion; aqui se acordo que **el agente del worktree la genera Y (tras
+> el "dale") la aplica**, y la principal solo queda enterada. Todo lo demas del prompt (alcance,
+> criterios de aceptacion, DAL dual, multi-tenant, lectura obligatoria) sigue vigente.
 
 Relacionado: [[00 - INDICE y objetivo (Formularios avanzados)]],
 [[01 - Arquitectura, decisiones y datos (Formularios avanzados)]],
