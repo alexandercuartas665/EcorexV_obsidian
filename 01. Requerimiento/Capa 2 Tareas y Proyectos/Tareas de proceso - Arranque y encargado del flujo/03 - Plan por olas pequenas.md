@@ -35,20 +35,39 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
 
 ## OLA A - El encargado que dicta el flujo (cierra HU-01)
 
-### Ola A1 - Resolver el candidato del primer nodo (solo backend, sin UI)
+### Ola A1 - Resolver el candidato del primer nodo (solo backend, sin UI)  -- HECHA 2026-07-14
 
-- **Que**: metodo nuevo en `Ecorex.Application` (p.ej. `IWorkflowStartService.ResolveFirstStepAsync(subcategoriaId)`)
-  que, dada una subcategoria con flujo **publicado**:
-  1. carga la `WorkflowDefinition` publicada,
-  2. recorre desde el `startEvent` saltando gateways (misma logica de auto-resolucion, ADR-0037),
-  3. encuentra el **primer nodo Task**,
-  4. lee su `WorkflowNodePolicy` -> **cargo**,
-  5. usa **`INodeAssigneeResolver`** (ya existe) -> **candidatos**.
-- **Devuelve**: `{ NodeId, NodeName, CargoId, CargoNombre, Candidatos[] }`.
-- **NO toca UI. NO toca el motor.** Solo lee.
-- **Aceptacion**: test unitario/integracion con el flujo de Compras del demo -> devuelve nodo
-  "Cotizar", cargo "Comprador", candidato Beto. Caso borde: flujo sin nodo Task -> devuelve null
-  sin reventar; cargo sin ocupantes -> lista vacia.
+- **Construido**: `IWorkflowStartService.ResolveFirstStepAsync(subcategoriaId)` +
+  `WorkflowStartService` (en `Ecorex.Application/Workflows/`), registrado en DI (scoped).
+  Camina el grafo **EN SECO** (sin instancia, sin pasos, sin persistir):
+  1. lee `Subcategoria.WorkflowDefinitionId`,
+  2. exige la definicion **publicada y no archivada**,
+  3. desde el `startEvent`, atraviesa startEvents y **compuertas** hasta el **primer nodo Task**,
+  4. lee sus `WorkflowNodePolicy` -> **cargos** (ordenados por `SortOrder`),
+  5. usa **`INodeAssigneeResolver`** (ya existia) -> **candidatos**.
+- **Clave de fidelidad**: la resolucion de compuertas es un **espejo exacto** de
+  `WorkflowEngine.ResolveOutgoing` evaluada con `approvalResult = null` -- que es el estado real
+  en el que el motor las evalua al arrancar. Por eso **el nodo que devuelve este servicio es el
+  mismo que el motor activara despues**. No se duplico logica de negocio: solo la navegacion.
+- **Devuelve** `FirstStepDto { Status, WorkflowDefinitionId, NodeId, NodeName, Cargos[], CandidateUserIds[] }`
+  con helpers `EsProceso`, `TieneCandidatoUnico`, `CargoPrincipal`. **Nunca lanza** por
+  configuracion incompleta: lo reporta en `FirstStepStatus`:
+
+  | Status | Significado | Lo consume |
+  |---|---|---|
+  | `Ok` | nodo + cargo + al menos un candidato | A2 (preselecciona), A3 (persiste) |
+  | `SinFlujo` | la subcategoria no tiene flujo: es actividad simple | el wizard normal |
+  | `FlujoNoPublicado` | borrador/archivado: nacera SIN proceso | **C1 (banner de D3)** |
+  | `SinNodoTask` | publicado pero no se alcanza ninguna Task | C1 (validar al publicar) |
+  | `SinCargo` | el primer Task no tiene cargo | C1 (validar al publicar) |
+  | `SinCandidatos` | el cargo no tiene ocupantes: el paso naceria huerfano | C1 (avisar) |
+
+- **NO toca UI. NO toca el motor. Solo lee.**
+- **Aceptacion CUMPLIDA**: `WorkflowStartServiceTests` (7 casos) **verde en la matriz dual
+  (PostgreSQL + SQL Server)**: flujo lineal -> primer Task "Cotizar" + cargo "Comprador" +
+  candidato unico; **compuerta justo despues del startEvent -> la atraviesa** y encuentra la Task;
+  y los 4 estados de config incompleta (sin flujo / borrador / sin cargo / sin ocupantes) +
+  **aislamiento cross-tenant** (el tenant B no ve la subcategoria de A).
 
 ### Ola A2 - El wizard muestra y preselecciona ese encargado (cierra B1 + B2)
 
