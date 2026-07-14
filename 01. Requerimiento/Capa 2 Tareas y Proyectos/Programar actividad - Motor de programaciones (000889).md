@@ -296,6 +296,25 @@ Verificado E2E: PAC-000003 (Actividad, Operaciones/Visita tecnica) persiste el e
 Crear Notificacion (Semanal Lun/Mie, Correo+WhatsApp) -> PAC-000001; crear Actividad (Operaciones/Visita
 tecnica, Mensual primer Lunes) -> PAC-000002; editar recarga los datos; enlace de menu visible para Owner.
 
+### Cierre de P1 (2026-07-14): pausar/activar + tests duales + bug de edicion
+
+- **Pausar/activar**: el chip de ESTADO de la fila es un boton que alterna Activa/Pausada
+  (`ToggleStatusAsync`). El worker de P2 SOLO debe disparar las **Activas**.
+- **Nodo de menu en PROD**: 000889 se agrego a la lista `expected` de `ReconcileMenuNodesAsync`, asi que
+  los tenants YA sembrados (prod) se auto-corrigen al arrancar (stub `modulo/...` -> `programar-actividad`,
+  State=Ready). No hace falta SQL manual en el deploy.
+- **BUG REAL cazado por los tests** (invisible en la prueba manual): al editar, el servicio hacia
+  `RemoveRange(hijos)` y ademas vaciaba las **navs** del padre. Vaciar la nav de una relacion con CASCADA
+  marca los hijos como huerfanos -> EF emite un SEGUNDO DELETE sobre filas ya borradas -> "affected 0 rows"
+  -> `DbUpdateConcurrencyException` espuria. **Ninguna edicion se podia guardar.** Arreglado: el reemplazo
+  total opera sobre los DbSet, nunca sobre las navs.
+- **Tests de integracion DUALES** (PG + SQL Server), `ScheduledJobsTests.cs`, **10/10 verde**: consecutivo
+  PAC sin duplicados, validaciones, reemplazo total al editar (sin huerfanos, el codigo no cambia), tipo
+  Activity conserva concepto + encargado opcional, toggle de estado, y el **BLOQUEANTE de aislamiento
+  cross-tenant** (B no lista/lee/edita/borra/pausa lo de A; el consecutivo de B arranca en su PAC-000001).
+
+**P1 CERRADA.**
+
 ## Olas siguientes (pendientes)
 - **P2**: motor de recurrencia (proxima ejecucion timezone-aware) + worker (hosted service) que dispara
   Notificacion por canales + escribe `scheduled_job_runs` + KPIs (ejecutados hoy / errores), idempotente.
