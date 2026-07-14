@@ -315,6 +315,39 @@ tecnica, Mensual primer Lunes) -> PAC-000002; editar recarga los datos; enlace d
 
 **P1 CERRADA.**
 
+## Ola P2 - HECHA (2026-07-14): motor de recurrencia + worker + bitacora + KPIs
+
+Las programaciones ya DISPARAN solas. Cierra las 3 piezas que el origen nunca completo (O4): el bucle de
+ejecucion, la bitacora y los contadores (ContarEjecutadosHoy/ContarErrores devolvian 0 fijo).
+
+- **Motor de recurrencia** (`ScheduledJobRecurrence`, PURO): proxima ejecucion calculada en la **zona del
+  tenant** (regla 9) y devuelta en UTC -> "los lunes a las 08:00" = 08:00 EN EL TENANT. Cubre las 4
+  frecuencias del prototipo, intervalos "cada N", dias marcados, ordinal mensual (Primer..Ultimo x
+  Lunes..Domingo o "dia"), repeticion intradia y vigencia. Con tope de busqueda (no se cuelga).
+- **Worker** (`ScheduledJobWorker`): hosted service **dentro de Ecorex.SuperAdmin**, NO en Ecorex.Workers.
+  > OJO (hallazgo): el compose de prod (`deploy/docker-prod`) solo levanta el servicio `ecorex-app` (=
+  > SuperAdmin). Un worker en `Ecorex.Workers` **nunca correria en produccion**.
+- **Dispatcher**: barrido cross-tenant (unico `IgnoreQueryFilters`, devuelve solo ids de tenant) +
+  ejecucion acotada con `AmbientTenantContext.Begin`. Dispara solo las **Activas**; escribe
+  `scheduled_job_run` con la **VENTANA** como `fired_at` (no el "ahora") y avanza `NextRunAt` desde ella.
+  Notification -> notificacion in-app al encargado. Activity -> **Skipped hasta P3**.
+- **Idempotencia**: indice UNICO `(tenant_id, job_id, rule_id, fired_at)` -> una ventana = un disparo,
+  aunque corran dos instancias del worker.
+- **Auto-reparacion**: reglas sin `NextRunAt` quedarian MUERTAS; el barrido las visita y las reprograma.
+
+### Esquema P2 para PROD (migracion DUAL `AddSchedulerEngine`, ADITIVA)
+- `tenants.time_zone_id` (varchar60, nullable, IANA; fallback `America/Bogota`).
+- Indice UNICO `(tenant_id, job_id, rule_id, fired_at)` en `scheduled_job_runs`.
+
+### Verificado
+34 tests verde: 12 unitarios del motor + 22 de integracion DUAL (dispara, ignora Pausadas, idempotente,
+Activity=Skipped, barrido de plataforma, auto-reparacion, aislamiento cross-tenant). **En vivo**: se forzo
+una ventana vencida -> el worker disparo solo, dejo bitacora Ok, entrego la notificacion in-app y avanzo
+`next_run_at` a las 08:00 de Bogota. UI: KPIs "1 ejecutados hoy / 0 errores / 3 activas" y proximas
+correctas (semanal Lun -> 20/07; mensual primer Lunes -> 03/08; Lun+Mie -> 15/07).
+
+**P2 CERRADA.**
+
 ## Olas siguientes (pendientes)
 - **P2**: motor de recurrencia (proxima ejecucion timezone-aware) + worker (hosted service) que dispara
   Notificacion por canales + escribe `scheduled_job_runs` + KPIs (ejecutados hoy / errores), idempotente.
