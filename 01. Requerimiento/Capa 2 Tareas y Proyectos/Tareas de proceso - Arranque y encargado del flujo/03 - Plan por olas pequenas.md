@@ -202,7 +202,35 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
 
 ## OLA C - Guardas y QA
 
-### Ola C1 - Guardas de coherencia (cierra B6 + B7 y el resto de la tabla del doc 01 seccion 4)
+### Ola C1 - Guardas de coherencia (cierra B6 + B7 y el resto de la tabla del doc 01 seccion 4)  -- HECHA 2026-07-14
+
+- **Construido (3 piezas)**:
+  1. **Banner en el arranque (D3)** -- `TaskWizard.razor` muestra, arriba del paso 1, un aviso ambar
+     cuando el concepto tiene flujo pero **no es utilizable**. Cubre tres estados de
+     `IWorkflowStartService`: `FlujoNoPublicado` ("nacera sin proceso"), `SinNodoTask` ("el flujo no
+     tiene ningun paso") y `SinCargo` ("el primer paso no tiene cargo -> sin encargado").
+     `FormFirstStarter.razor` ya traia el banner de `FlujoNoPublicado`/`SinCandidatos` desde B1.
+  2. **Chip "borrador" en el menu** -- `NavMenu.razor`: la hoja de un concepto cuyo flujo NO esta
+     publicado se muestra igual (D3: avisar, no ocultar), pero con un chip ambar **"borrador"** en
+     vez del habitual "proc". Se resuelve con una consulta al set de `WorkflowDefinitions` publicadas
+     del tenant (barata, tenant-scoped) y un campo `Publicado` en el record `ProcesoSub`.
+  3. **Validacion al publicar** -- `WorkflowEngine.PublishAsync` **bloquea** publicar un flujo **sin
+     ningun nodo Task** (irrecuperable: un concepto que lo use crearia actividades enroladas y sin
+     nada que atender). **Decision de alcance**: el caso "paso sin cargo" **NO** bloquea la
+     publicacion (seria muy rigido con el admin a mitad de autoria y rompe flujos mecanicos de test);
+     se **avisa al crear** via el banner de la pieza 1 (mas util: sale justo cuando importa).
+- **Aceptacion CUMPLIDA**:
+  - **Test dual** `Publish_FlowWithoutTaskNode_IsRejected` (PostgreSQL + SQL Server, 2/2): un flujo
+    `start -> end` no publica (`Invalid`, sigue en borrador); un flujo con pasos si publica.
+    Regresion: 45 tests de workflow + 360 unitarios en verde (la guarda no rompio nada -> todos los
+    flujos reales tienen paso Task).
+  - **Chrome real**: se **despublico** temporalmente el flujo `COT-COM` (de "Cotizacion de equipos")
+    en local -> en el menu la hoja aparecio con chip **"borrador"** (mientras "Compra urgente" seguia
+    con "proc"); al abrirla, el wizard mostro el **banner ambar** "el flujo aun no esta publicado...
+    la actividad se creara sin proceso" y el combo Encargado **dejo de estar restringido** (cae a los
+    cargos del concepto). Restaurado a publicado.
+
+**Detalle historico de la propuesta original (algunos puntos se ajustaron arriba):**
 
 > Ajustada por la **decision D3**: el menu **NO** se filtra por `IsPublished`. La hoja sigue
 > apareciendo; lo que se ataca es el **silencio** al crear.
@@ -282,7 +310,7 @@ Guion (contra `ecorex_dev` local, nunca prod):
 | **A3** | ✅ HECHA | El 1er paso nace asignado + notificado; D2 revalidado en servidor | `4537b29` |
 | **B1** | ✅ HECHA | La hoja form-first abre el formulario del concepto directo (D1-a) | `9aee589` |
 | **B2** | ✅ HECHA | El wizard queda con un solo camino (no crea la tarea por adelantado) | `368c09b` |
-| **C1** | PENDIENTE | Guardas: **banner** si el flujo no esta publicado (D3) + validacion al publicar + chip "borrador" | - |
+| **C1** | ✅ HECHA | Guardas: banner D3 en el arranque + chip "borrador" en el menu + no publicar flujo sin paso Task | (esta tanda) |
 | **C2** | PENDIENTE | QA end-to-end en Chrome (los 6 pasos del guion) | - |
 | **D1** | PENDIENTE | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | - |
 | **D2** | PENDIENTE | Editor de flujos: formulario por nodo | - |

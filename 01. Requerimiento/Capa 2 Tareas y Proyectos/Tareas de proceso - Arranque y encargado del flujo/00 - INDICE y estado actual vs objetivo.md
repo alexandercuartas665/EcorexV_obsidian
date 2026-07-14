@@ -82,7 +82,7 @@ Columna "Antes" = como estaba al auditar; "Ahora" = tras las Olas A/B (validado 
 | 5 | Al crear, **enrola** la tarea en el flujo (instancia + 1er paso `Pending`/`IsCurrent`) | OK | OK |
 | 6 | El **primer paso** nace con `AssignedToTenantUserId` resuelto y **notificado** | NO (null) | **SI (A3)** |
 | 7 | Concepto `IniciaModulo` -> **arranca en el FORMULARIO**, no en el wizard | NO (form era el paso 3) | **SI (B1/B2)** |
-| 8 | Concepto con flujo **sin publicar** -> **AVISA** al crear (banner, D3) | NO (silencio) | **PENDIENTE (C1)** |
+| 8 | Concepto con flujo **sin publicar** -> **AVISA** al crear (banner + chip menu, D3) | NO (silencio) | **SI (C1)** |
 | 9 | Cada paso pide **su propio formulario** (por nodo del BPMN) | NO | **PENDIENTE (Ola D)** |
 
 Detalle de codigo de cada brecha en [[01 - Arquitectura del arranque (menu, encargado, form-first)]].
