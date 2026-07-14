@@ -134,20 +134,41 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
 
 ## OLA B - Form-first de verdad (cierra HU-02)
 
-### Ola B1 - La hoja form-first abre el FORMULARIO, no el wizard (cierra B5)
+### Ola B1 - La hoja form-first abre el FORMULARIO, no el wizard (cierra B5)  -- HECHA 2026-07-14
 
-- **Que**: en la ruta `?sub=`, si la subcategoria es **form-first**
-  (`IniciaModulo && FormDefinitionId != null`), `ActivityBoardDetail` abre un **modal de
-  formulario** (`DynamicFormRenderer` en modo Fill) en vez del `TaskWizard`.
-- Los datos que el wizard pedia se resuelven **del concepto** (tabla en el doc 01, seccion 3.2):
-  titulo `TituloAuto`, detalle `DetalleAuto`, tablero, y **encargado desde el flujo** (Ola A1).
-- **Al "Enviar"** (y solo entonces): validar en servidor -> crear tarea -> arrancar flujo -> asignar
-  1er paso -> persistir `FormResponse` enlazada. **Todo en una transaccion.** Si el formulario no
-  valida, **no se crea nada** (cambio respecto de hoy, que crea la tarea al entrar al paso 3).
-- **Escape hatch**: formulario archivado / sin permiso -> **cae al wizard** con aviso.
-- **Aceptacion (Chrome)**: Mis Procesos > Comercial > "Requerimiento infraestructura" -> se abre
-  **el formulario directo** (sin wizard); al enviar nace la tarea con su flujo y la respuesta
-  enlazada por numero. Dejar un campo obligatorio vacio -> bloquea y **no crea** tarea.
+- **Construido**: componente nuevo `FormFirstStarter.razor` (Components/Shared/Tasks). En la ruta
+  `?sub=`, `ActivityBoardDetail.OnAfterRenderAsync` llama primero a `_formFirst.TryOpenAsync(sub)`:
+  - si el concepto es **form-first** (`IniciaModulo && FormDefinitionId != null`) **y** su formulario
+    es utilizable (`Active`, no archivado) -> abre el **modal del FORMULARIO** (`DynamicFormRenderer`
+    en modo Fill) y **NO** el wizard;
+  - si no lo es (o el formulario no sirve) -> `TryOpenAsync` devuelve **false** y se cae al **wizard
+    de siempre**. Ese es el **escape hatch**: nunca se queda sin poder crear la actividad.
+- **El orden se invirtio, y eso es lo importante**: hoy el wizard creaba la tarea **al ENTRAR** al
+  paso 3 (parche de la Ola 5), asi que un formulario invalido dejaba una **tarea huerfana con su
+  flujo ya arrancado**. Ahora: **formulario -> validacion en servidor -> recien entonces nace la
+  actividad** (con su flujo y su primer paso asignado, Ola A3) **-> se ancla la respuesta** a su
+  numero.
+- **Pieza nueva de servicio**: `IFormResponseService.SetReferenceAsync(responseId, reference)` --
+  ancla una respuesta YA ENVIADA al numero de la tarea, que al diligenciarla todavia no existia.
+  Idempotente y **no destructivo** (si ya tiene referencia, no la pisa).
+- Lo que el wizard preguntaba se resuelve solo: titulo `TituloAuto`, detalle `DetalleAuto`, tablero
+  del concepto, y **encargado dictado por el flujo** (Olas A1/A2). El modal lo muestra como resumen,
+  no como formulario que rellenar. Si el flujo esta en borrador, muestra el **banner de D3**.
+- **Bug encontrado y corregido en la validacion**: `TituloAuto` = "Requerimiento infra - @cliente" y,
+  como el arranque form-first no captura el cliente, la tarea nacia titulada **"Requerimiento infra -
+  "** (separador colgando). `RenderConceptTemplate` ahora limpia el borde cuando el token queda vacio.
+- **Aceptacion CUMPLIDA (Chrome real, tenant demo)**:
+  1. `?sub=` de "Requerimiento infraestructura" (form-first) -> se abre **el formulario "Solicitud de
+     cotizacion" (FRM-001) DIRECTO**, sin wizard ni pasos;
+  2. **Enviar vacio** -> "Este campo es obligatorio", el formulario NO se envia y **NO se crea
+     ninguna tarea** (la ultima siguio siendo T00216). Este es el punto que antes fallaba;
+  3. Llenarlo y enviar -> **T00218** creada, titulo limpio **"Requerimiento infra"**, en el tablero
+     del concepto / columna "Por hacer", y la `FormResponse` en **`Submitted` con `ref=T00218`**.
+
+> [!note] Pendiente menor (no bloquea): mapear un campo del formulario al token `@cliente`
+> Hoy el token queda vacio en form-first porque no hay convencion que diga QUE campo del formulario
+> es el cliente. Se limpia el separador para que el titulo no nazca roto, pero lo ideal es marcar un
+> campo como "cliente" en el disenador (o usar `RequiereCliente`). Queda anotado para C1/D.
 
 ### Ola B2 - Limpiar el paso "Formulario" del wizard
 
