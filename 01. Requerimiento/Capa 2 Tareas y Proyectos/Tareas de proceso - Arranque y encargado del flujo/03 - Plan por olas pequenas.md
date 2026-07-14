@@ -1,7 +1,7 @@
 ---
 tipo: plan-olas
 proyecto: Tareas de proceso - Arranque y encargado del flujo
-estado: POR EJECUTAR (2026-07-14)
+estado: EN CURSO (2026-07-14) - Olas 0/A/B HECHAS; faltan C, D y el deploy a prod
 fecha: 2026-07-14
 ---
 
@@ -10,6 +10,13 @@ fecha: 2026-07-14
 > Cada ola es **chica, entregable y verificable por si sola**. Ninguna deja el sistema roto.
 > Orden pensado para que el valor se vea temprano: **A** cierra el encargado (lo que mas duele),
 > **B** cierra el form-first, **C** pone las guardas y el QA.
+
+> [!success] Avance al 2026-07-14 (todo commiteado en `main` + `fase-0/clon-backbone`)
+> **HECHAS y validadas en Chrome local**: Ola 0 (decisiones), **A1** (resolver el encargado del 1er
+> nodo), **A2** (el wizard lo preselecciona), **A3** (el paso nace asignado + D2 en servidor),
+> **B1** (form-first abre el formulario directo), **B2** (el wizard queda con un solo camino).
+> **PENDIENTES**: **C1** (guardas + banner D3), **C2** (QA end-to-end), **Ola D** (formulario por
+> nodo), y el **deploy a produccion**. Ver la tabla "Resumen de olas" al final.
 
 Fuente de las brechas: [[00 - INDICE y estado actual vs objetivo]] seccion 4.
 Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]].
@@ -267,19 +274,24 @@ Guion (contra `ecorex_dev` local, nunca prod):
 
 ## Resumen de olas
 
-| Ola | Alcance | Toca | Cierra |
+| Ola | Estado | Alcance | Commit |
 |---|---|---|---|
-| **0** | Decisiones D1/D2/D3 -- **CERRADA 2026-07-14** | nada (doc) | - |
-| **A1** | Resolver candidato del 1er nodo | Application (servicio nuevo, solo lectura) | - |
-| **A2** | Wizard muestra/preselecciona el encargado (**restringido**, D2) | TaskWizard.razor | B1, B2 |
-| **A3** | Persistir + notificar asignado del 1er paso (**validado**, D2) | TaskItemService, WorkflowEngine | B3, B4 |
-| **B1** | Hoja form-first abre el formulario del **concepto** directo (D1-a) | Actividades / ActivityBoardDetail / servicio de alta | B5 |
-| **B2** | Limpiar el paso Formulario del wizard | TaskWizard.razor | deuda de la Ola 5 anterior |
-| **C1** | Guardas: **banner** si el flujo no esta publicado (D3) + validacion al publicar + tablero | Wizard, form-first, WorkflowService, NavMenu (chip borrador) | B6, B7 |
-| **C2** | QA end-to-end en Chrome | - | verificacion |
-| **D1** | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | Domain, Infrastructure | D1-b |
-| **D2** | Editor de flujos: formulario por nodo | Flujos.razor | D1-b |
-| **D3** | Runtime: cada paso pide su formulario | TaskDetailModal (seccion Flujo), form-first | D1-b |
+| **0** | ✅ HECHA | Decisiones D1/D2/D3 | (doc) |
+| **A1** | ✅ HECHA | Resolver candidato del 1er nodo (`WorkflowStartService`, solo lectura) | `d7a09fd` |
+| **A2** | ✅ HECHA | El wizard muestra/preselecciona el encargado (restringido, D2) | `8579f30` |
+| **A3** | ✅ HECHA | El 1er paso nace asignado + notificado; D2 revalidado en servidor | `4537b29` |
+| **B1** | ✅ HECHA | La hoja form-first abre el formulario del concepto directo (D1-a) | `9aee589` |
+| **B2** | ✅ HECHA | El wizard queda con un solo camino (no crea la tarea por adelantado) | `368c09b` |
+| **C1** | PENDIENTE | Guardas: **banner** si el flujo no esta publicado (D3) + validacion al publicar + chip "borrador" | - |
+| **C2** | PENDIENTE | QA end-to-end en Chrome (los 6 pasos del guion) | - |
+| **D1** | PENDIENTE | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | - |
+| **D2** | PENDIENTE | Editor de flujos: formulario por nodo | - |
+| **D3** | PENDIENTE | Runtime: cada paso pide su formulario | - |
+| **DEPLOY** | PENDIENTE | Llevar A/B (y lo previo acumulado) a **produccion** (10.0.0.3) | - |
+
+> Ademas hay un **fix preexistente** ya commiteado en esta tanda (`433a1ba`): el host `Ecorex.Api`
+> no arrancaba porque `IFormRecordBroadcaster` no estaba registrado (venia del merge de formularios).
+> No es de este capitulo, pero bloqueaba 27 tests de endpoints; quedo resuelto.
 
 ---
 

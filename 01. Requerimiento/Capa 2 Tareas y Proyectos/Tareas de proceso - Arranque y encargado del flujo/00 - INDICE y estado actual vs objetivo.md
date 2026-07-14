@@ -2,7 +2,7 @@
 tipo: indice-proyecto
 proyecto: Tareas de proceso - Arranque y encargado del flujo
 modulos_web: /actividades (000636), /conceptos (000270), /flujos (000291), /formularios (000131), /dependencias (000850), /configuracion-menu (000194)
-estado: EN ESPECIFICACION (2026-07-14) - auditoria de codigo hecha, olas por ejecutar
+estado: EN CURSO (2026-07-14) - Olas 0/A/B HECHAS y validadas en local; faltan C, D y el deploy a prod
 fecha: 2026-07-14
 autor: documentado por agente IA (auditoria read-only sobre el codigo real) a partir del dictado del usuario
 ---
@@ -14,13 +14,21 @@ autor: documentado por agente IA (auditoria read-only sobre el codigo real) a pa
 > cierra lo que quedo a medias en el **arranque de una tarea que nace de un proceso**: el
 > **encargado que dicta el flujo** y el **arranque form-first real**.
 
-> [!warning] ESTADO 2026-07-14: el enrolamiento SI funciona; el ENCARGADO no
-> Al crear una actividad desde el menu Mis Procesos, la tarea **si se enrola** en el flujo
-> (instancia + primer paso `Pending`/`IsCurrent`) y sigue la secuencia BPMN. Pero el **encargado
-> del paso** no se resuelve desde el flujo: el wizard lo pide a mano (filtrado por los cargos del
-> CONCEPTO, no por el cargo del NODO), y el primer paso nace **sin asignado**. Ademas, los
-> conceptos marcados `IniciaModulo` (form-first) **igual abren el wizard de 4 pasos** en vez de
-> abrir directamente el formulario del proceso.
+> [!success] ESTADO 2026-07-14: el ENCARGADO y el FORM-FIRST ya funcionan (Olas 0/A/B)
+> Lo que estaba roto ya se cerro **y se valido en Chrome real (BD local)**:
+> - **El encargado lo dicta el flujo**: al abrir el arranque, el combo se llena con los candidatos
+>   del **cargo del primer nodo BPMN** (no con los cargos del concepto), y se **preselecciona** si
+>   hay uno solo (Olas A1/A2).
+> - **El primer paso nace asignado y notificado** (Ola A3), y quien lo atiende lo ve en "Pendientes
+>   mios" **sin reclamarlo**. Antes nacia `null` y habia que reclamarlo.
+> - **Los conceptos form-first arrancan por el FORMULARIO**, no por el wizard (Ola B1). La actividad
+>   nace **solo si el formulario valida** (antes se creaba a medias). El wizard quedo con **un solo
+>   camino** (Ola B2).
+>
+> **Falta**: las guardas de coherencia (Ola C: el banner de "flujo sin publicar" de D3, validacion al
+> publicar), el **formulario por nodo** (Ola D, comprometida en D1) y el **deploy a produccion** de
+> todo el acumulado (hoy vive solo en local + las ramas `main`/`fase-0`). Detalle en
+> [[03 - Plan por olas pequenas]].
 
 ---
 
@@ -61,17 +69,21 @@ Y la precision posterior:
 
 ---
 
-## 3. Estado actual vs objetivo (auditoria del codigo real, 2026-07-14)
+## 3. Estado actual vs objetivo (auditoria + avance de Olas A/B, 2026-07-14)
 
-| # | Paso de la cadena | Hoy | Objetivo |
+Columna "Antes" = como estaba al auditar; "Ahora" = tras las Olas A/B (validado en Chrome local).
+
+| # | Paso de la cadena | Antes | Ahora |
 |---|---|---|---|
 | 1 | Hoja del menu abre el **tablero del concepto** (`sub.TaskBoardId`) | OK | OK |
-| 2 | Abre **automaticamente** el wizard grande (4 pasos) | OK | OK, *salvo form-first* (ver 4) |
+| 2 | Abre **automaticamente** el arranque (wizard, o formulario si es form-first) | OK | OK |
 | 3 | Preselecciona **Categoria** y **Subcategoria** | OK | OK |
-| 4 | Preselecciona el **Encargado que dicta el flujo** | **NO** | **SI** (candidato del 1er nodo) |
+| 4 | Preselecciona el **Encargado que dicta el flujo** (cargo del 1er nodo) | NO | **SI (A1/A2)** |
 | 5 | Al crear, **enrola** la tarea en el flujo (instancia + 1er paso `Pending`/`IsCurrent`) | OK | OK |
-| 6 | El **primer paso** nace con `AssignedToTenantUserId` resuelto y **notificado** | **NO** (nace null) | **SI** |
-| 7 | Concepto `IniciaModulo` -> **arranca en el formulario**, no en el wizard | **NO** (form es el paso 3) | **SI** |
+| 6 | El **primer paso** nace con `AssignedToTenantUserId` resuelto y **notificado** | NO (null) | **SI (A3)** |
+| 7 | Concepto `IniciaModulo` -> **arranca en el FORMULARIO**, no en el wizard | NO (form era el paso 3) | **SI (B1/B2)** |
+| 8 | Concepto con flujo **sin publicar** -> **AVISA** al crear (banner, D3) | NO (silencio) | **PENDIENTE (C1)** |
+| 9 | Cada paso pide **su propio formulario** (por nodo del BPMN) | NO | **PENDIENTE (Ola D)** |
 
 Detalle de codigo de cada brecha en [[01 - Arquitectura del arranque (menu, encargado, form-first)]].
 
