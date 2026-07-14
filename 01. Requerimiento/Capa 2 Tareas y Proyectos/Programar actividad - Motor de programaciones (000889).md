@@ -373,6 +373,47 @@ concepto Operaciones/Visita tecnica, encargado operator@) -> el worker disparo s
 
 **P3 CERRADA.** Sin cambios de esquema.
 
+## Ola P4 - HECHA (2026-07-14): canales REALES + reintento y dead-letter
+
+Cierra la ultima pieza abierta del origen (O4: el dispatch de canales) y corrige una **mentira** de la
+bitacora.
+
+**BUG DE HONESTIDAD (corregido)**: la bitacora reportaba `Ok - "Canales configurados: Email, Slack,
+WhatsApp"` cuando en realidad SOLO se habia entregado la notificacion in-app; los canales se listaban sin
+haber enviado nada. Ahora se entrega de verdad y se dice **canal por canal** que paso; si un canal falla,
+la ejecucion es Error y entra al ciclo de reintento.
+
+**Canales** (allow-list TIPADA resuelta por DI, sin reflexion):
+- **Correo**: REAL (SMTP de la plataforma) al correo del encargado.
+- **WhatsApp**: REAL por las **lineas que ya tiene el tenant**. Envia desde una linea CONECTADA al numero
+  del encargado, que en este modelo es el `PhoneNumber` de la linea que tiene **asignada**
+  (`WhatsAppLine.AssignedToTenantUserId`) -- no hay telefono en el perfil del usuario. Sin linea
+  asignada -> se dice, no se finge.
+- **Slack y SMS**: **NO tienen integracion** en el sistema. No se registran senders, la bitacora lo dice
+  ("canal sin integracion") y se **retiran de los chips del modal** para no ofrecer un envio que nunca
+  ocurriria. El enum los conserva para no romper programaciones ya guardadas.
+
+**Reintento + dead-letter** (migracion DUAL aditiva `AddSchedulerRetry`):
+- `scheduled_job_rules.pending_window_at` + `attempt`: al fallar, la ventana **conserva su identidad** y se
+  reintenta ESA misma (NextRunAt pasa a ser el instante del reintento, no una ventana nueva).
+- `scheduled_job_runs.attempt` + indice unico `(tenant, job, rule, fired_at, ATTEMPT)`: cada intento deja
+  su fila, pero un intento concreto nunca se duplica.
+- Backoff 5/10/15 min; a los **3 intentos -> dead-letter**: se registra la perdida y la regla vuelve a su
+  cadencia normal (no se queda atascada reintentando).
+
+### Verificado
+32/32 tests DUAL. **En vivo**: PAC-000001 disparo y la bitacora dijo la VERDAD -> *"In-app: entregada.
+Correo: fallo el envio (el correo saliente no esta configurado). Slack: canal sin integracion, no se envio.
+WhatsApp: el encargado no tiene numero (asignale una linea). [intento 1/3; se reintenta en 5 min]"*. El
+reintento corrio solo: 2 filas Error con el MISMO `fired_at` y backoff 5 -> 10 min.
+
+**P4 CERRADA. El modulo 000889 queda COMPLETO (P1..P4).**
+
+### Pendiente real (fuera de alcance, requiere decision de producto)
+Para que el **Correo** entregue de verdad hace falta configurar el SMTP de la plataforma. Para **WhatsApp**,
+que el encargado tenga una **linea asignada** (de ahi sale su numero). **Slack/SMS** requeririan integrarse
+desde cero.
+
 ## Olas siguientes (pendientes)
 - **P2**: motor de recurrencia (proxima ejecucion timezone-aware) + worker (hosted service) que dispara
   Notificacion por canales + escribe `scheduled_job_runs` + KPIs (ejecutados hoy / errores), idempotente.
