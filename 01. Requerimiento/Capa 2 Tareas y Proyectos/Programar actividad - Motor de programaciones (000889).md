@@ -249,7 +249,10 @@ por permisos lo oculta a roles sin acceso (por diseno, ADR-0033).
 
 - **`scheduled_jobs`**: id, tenant_id, code(varchar20 UNIQUE por tenant), name(varchar200),
   type/status/priority (varchar40 texto), area_entity_id/category_id/subcategory_id (uuid null),
+  **assignee_tenant_user_id (uuid null)** = encargado OPCIONAL,
   version(bigint, concurrencia), + auditoria. Indices: (tenant_id, code) UNIQUE, (tenant_id, status).
+  > `assignee_tenant_user_id` llega en la migracion DUAL **aditiva** `AddScheduledJobAssignee` (2a migracion
+  > de P1). Si tu prod ya aplico `AddScheduledJobs`, esta se aplica encima sin tocar datos.
 - **`scheduled_job_rules`**: id, tenant_id, job_id(FK scheduled_jobs, CASCADE), sort_order,
   frequency(varchar40), interval_num(int def 1), weekdays(varchar40 csv), month_ordinal/month_weekday
   (varchar20), day_of_month(int null), at_time(varchar8 "HH:mm"), repeat_intraday(bool),
@@ -261,6 +264,33 @@ por permisos lo oculta a roles sin acceso (por diseno, ADR-0033).
 - **`scheduled_job_runs`**: id, tenant_id, job_id(FK RESTRICT - la bitacora sobrevive), rule_id(uuid null),
   fired_at(timestamptz), result(varchar40), detail(varchar600), created_entity_ref(varchar100), + auditoria.
   Indice (tenant_id, job_id, fired_at). SIN uso en P1 (la escribe el worker en P2).
+
+### REGLA DE DOMINIO (verificada en codigo, 2026-07-14): tarea == actividad == TaskItem
+
+"Tarea" y "actividad" son LA MISMA entidad: **`TaskItem`**, exactamente lo que produce el **wizard de 4
+pasos** (`TaskWizard.razor`). El wizard solo RECOLECTA datos y llama a
+`ITaskItemService.CreateAsync(CreateTaskItemRequest{...}, actor, actorName)`.
+
+El campo clave es **`SubcategoriaId`** (el concepto, 000270): dentro de `CreateAsync` dispara el puente
+Concepto->Tarea = resuelve **TituloAuto** (tokens @cliente), coloca en el **tablero del concepto**
+(`TaskBoardId`), arranca el **flujo** (IniciaModulo, IWorkflowEngine) y notifica a los **destinatarios del
+concepto**. **NO auto-asigna por cargo**: `AssigneeTenantUserId` viene del request; si va null, la tarea
+nace **Pending / sin asignar**.
+
+**Consecuencia para P3:** el tipo Activity del scheduler NO duplica nada: llama a ese mismo `CreateAsync`
+con el `SubcategoriaId` de la programacion, pasando `AssigneeTenantUserId = job.AssigneeTenantUserId`
+(encargado opcional, ver abajo) y, si el concepto no define TituloAuto, `Title = job.Name` (fallback).
+
+### Encargado OPCIONAL de la programacion (decision del usuario, 2026-07-14)
+
+Se agrego `scheduled_jobs.assignee_tenant_user_id` (nullable) + select "Encargado (opcional)" en el modal,
+con el MISMO origen que el wizard (`ITenantUserService` + `TaskUi.UserLabel`). Semantica por tipo:
+- **Activity**: se pasa tal cual a `CreateTaskItemRequest.AssigneeTenantUserId`. Vacio -> la actividad nace
+  sin asignar (Pendiente) en el tablero del concepto (comportamiento por defecto de TaskItemService).
+- **Notification**: es el destinatario in-app del aviso (lo consumira P2).
+
+Verificado E2E: PAC-000003 (Actividad, Operaciones/Visita tecnica) persiste el encargado
+`operator@sky-system.local`; editar lo recarga; las programaciones previas quedan "sin asignar".
 
 ### Verificado E2E (Chrome, ecorex_forms)
 Crear Notificacion (Semanal Lun/Mie, Correo+WhatsApp) -> PAC-000001; crear Actividad (Operaciones/Visita
