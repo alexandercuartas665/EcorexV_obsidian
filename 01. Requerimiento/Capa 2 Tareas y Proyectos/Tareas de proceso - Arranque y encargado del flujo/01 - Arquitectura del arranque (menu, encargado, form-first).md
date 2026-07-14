@@ -90,9 +90,12 @@ WorkflowDefinition (publicada)
                                                                      candidatos = ocupantes del cargo
 ```
 
-**Regla**: el combo "Encargado" del wizard, **cuando la subcategoria tiene flujo**, debe llenarse
-con **esos** candidatos (no con `SelectedSub.CargoIds`), mostrar el **cargo del paso** como
-etiqueta (ej. "Paso 1 - Comprador") y **preseleccionar** cuando hay un unico candidato.
+**Regla (DECISION D2, 2026-07-14 - "el flujo manda")**: el combo "Encargado" del wizard, **cuando la
+subcategoria tiene flujo**, debe llenarse con **esos** candidatos (no con `SelectedSub.CargoIds`),
+mostrar el **cargo del paso** como etiqueta (ej. "Paso 1 - Comprador"), **preseleccionar** cuando hay
+un unico candidato, y quedar **restringido**: el iniciador **no puede** elegir a alguien fuera del
+cargo del primer nodo, y el **servidor valida** que el asignado sea candidato legitimo (no basta con
+restringir la UI).
 
 `INodeAssigneeResolver` **ya existe** y ya resuelve cargo -> candidatos. Hoy solo lo consumen el
 inbox y el tablero; **hay que consumirlo tambien desde el arranque**.
@@ -176,7 +179,7 @@ formulario.
 
 | Guarda | Hoy | Objetivo |
 |---|---|---|
-| Concepto con flujo **sin publicar** | la hoja aparece en el menu, la tarea se crea **sin flujo** y **en silencio** (`TaskItemService.cs:287-288` vs `NavMenu.razor:391`) | o **no publicar la hoja**, o **avisar** al crear ("el flujo no esta publicado") |
+| Concepto con flujo **sin publicar** | la hoja aparece en el menu, la tarea se crea **sin flujo** y **en silencio** (`TaskItemService.cs:287-288` vs `NavMenu.razor:391`) | **(D3)** la hoja **sigue apareciendo** (con chip "borrador"), pero al crear sale un **banner**: "el flujo no esta publicado; la actividad nacera SIN proceso". Se ataca el **silencio**, no la visibilidad |
 | Concepto con flujo **sin tablero** | el preset se pierde, aterriza en el indice sin explicacion (`Actividades.razor:60-64`) | auto-crear tablero (ya hecho, commit `388e895`) + fallback con aviso |
 | Flujo publicado **sin primer nodo Task** (solo start + end) | la tarea nace enrolada y se cierra sola o queda rara | validar al **publicar** el flujo |
 | Cargo del primer nodo **sin ocupantes** | no hay candidatos -> el paso queda huerfano | avisar al crear y ofrecer el responsable de la dependencia |

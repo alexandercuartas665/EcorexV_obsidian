@@ -16,17 +16,20 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
 
 ---
 
-## Ola 0 - Decisiones (bloqueante, no se codea)
+## Ola 0 - Decisiones  -- CERRADA (usuario, 2026-07-14)
 
-Tres preguntas al usuario. Sin esto, las olas B y C quedan a ciegas.
-
-| # | Pregunta | Opciones | Recomendacion |
+| # | Pregunta | **DECISION DEL USUARIO** | Consecuencia |
 |---|---|---|---|
-| **D1** | El formulario del arranque, de donde sale? | **(a)** del **concepto** (`Subcategoria.FormDefinitionId`) - lo que ya existe. **(b)** **por nodo** del flujo (`WorkflowNodePolicy.FormDefinitionId`) - dominio + migracion + editor | **(a) para v1**; (b) al backlog |
-| **D2** | Puede el iniciador **cambiar** el encargado que dicta el flujo? | **(a)** NO: solo candidatos del cargo del 1er nodo (combo restringido). **(b)** SI, pero avisando que se sale del flujo | **(a)**: el flujo manda |
-| **D3** | Concepto con flujo **sin publicar**: que hace el menu? | **(a)** **no** muestra la hoja. **(b)** la muestra pero avisa al crear | **(a)**: si no esta listo, no se ofrece |
+| **D1** | El formulario del arranque, de donde sale? | **AMBOS, en dos tiempos**: (a) **ahora** del **concepto** (`Subcategoria.FormDefinitionId`, lo que ya existe); (b) **despues** por **nodo** del flujo, como **ola planificada explicita**, no como backlog difuso | Ola **B1** usa (a). Se crea la **Ola D** (formulario por nodo) como capitulo comprometido |
+| **D2** | Puede el iniciador **cambiar** el encargado que dicta el flujo? | **NO. El flujo manda.** El combo solo lista candidatos del cargo del **1er nodo**; asignar fuera de ese cargo = **error de validacion** | Olas **A2** (combo restringido) y **A3** (validacion server-side) |
+| **D3** | Concepto con flujo **sin publicar**: que hace el menu? | **Se muestra la hoja igual, pero se AVISA al crear** que el flujo no esta publicado y la actividad nacera **sin proceso** | **Cambia la Ola C1**: `NavMenu` **NO** se filtra por `IsPublished`; el aviso va en el **arranque** (wizard y form-first) |
 
-**Entregable**: esta tabla respondida en este mismo doc. **Sin codigo.**
+> [!note] Por que D3 asi
+> El admin quiere **ver** su concepto en el menu mientras aun esta armando el flujo (feedback
+> inmediato de que la configuracion "engancho"). Lo inaceptable no es que aparezca, sino que la
+> tarea nazca **sin flujo y en silencio**. Se ataca el silencio, no la visibilidad.
+
+**Entregable**: esta tabla. **Sin codigo.** -- HECHO.
 
 ---
 
@@ -106,14 +109,23 @@ Tres preguntas al usuario. Sin esto, las olas B y C quedan a ciegas.
 
 ### Ola C1 - Guardas de coherencia (cierra B6 + B7 y el resto de la tabla del doc 01 seccion 4)
 
-- **Menu**: la hoja solo aparece si el flujo esta **publicado** (segun D3) -> `NavMenu.razor:391`
-  pasa a exigir `IsPublished && !IsArchived`.
+> Ajustada por la **decision D3**: el menu **NO** se filtra por `IsPublished`. La hoja sigue
+> apareciendo; lo que se ataca es el **silencio** al crear.
+
+- **Menu**: `NavMenu.razor:391` **se deja como esta** (basta `WorkflowDefinitionId != null`), pero
+  la hoja muestra un **indicador visual** de "flujo en borrador" (chip atenuado junto al badge
+  "proc") para que el admin sepa que aun no arranca proceso.
+- **Aviso al crear (lo importante)**: si el flujo del concepto **no esta publicado o esta
+  archivado**, tanto el **wizard** como el **arranque form-first** muestran un **banner claro**:
+  *"El flujo de este proceso aun no esta publicado. La actividad se creara SIN proceso."* El
+  usuario puede continuar (crea tarea simple) o cancelar. **Nunca en silencio.**
 - **Publicar flujo**: validar que tenga **al menos un nodo Task**, que los nodos tengan **cargo**, y
   avisar si algun cargo **no tiene ocupantes**.
 - **Sin tablero**: ya mitigado (auto-creacion, commit `388e895`); agregar fallback con aviso por si
   quedan conceptos viejos.
-- **Aceptacion**: un concepto con flujo en borrador **no** aparece en Mis Procesos; publicar un
-  flujo sin cargos **avisa** y no publica.
+- **Aceptacion**: un concepto con flujo en borrador **si** aparece en Mis Procesos, con su chip de
+  borrador; al crear desde el, sale el **banner** y la tarea nace sin flujo **habiendolo advertido**.
+  Publicar un flujo sin cargos **avisa** y no publica.
 
 ### Ola C2 - QA end-to-end del proceso completo (MCP Chrome, BD local)
 
@@ -133,26 +145,58 @@ Guion (contra `ecorex_dev` local, nunca prod):
 
 ---
 
+## OLA D - Formulario por NODO del flujo (comprometida por D1, va DESPUES de A/B/C)
+
+> Por decision D1, esto **no es backlog difuso**: es una ola planificada. Se hace **despues** de
+> que A/B/C esten verdes, porque toca dominio y no debe bloquear el valor inmediato.
+
+### Ola D1 - Dominio + migracion dual
+
+- `WorkflowNodePolicy.FormDefinitionId (Guid?)` -> FK a `FormDefinition`. Migracion **PG + SQL
+  Server** (regla DAL dual).
+- Regla de precedencia: **el formulario del NODO gana**; si el nodo no tiene, se usa el del
+  **concepto** (compatibilidad hacia atras con todo lo construido en B1).
+- **Aceptacion**: migracion aplicada en ambos motores; tests de integracion dual verdes; nada de lo
+  existente se rompe (los flujos actuales, sin formulario por nodo, siguen usando el del concepto).
+
+### Ola D2 - Editor de flujos: asignar formulario al nodo
+
+- En `/flujos`, el panel de propiedades del nodo (donde hoy se elige el **cargo**) suma un selector
+  de **Formulario**.
+- **Aceptacion (Chrome)**: en el flujo de Compras, al nodo "Cotizar" se le asigna un formulario
+  distinto al del concepto; se publica; queda persistido.
+
+### Ola D3 - Runtime: cada paso pide SU formulario
+
+- La seccion **Flujo** dentro de la tarea (ADR-0038) renderiza el formulario del **paso actual**
+  (el del nodo, o el del concepto si el nodo no tiene).
+- El arranque form-first (Ola B1) usa el formulario del **primer nodo** si lo tiene.
+- **Aceptacion (Chrome)**: Beto atiende "Cotizar" y ve **el formulario del nodo**; Carla atiende
+  "Aprobar" y ve **otro** formulario. Cada `FormResponse` queda enlazada al **paso**, no solo a la
+  tarea.
+
+---
+
 ## Resumen de olas
 
 | Ola | Alcance | Toca | Cierra |
 |---|---|---|---|
-| **0** | Decisiones D1/D2/D3 | nada (doc) | - |
+| **0** | Decisiones D1/D2/D3 -- **CERRADA 2026-07-14** | nada (doc) | - |
 | **A1** | Resolver candidato del 1er nodo | Application (servicio nuevo, solo lectura) | - |
-| **A2** | Wizard muestra/preselecciona el encargado | TaskWizard.razor | B1, B2 |
-| **A3** | Persistir + notificar asignado del 1er paso | TaskItemService, WorkflowEngine | B3, B4 |
-| **B1** | Hoja form-first abre el formulario directo | Actividades / ActivityBoardDetail / servicio de alta | B5 |
+| **A2** | Wizard muestra/preselecciona el encargado (**restringido**, D2) | TaskWizard.razor | B1, B2 |
+| **A3** | Persistir + notificar asignado del 1er paso (**validado**, D2) | TaskItemService, WorkflowEngine | B3, B4 |
+| **B1** | Hoja form-first abre el formulario del **concepto** directo (D1-a) | Actividades / ActivityBoardDetail / servicio de alta | B5 |
 | **B2** | Limpiar el paso Formulario del wizard | TaskWizard.razor | deuda de la Ola 5 anterior |
-| **C1** | Guardas (flujo publicado, validacion al publicar, tablero) | NavMenu, WorkflowService | B6, B7 |
+| **C1** | Guardas: **banner** si el flujo no esta publicado (D3) + validacion al publicar + tablero | Wizard, form-first, WorkflowService, NavMenu (chip borrador) | B6, B7 |
 | **C2** | QA end-to-end en Chrome | - | verificacion |
+| **D1** | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | Domain, Infrastructure | D1-b |
+| **D2** | Editor de flujos: formulario por nodo | Flujos.razor | D1-b |
+| **D3** | Runtime: cada paso pide su formulario | TaskDetailModal (seccion Flujo), form-first | D1-b |
 
 ---
 
-## Backlog explicito (fuera de estas olas)
+## Backlog (fuera de estas olas)
 
-- **Formulario por NODO del flujo** (decision D1 opcion (b)): `WorkflowNodePolicy.FormDefinitionId`,
-  migracion dual, editor de flujos, y el runtime pidiendo el formulario del paso. Es el camino
-  "BPMN de verdad", pero es un capitulo aparte.
 - **Reasignacion de paso** por un supervisor (hoy existe en `WorkflowInboxService.cs:224`, pero sin
   UI dentro de la tarea).
 - **SLA / vencimiento por paso** (notificar si un paso lleva N dias sin atender).

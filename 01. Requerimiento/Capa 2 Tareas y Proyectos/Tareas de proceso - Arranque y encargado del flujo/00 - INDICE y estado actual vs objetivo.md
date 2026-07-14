@@ -110,22 +110,21 @@ Detalle de codigo de cada brecha en [[01 - Arquitectura del arranque (menu, enca
 
 ---
 
-## 5. Decision de diseno pendiente (bloqueante de la Ola B)
+## 5. Decisiones de diseno -- CERRADAS (usuario, 2026-07-14)
 
-**El formulario del arranque sale del CONCEPTO, no del nodo del flujo.** Verificado:
-`FormDefinitionId` existe **unicamente** en `ActividadSubcategoria`
-(`Ecorex.Domain/Entities/ActividadSubcategoria.cs:60`); **no hay** formulario por nodo BPMN.
+Hallazgo que las motivo: **el formulario del arranque sale del CONCEPTO, no del nodo del flujo.**
+Verificado: `FormDefinitionId` existe **unicamente** en `ActividadSubcategoria`
+(`Ecorex.Domain/Entities/ActividadSubcategoria.cs:60`); **no hay** formulario por nodo BPMN. Asi que
+cuando el dictado dice "el formulario que tenga asociado el flujo del proceso", en el modelo actual
+eso es **el formulario del concepto que tambien lleva el flujo**.
 
-Por tanto, cuando el dictado dice "el formulario que tenga asociado el flujo del proceso", en el
-modelo actual eso es **el formulario del concepto que tambien lleva el flujo**. Hay dos caminos:
+| # | Decision | Impacto |
+|---|---|---|
+| **D1** | **Ambos, en dos tiempos**: el arranque form-first usa **ahora** el formulario del **concepto** (`Subcategoria.FormDefinitionId`); el **formulario por NODO** (`WorkflowNodePolicy.FormDefinitionId`) se compromete como **Ola D**, no como backlog difuso | Ola B1 (ahora) + Olas D1/D2/D3 (despues) |
+| **D2** | **El flujo manda**: el iniciador **no puede** elegir un encargado fuera del cargo del primer nodo. El combo se restringe a los candidatos y el servidor **valida** | Olas A2 + A3 |
+| **D3** | Un concepto con flujo **sin publicar** **si aparece** en el menu (con chip de "borrador"), pero al crear se muestra un **banner**: la actividad nacera **sin proceso**. Se ataca el **silencio**, no la visibilidad | Ola C1 (cambia respecto de la propuesta inicial) |
 
-- **(a) Se mantiene 1 formulario por concepto** (lo que hay). El arranque form-first abre
-  `Subcategoria.FormDefinitionId`. **Cambio pequeno.** <- recomendado para v1.
-- **(b) Se agrega formulario por NODO del flujo** (`WorkflowNodePolicy.FormDefinitionId`), y cada
-  paso pide su propio formulario. Mas potente y mas fiel a BPMN, pero es **dominio + migracion +
-  editor de flujos**. Se deja como backlog explicito.
-
-Ver [[03 - Plan por olas pequenas]] > Ola 0.
+Detalle y consecuencias en [[03 - Plan por olas pequenas]] > Ola 0.
 
 ---
 
