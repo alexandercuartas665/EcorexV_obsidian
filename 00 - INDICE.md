@@ -69,6 +69,7 @@ OBSIDIAN.tareas/
 - [[ctrVertareasII - Spec para reconstruir en Claude Design]] — detalle + timer worklog + 4 tabs
 - [[AdmWorkflow - Motor de flujo de la tarea]] — el proceso que acompaña a una tarea: ciclo de vida, reglas por actividad, reinicios, autorizacion, mover a flujo (AdmWorkflow.vb, 1613 lineas)
 - [[crtFlujoProcesos - Graficador de flujo en el visor]] — herramienta que dibuja el flujo (bpmn-js) dentro del visor de tareas, con paneles de reglas/componentes/permisos por nodo
+- [[Programar actividad - Motor de programaciones (000889)]] — scheduler que dispara notificaciones o crea actividades por reglas de recurrencia y las entrega por canales (Correo/WhatsApp/Slack). Reutiliza el alta que consume el concepto. ORIGEN (`adm_programador` + `PROG_ACTIVIDADES*`) quedo incompleto (stub, sin bitacora ni runner cerrado); DESTINO agrega worker + bitacora de ejecucion
 
 ### Capa 3 - Flujos de Tareas BPMN (mod 000291)
 - [[00 - Visión Flujos]]
