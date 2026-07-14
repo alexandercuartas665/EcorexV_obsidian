@@ -348,6 +348,31 @@ correctas (semanal Lun -> 20/07; mensual primer Lunes -> 03/08; Lun+Mie -> 15/07
 
 **P2 CERRADA.**
 
+## Ola P3 - HECHA (2026-07-14): el tipo Actividad crea la TAREA real
+
+Aplica la regla de dominio: **tarea == actividad == TaskItem**, la MISMA que produce el wizard de 4 pasos.
+El motor **NO duplica nada**: llama al MISMO `ITaskItemService.CreateAsync` con el `SubcategoriaId` de la
+programacion, que es quien dispara el puente Concepto->Tarea dentro del servicio (titulo automatico,
+tablero del concepto, arranque del flujo y aviso a los destinatarios del concepto).
+
+Al dispararse una programacion de tipo Activity, el dispatcher:
+- **Titulo**: manda el `TituloAuto` del concepto (tokens tipo @cliente); si el concepto no lo define, cae
+  al **nombre de la programacion** (sin esto `TaskItemService` rechazaria la tarea sin titulo).
+- **Encargado** opcional -> `AssigneeTenantUserId`. Vacio = la actividad nace **Pendiente / sin asignar**
+  (comportamiento por defecto de TaskItemService: NO auto-asigna por cargo).
+- **Actor**: quien configuro la programacion (`job.CreatedBy`), con actorName "Motor de programaciones
+  (PAC-xxxxxx)" para dejar rastro en la auditoria.
+- **Trazabilidad**: el NUMERO de la tarea creada queda en `scheduled_job_runs.created_entity_ref`.
+- Sin concepto configurado -> la ejecucion queda como **Error** en la bitacora (no revienta el motor).
+
+### Verificado
+26/26 tests DUAL (3 nuevos: crea la tarea con concepto+encargado y registra su numero; TituloAuto tiene
+precedencia; sin concepto = Error). **En vivo**: se forzo una ventana vencida de PAC-000003 (Actividad,
+concepto Operaciones/Visita tecnica, encargado operator@) -> el worker disparo solo y nacio la tarea REAL
+**T00215** (Active, con su concepto y encargado); la bitacora la registra y la UI muestra "2 ejecutados hoy".
+
+**P3 CERRADA.** Sin cambios de esquema.
+
 ## Olas siguientes (pendientes)
 - **P2**: motor de recurrencia (proxima ejecucion timezone-aware) + worker (hosted service) que dispara
   Notificacion por canales + escribe `scheduled_job_runs` + KPIs (ejecutados hoy / errores), idempotente.
