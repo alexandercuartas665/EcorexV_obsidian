@@ -99,18 +99,36 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
     usuarios): la ruta clasica quedo intacta.
   - Regresion: **360/360** Application.Tests + **35/35** Domain.Tests. Solucion en verde.
 
-### Ola A3 - Persistir y notificar el asignado del primer paso (cierra B3 + B4)
+### Ola A3 - Persistir y notificar el asignado del primer paso (cierra B3 + B4)  -- HECHA 2026-07-14
 
-- **Que**: en `TaskItemService.CreateAsync`, **dentro de la misma transaccion**, despues de
-  `StartInstanceAsync`:
-  1. tomar el paso actual (`IsCurrent`, `Pending`),
-  2. **validar** que el encargado elegido sea candidato del cargo del nodo,
-  3. fijar `WorkflowStepHistory.AssignedToTenantUserId`,
-  4. **notificar** a ese usuario (campana + email), como ya se hace con el assignee,
-  5. auditar.
-- **Aceptacion**: crear una compra -> en BD el primer `WorkflowStepHistory` tiene
-  `AssignedToTenantUserId = Beto`; Beto **recibe notificacion al nacer la tarea** (no al reclamarla);
-  la tarea aparece en su alcance "Pendientes mios" **sin** necesidad de claim.
+- **Construido** en `TaskItemService.CreateAsync`, **dentro de la misma transaccion**, justo despues
+  de `StartInstanceAsync`:
+  1. se toma el paso actual (`IsCurrent`, `Pending`) de la instancia recien creada;
+  2. **D2 revalidado en SERVIDOR**: si el nodo tiene cargo (`WorkflowNodePolicy`) y el encargado NO
+     esta entre sus candidatos (`INodeAssigneeResolver`) -> **rollback total** + error tipado
+     ("El encargado debe ocupar el cargo que el flujo asigna al primer paso"). Restringir el combo
+     del wizard (A2) no basta: un API podria saltarselo;
+  3. se **FIJA** `WorkflowStepHistory.AssignedToTenantUserId` -> el paso **ya no nace colgando**;
+  4. se **audita** ("ruto el primer paso del flujo a {usuario}"). La notificacion al encargado ya la
+     emite el bloque de creacion (TaskAssigned, campana + email).
+- `INodeAssigneeResolver` se inyecta como parametro **REQUERIDO** (no opcional): una regla de
+  gobierno no debe poder desactivarse en silencio si falla el cableado de DI.
+- **Aceptacion CUMPLIDA - tests**: `WorkflowStartServiceTests` sube a 10 casos, **verde en matriz
+  dual (PostgreSQL 10/10 + SQL Server 10/10)**. Los 3 nuevos: (a) el primer paso **nace asignado** al
+  candidato del cargo + notificacion `TaskAssigned` presente; (b) un encargado **fuera del cargo** ->
+  `Invalid` + **rollback total** (ni tarea, ni instancia, ni pasos); (c) regresion: una actividad
+  **sin flujo** sigue aceptando cualquier encargado.
+- **Aceptacion CUMPLIDA - CICLO COMPLETO en Chrome real** (tenant demo, BD local):
+  1. Owner entra por **Mis Procesos > Procesos > Comercial > Cotizacion de equipos**;
+  2. el wizard abre con chip **"Paso 1 - Requerimiento - Asesor Comercial"** y **Operator
+     preseleccionado** (A2);
+  3. crea la actividad -> **T00216**;
+  4. en BD: `ENROLADA` | paso actual `Requerimiento` | `Pending` | **asignado a
+     operator@sky-system.local** (antes: `NULL`);
+  5. auditoria completa: *creo la tarea T00216* -> *notifico a operator* -> *inicio el flujo
+     Cotizacion Comercial v1* -> ***ruto el primer paso del flujo a operator*** (linea nueva de A3);
+  6. **login como Operator** -> tablero del concepto -> alcance **"Pendientes mios" (27)** ->
+     **T00216 aparece SIN haberla reclamado**. Esto es lo que antes exigia un claim manual.
 
 ---
 
