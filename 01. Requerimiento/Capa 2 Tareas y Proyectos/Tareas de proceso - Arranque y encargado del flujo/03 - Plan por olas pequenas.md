@@ -170,14 +170,26 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
 > es el cliente. Se limpia el separador para que el titulo no nazca roto, pero lo ideal es marcar un
 > campo como "cliente" en el disenador (o usar `RequiereCliente`). Queda anotado para C1/D.
 
-### Ola B2 - Limpiar el paso "Formulario" del wizard
+### Ola B2 - Limpiar el paso "Formulario" del wizard  -- HECHA 2026-07-14
 
-- **Que**: con B1, el paso 3 del wizard ya **no** necesita crear la tarea (eso era el parche de la
-  Ola 5 anterior). El wizard queda para el camino **no** form-first: si el concepto tiene formulario
-  pero **no** `IniciaModulo`, el formulario sigue siendo un paso **opcional** (diligenciar luego).
-- Retirar `FormStepLocked` / la creacion anticipada; simplificar el footer.
-- **Aceptacion**: el wizard normal crea la tarea **solo** al pulsar "Crear actividad"; ningun camino
-  crea tareas a medias.
+- **Retirado del wizard** todo el parche form-first de la Ola 5: la rama `IsFormFirst` del paso 3
+  (que renderizaba el formulario), la **creacion anticipada de la tarea** en `NextStep` (al pasar de
+  Contacto al paso Formulario), `FormStepLocked`, los handlers `OnFormSubmittedAsync` /
+  `OnFormSkipAsync` y el estado muerto (`_createdTaskId` / `_createdTaskNumber` / `_createdDetail`).
+- **El wizard queda con UN SOLO camino**: la tarea se crea **unicamente** al pulsar "Guardar
+  actividad" (o "Guardar y crear otra"). **Ningun paso crea nada por adelantado.** El footer se
+  unifica (Atras / Limpiar / Guardar y crear otra / Guardar actividad).
+- El paso 3 queda **informativo**: si el concepto tiene formulario, avisa que se diligencia desde el
+  **detalle** de la actividad (ADR-0038); si no, muestra el estado vacio.
+- **Aceptacion CUMPLIDA (Chrome real)**: se **desactivo FRM-001** en la BD local para forzar el
+  **escape hatch** (concepto form-first cuyo formulario ya no sirve):
+  1. la hoja **cayo al wizard** (no al formulario) -- escape hatch de B1 confirmado;
+  2. se camino el wizard **hasta el paso 4** pasando por el paso Formulario -- que es exactamente
+     donde antes se creaba la tarea -- y la **ultima tarea siguio siendo T00218**: **no se creo
+     nada**;
+  3. el resumen lateral seguia en **"Borrador / Sin guardar"** y "Num. de actividad: **Sin
+     asignar**"; el footer mostraba el camino unico.
+  Luego se restauro FRM-001 a `Active`. Solucion en verde + 360/360 Application.Tests.
 
 ---
 
