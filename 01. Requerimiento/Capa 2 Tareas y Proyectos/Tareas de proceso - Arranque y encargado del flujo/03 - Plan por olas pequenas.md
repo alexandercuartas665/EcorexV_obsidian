@@ -69,17 +69,35 @@ Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]
   y los 4 estados de config incompleta (sin flujo / borrador / sin cargo / sin ocupantes) +
   **aislamiento cross-tenant** (el tenant B no ve la subcategoria de A).
 
-### Ola A2 - El wizard muestra y preselecciona ese encargado (cierra B1 + B2)
+### Ola A2 - El wizard muestra y preselecciona ese encargado (cierra B1 + B2)  -- HECHA 2026-07-14
 
-- **Que**: `TaskWizard` inyecta el servicio de A1. En `OpenAsync`, **si la subcategoria tiene
-  flujo**, el combo "Encargado":
-  - se llena con los **candidatos del primer nodo** (no con `SelectedSub.CargoIds`),
-  - muestra la **etiqueta del paso** ("Paso 1 - Comprador"),
-  - **preselecciona** `_assigneeId` si hay **un unico** candidato,
-  - queda **restringido** a esos candidatos (segun D2).
-- Si la subcategoria **no** tiene flujo -> comportamiento actual intacto (cargos del concepto).
-- **Aceptacion (Chrome)**: clic en Mis Procesos > Compras > Compra -> el modal abre con Encargado
-  **ya puesto** en Beto y la etiqueta del cargo. Un concepto sin flujo sigue igual que hoy.
+- **Construido** en `TaskWizard.razor` (inyecta `IWorkflowStartService`). `ResolveEncargadoAsync`
+  ahora bifurca:
+  - **Actividad-PROCESO** (la subcategoria tiene flujo): pide `ResolveFirstStepAsync` (Ola A1). Si
+    el paso se resolvio (`Ok` o `SinCandidatos`), el combo "Encargado" se llena con los
+    **candidatos del cargo del PRIMER NODO** (ya **no** con `SelectedSub.CargoIds`), queda
+    **RESTRINGIDO** a ellos (D2), muestra el chip **"Paso 1 - {nodo} - {cargo}"** y la nota *"Lo
+    dicta el flujo: solo el cargo X atiende este paso"*, y **PRESELECCIONA** al candidato si hay
+    uno solo. Si el cargo esta **vacante** (`SinCandidatos`), el combo se **deshabilita** y avisa
+    *"El cargo X del primer paso no tiene ocupantes. Asignalo en Dependencias."*
+  - **Actividad simple** (sin flujo) o **flujo aun no utilizable** (borrador / sin nodo Task / sin
+    cargo): comportamiento de siempre (cargos del concepto). El banner de "nacera sin proceso" es
+    de la Ola C1.
+- **D2 tambien en validacion**: `ValidateStep(1)` rechaza un encargado fuera de los candidatos
+  ("El encargado debe ocupar el cargo del primer paso del flujo"). Es solo el atajo de UI: el
+  servidor lo **revalida** al crear en la Ola A3.
+- **Bug encontrado y corregido en la validacion visual**: al cambiar de una actividad-proceso a una
+  actividad simple, el encargado **que habia dictado el flujo** se quedaba pegado (el usuario nunca
+  lo eligio). Ahora, si el encargado venia del flujo, se **limpia** al salir del modo restringido.
+- **Aceptacion CUMPLIDA (validado en Chrome real, tenant demo)**:
+  - `Cotizacion de equipos` -> chip **"Paso 1 - Requerimiento - Asesor Comercial"**, combo con
+    **1 sola opcion** y **preseleccionado Operator SKY SYSTEM** (unico ocupante del cargo).
+  - `Compra urgente` -> chip **"Paso 1 - Aprobacion jefe de compras - Aprobador"**, **1 sola
+    opcion**, **preseleccionado Admin SKY SYSTEM**. Cargo distinto -> persona distinta: el servicio
+    de A1 esta leyendo de verdad el BPMN, no adivinando.
+  - `Solicitud de compra` (sin flujo) -> **sin chip**, encargado **limpio**, lista **completa** (11
+    usuarios): la ruta clasica quedo intacta.
+  - Regresion: **360/360** Application.Tests + **35/35** Domain.Tests. Solucion en verde.
 
 ### Ola A3 - Persistir y notificar el asignado del primer paso (cierra B3 + B4)
 
