@@ -84,6 +84,18 @@ acciones necesita; el orquestador local instancia el sub-agente adecuado para ca
 
 Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador.
 
+> **[CONSTRUIDO 2026-07-15] Sub-agente Navegador (base) - Nav-1/2/3.** `WebView2BrowserSubAgent`
+> (Microsoft.Web.WebView2) en el agente ejecuta acciones TIPADAS del catalogo browser.* (doc 07):
+> `Navigate`, `Eval` (JS inyectado), `Wait`, `Screenshot`, `Html`. Contrato aditivo en
+> `Ecorex.Contracts.Agent` (`BrowserRequestMsg`/`BrowserResultMsg`/`BrowserAction`). **Seguridad
+> (doc 06 s4)**: `BrowserAllowList` LOCAL cifrada con DPAPI gobierna a que dominios se navega y en
+> cuales se permite inyectar JS -fail-closed si esta vacia; nada fuera de la lista aunque la nube lo
+> pida. Cableado en `RealHiveConnection` (marshala al hilo UI) + `AgenteHub.BrowserResult` + endpoint
+> dev. Verificado E2E: el servidor ordena navegar a example.com -> el agente abre WebView2, `Eval`
+> `document.title` -> "Example Domain", captura el PNG real; navegar a un dominio NO permitido ->
+> `Navigate ok=False` (bloqueado). **Pendiente**: servidor MCP localhost (7 tools), `browser.mouse`/
+> `browser.downloads`, JS firmado/versionado por el servidor, y UI de la allow-list en la colmena.
+
 ### 3.3 GUI colmena (aspecto de panal)
 
 - Cada **poligono** es un sub-agente.
@@ -196,6 +208,11 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       filas en un contenedor reusando el motor EAV (`IRowIngestService` + `IAgentImportService`).
       Verificado E2E con `ciudades` (Replace/Upsert). Detalle en doc 03 s6/s9. **Pendiente**: scheduler
       (Ola 4) + `RunsViaAgent`/UI + migrar el import REST al nucleo compartido.
+- [~] **Sub-agente Navegador (base, Nav-1/2/3)** (2026-07-15): WebView2 + acciones tipadas
+      (navigate/eval/wait/screenshot/html) + allow-list de dominios local (DPAPI). Verificado E2E
+      (example.com: navega, `Eval` titulo, screenshot; dominio no permitido -> bloqueado). Ver recuadro
+      en 3.2. **Pendiente**: servidor MCP localhost (7 tools), mouse/downloads, JS firmado, UI allow-list.
+- [ ] **Sub-agente Archivos** (colmena, doc 06 s3.2): lee/escribe rutas permitidas (allow-list). Falta.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en
