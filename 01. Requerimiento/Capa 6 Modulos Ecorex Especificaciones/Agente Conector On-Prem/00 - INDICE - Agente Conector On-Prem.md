@@ -2,10 +2,18 @@
 tipo: indice-proyecto
 proyecto: Agente Conector On-Prem para Contenedor de datos
 modulo_web: contenedor-datos (Sistema . Datos personalizados)
-estado: especificacion (por construir)
-fecha: 2026-07-11
+estado: especificacion (por construir). ALCANCE EN EXPANSION 2026-07-15 - de agente unico a colmena multi-agente (ver doc 06)
+fecha: 2026-07-11 (actualizado 2026-07-15)
 autor: documentado por agente IA a partir de decisiones del usuario
 ---
+
+> [!important] ACTUALIZACION 2026-07-15 - lee primero el doc 06
+> El usuario reabrio el **stack** (.NET 10 / C# / WPF / Windows-first) y **expandio el alcance**:
+> de este agente unico (gateway de datos) a una **COLMENA de sub-agentes** (gateway + navegador
+> web con JS inyectado + MCP + agente de archivos), orquestada por un servicio local. La duda
+> "navegador en Linux -> Windows-only?" queda resuelta en
+> [[06 - Decision de stack y expansion a colmena multi-agente]]. Los docs 01-05 de abajo siguen
+> validos como la spec del **sub-agente Gateway de datos**.
 
 # Agente Conector On-Prem - Contenedor de datos
 
@@ -63,6 +71,8 @@ WPF** en si.
 | [[03 - Servidor (Hub + Scheduler + Ingesta)]] | Implementacion servidor: Hub, `Ecorex.Workers` scheduler, conector tipo Agente, ingesta reusando el motor existente |
 | [[04 - Cliente VB.NET WPF (Servicio Windows + config)]] | Arquitectura del agente: Servicio Windows + WPF, cliente SignalR .NET, ejecucion contra fuente local, empaque/instalador |
 | [[05 - Plan de trabajo por olas (para sub-agente)]] | Backlog en olas con criterios de aceptacion; contrato de trabajo para el sub-agente |
+| [[06 - Decision de stack y expansion a colmena multi-agente]] | **(2026-07-15)** Resuelve la duda de stack (.NET 10 / C# / WPF / navegador en Linux -> Windows-first, **D7 CONFIRMADA**) y encuadra la expansion a colmena: orquestador + sub-agentes (gateway / navegador+JS+MCP / archivos), GUI panal, identidad por ClientId (WhatsApp), seguridad de la superficie ampliada |
+| [[07 - Prior-art Doom (orquestador drone + sub-agente navegador WebView2 + MCP)]] | **(2026-07-15)** Ingenieria inversa del sistema Doom (VB.NET 4.8) que el usuario ya construyo: orquestador `ucClienteDrone` que abre sub-agentes, transporte `DroneClientService` (SignalR), y sub-agente navegador `consumoweb_webserver` (WebView2 + inyeccion de JS + servidor MCP con 7 herramientas `browser.*`). Mapeo ORIGEN -> DESTINO |
 
 ## 5. Opinion de arquitectura (resumen)
 

@@ -9,6 +9,13 @@ proposito: Arquitectura del agente de escritorio en VB.NET + WPF (Servicio Windo
 > El agente es tonto (doc 01 seccion 5). Solo mantiene su identidad + URL del hub, se conecta,
 > espera ordenes `FetchRequest`, ejecuta contra la fuente local y responde `FetchResult`.
 
+> [!warning] Stack en revision 2026-07-15
+> El titulo/stack de este doc (VB.NET + WPF + .NET 8) esta EN REVISION. La recomendacion
+> actualizada es **.NET 10 + C#** (Windows-first), con el orquestador como Worker Service y la
+> GUI colmena en WPF. Ademas este cliente pasa a ser el **sub-agente Gateway** dentro de una
+> colmena. No reescribir este doc hasta confirmar D7; ver
+> [[06 - Decision de stack y expansion a colmena multi-agente]].
+
 ## 1. Forma (D4): Servicio Windows + WPF
 
 Dos ejecutables que comparten un nucleo comun:

@@ -6,6 +6,12 @@ proposito: Vision, actores, diagrama, prior-art, seguridad y casos de uso del ag
 
 # 01 - Vision, arquitectura y decisiones
 
+> [!note] Alcance ampliado 2026-07-15
+> Este doc describe el **sub-agente Gateway de datos**, que sigue vigente. El proyecto se
+> expandio a una **colmena de sub-agentes** (gateway + navegador + archivos) con orquestador
+> local; ver [[06 - Decision de stack y expansion a colmena multi-agente]]. Este Gateway es una
+> de las capacidades de esa colmena.
+
 ## 1. Problema
 
 El "Contenedor de datos" ya sabe importar desde Excel y desde APIs REST publicas
