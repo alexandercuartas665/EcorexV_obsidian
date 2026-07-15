@@ -119,9 +119,20 @@ clave). Refactor recomendado:
 
 ## 9. Checklist de construccion (servidor)
 
-- [ ] Hub `/hubs/agente` con `[Authorize]` + grupos por client/tenant.
-- [ ] `IAgentRegistry` (en linea/offline) + `IHubContext` para empujar.
-- [ ] `POST /api/agente/token` (HMAC -> JWT corto).
+> **[CONSTRUIDO 2026-07-15] Canal minimo del servidor (doc 05 Ola 1, lado servidor).** En
+> `Ecorex.SuperAdmin` (host que ya tiene SignalR + auth), rama `feat/agente-colmena-gui`:
+> `RealTime/AgenteHub.cs` (`[Authorize(AuthenticationSchemes="Agent")]`, grupos client/tenant,
+> presencia) + `Agents/` (`IAgentRegistry`/`InMemoryAgentRegistry`, `AgentTokenIssuer`,
+> `AgentNonceCache`, `AgentChannel` con el esquema bearer "Agent" NO-default -no toca la auth de
+> cookies- y los endpoints). Identidad = entidad `DataClient` existente (ClientId + secreto cifrado
+> con `ISecretProtector`). Verificado E2E contra la BD dev (Postgres 5442): handshake rechaza
+> credencial invalida/ts fuera de rango (401); con un `DataClient` valido el agente obtiene el JWT,
+> conecta autenticado ("[AGENTE] En linea" + AgentHello con tenant), y un push del servidor -> el
+> agente responde `FetchResult` (round-trip). La colmena WPF marca "En linea" con Gateway encendido.
+
+- [x] Hub `/hubs/agente` con `[Authorize]` + grupos por client/tenant.
+- [x] `IAgentRegistry` (en linea/offline) + `IHubContext` para empujar.
+- [x] `POST /api/agente/token` (HMAC -> JWT corto). Handshake opcion A completo (nonce + ts +/-120s).
 - [ ] `DataConnector.RunsViaAgent` + `DataClientId` + consulta + migracion.
 - [ ] `IRowIngestService` extraido de `ApiImportService` (compartido).
 - [ ] `IAgentImportService` (dispatch + on-result + on-failed).

@@ -181,8 +181,12 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       `FetchRequest`->colmena->acuse `FetchResult`. Probado E2E contra un **simulador de hub**
       (`tools/Ecorex.Agent.HubSim`, stand-in del backend, NO toca apps/backend): handshake + round-trip
       reales; la colmena enciende Gateway/Navegador con las ordenes empujadas. Ver recuadro en 3.3.
-      **Pendiente lado servidor**: el hub de produccion (doc 03: `AgenteHub` + `POST /api/agente/token`
-      + `IAgentRegistry`) va en `apps/backend` (doc 05 Ola 1, lado servidor) - fuera de este worktree.
+      El hub de produccion se construyo a continuacion (ver siguiente item).
+- [x] **Hub real de servidor** (2026-07-15): `AgenteHub` `[Authorize]` + `IAgentRegistry` +
+      `POST /api/agente/token` (HMAC del secreto de `DataClient` -> JWT) en `Ecorex.SuperAdmin`
+      (esquema bearer "Agent" no-default; no toca la auth de cookies). Verificado E2E contra la BD
+      dev: handshake rechaza invalidos, el agente conecta autenticado y responde a los `FetchRequest`
+      del servidor. Detalle en doc 03 s9. **Pendiente**: `RunsViaAgent`+ingesta+scheduler+UI (doc 03).
 - [ ] **Ola C+**: ejecucion real de sub-agentes (Gateway -> Archivos -> Navegador), allow-list de
       seguridad, instalador/servicio Windows.
 
