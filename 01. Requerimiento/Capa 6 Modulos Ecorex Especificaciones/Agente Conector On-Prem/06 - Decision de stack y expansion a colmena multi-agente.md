@@ -103,6 +103,18 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
 > enchufar el **SignalR real en la Ola B sin tocar la GUI**. Compila y corre; capturas de 3 estados
 > (idle / config / atendiendo). SIN SignalR real ni ejecucion de sub-agentes (olas siguientes).
 
+> **[CONSTRUIDO 2026-07-15] Ola B - canal SignalR real (lado agente).** `RealHiveConnection`
+> (Microsoft.AspNetCore.SignalR.Client) implementa `IHiveConnection` -la GUI y el ViewModel NO
+> cambian, solo se sustituye el mock-. Conecta saliente al hub (`wss://.../hubs/agente`, doc 02),
+> saluda con `AgentHello`, reconecta con backoff (0/2/5/10/30/60s) y traduce cada `FetchRequest`
+> empujado por el servidor en el encendido de la capacidad + un worker efimero, cerrando el canal
+> con un acuse `FetchResult` (la EJECUCION real es Ola C). El protocolo vive en
+> `Ecorex.Contracts.Agent` (`AgentProtocol`, `AgentHubMethods`, DTOs) como fuente de verdad
+> compartida con el futuro hub. Verificado END-TO-END contra `tools/Ecorex.Agent.HubSim` (simulador
+> del backend, NO toca apps/backend): en los logs se ven `AgentHello` + round-trip `FetchRequest`/
+> `FetchResult`, y en la colmena "En linea" con Gateway/Navegador encendiendose por ordenes reales.
+> Arranque headless `--save-config <clientId> <hubUrl>` (DPAPI) para despliegue/servicio.
+
 ### 3.4 Identidad y cliente (via WhatsApp)
 
 - La **app administrativa** carga el **ClientId** del cliente. Ese cliente es el que se conecta
@@ -162,9 +174,16 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
 **Avance de construccion:**
 
 - [x] **Ola A - cascara visual (WPF)** (2026-07-15): panal + estados + config (DPAPI) + tray + mock.
-      Ver recuadro en 3.3. Rama `feat/agente-colmena-gui` (sin merge/push a compartida aun).
-- [ ] **Ola B**: cliente SignalR real detras de `IHiveConnection` (sin tocar GUI/VM).
-- [ ] **Ola C+**: ejecucion de sub-agentes (Gateway -> Archivos -> Navegador), allow-list de
+      Ver recuadro en 3.3. Rama `feat/agente-colmena-gui`.
+- [x] **Ola B - cliente SignalR real (lado agente)** (2026-07-15): `RealHiveConnection` detras de
+      `IHiveConnection` (GUI/VM sin cambios); protocolo compartido en `Ecorex.Contracts.Agent`
+      (`AgentProtocol`/`AgentHubMethods` + DTOs de doc 02); AgentHello, reconexion con backoff,
+      `FetchRequest`->colmena->acuse `FetchResult`. Probado E2E contra un **simulador de hub**
+      (`tools/Ecorex.Agent.HubSim`, stand-in del backend, NO toca apps/backend): handshake + round-trip
+      reales; la colmena enciende Gateway/Navegador con las ordenes empujadas. Ver recuadro en 3.3.
+      **Pendiente lado servidor**: el hub de produccion (doc 03: `AgenteHub` + `POST /api/agente/token`
+      + `IAgentRegistry`) va en `apps/backend` (doc 05 Ola 1, lado servidor) - fuera de este worktree.
+- [ ] **Ola C+**: ejecucion real de sub-agentes (Gateway -> Archivos -> Navegador), allow-list de
       seguridad, instalador/servicio Windows.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente

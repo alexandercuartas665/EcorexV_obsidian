@@ -36,6 +36,14 @@ Agente (o un cliente de prueba temporal en .NET):
   conectado y recibe de vuelta `FetchResult`; en el web se ve el agente "en linea". Handshake
   rechaza credenciales invalidas.
 
+> **[AVANCE 2026-07-15] Lado AGENTE construido y probado E2E** (rama `feat/agente-colmena-gui`,
+> mapeado a la "Ola B" de la colmena, doc 06). `RealHiveConnection` (SignalR client) + protocolo
+> compartido en `Ecorex.Contracts.Agent`. Probado contra un **simulador** `tools/Ecorex.Agent.HubSim`
+> (NO es apps/backend): AgentHello + round-trip `FetchRequest`/`FetchResult` reales, reconexion con
+> backoff. **Pendiente lado SERVIDOR** (esta ola, en `apps/backend`): `AgenteHub` con `[Authorize]`,
+> `POST /api/agente/token` (HMAC->JWT), `IAgentRegistry` + `IHubContext`. Auth aun en anonimo en el
+> simulador; el hook `AccessTokenProvider` (opcion A de doc 02) queda listo en el cliente.
+
 ## Ola 2 - Ejecucion real contra BD local (agente)
 
 - `EcorexAgent.Core` (VB.NET): ejecuta `FetchRequest.query` parametrizado contra la fuente
