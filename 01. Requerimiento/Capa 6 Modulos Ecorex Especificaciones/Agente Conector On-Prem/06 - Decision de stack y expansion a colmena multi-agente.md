@@ -102,8 +102,18 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
 > (historial). Comparte la MISMA instancia WebView2 que el hub y marshala al hilo de UI; respeta la
 > allow-list. Devuelve contenido MCP (texto + imagen PNG). Verificado por JSON-RPC: `tools/list` = 7
 > tools; `tools/call` navigate+eval+screenshot ok; navegar a un dominio no permitido -> `isError:true`.
-> **Pendiente**: JS firmado/versionado por el servidor, UI de la allow-list en la colmena, y el
-> sub-agente Archivos.
+> **Pendiente**: JS firmado/versionado por el servidor, UI de la allow-list en la colmena.
+
+> **[CONSTRUIDO 2026-07-15] Sub-agente Archivos - Files-1/2/3.** Tercera capacidad de la colmena.
+> `FileSubAgent` ejecuta acciones TIPADAS: `List`, `Read` (tope 1 MB), `Write`, `Delete`, `Exists`,
+> `MakeDir`. Contrato aditivo en `Ecorex.Contracts.Agent` (`FileRequestMsg`/`FileResultMsg`/
+> `FileAction`/`FileEntry`). **Seguridad (doc 06 s4)**: `FileAllowList` LOCAL cifrada con DPAPI define
+> las rutas RAIZ permitidas; toda ruta se canonicaliza (impide traversal `..`) y debe caer DENTRO de
+> una raiz -fail-closed si esta vacia; no es un shell generico. Cableado en `RealHiveConnection` +
+> `AgenteHub.FileResult` + endpoint dev; y expuesto por el **servidor MCP** como `file.*` (6 tools),
+> junto a las `browser.*` (`AgentMcpServer` publica 13 tools). Verificado E2E por el hub y por MCP:
+> write/list/read dentro del sandbox ok; leer `C:\Windows\win.ini` (fuera de la allow-list) -> bloqueado.
+> **Pendiente**: lectura de binarios (base64), UI de allow-list, read-only vs read-write por raiz.
 
 ### 3.3 GUI colmena (aspecto de panal)
 
@@ -222,7 +232,10 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       local (DPAPI) + **servidor MCP localhost** (JSON-RPC, `tools/list`/`tools/call`) para clientes/IA
       locales. Verificado E2E por el hub y por MCP (example.com ok; dominio no permitido -> bloqueado).
       Ver recuadros en 3.2. **Pendiente**: JS firmado/versionado por el servidor, UI de allow-list.
-- [ ] **Sub-agente Archivos** (colmena, doc 06 s3.2): lee/escribe rutas permitidas (allow-list). Falta.
+- [~] **Sub-agente Archivos (Files-1/2/3)** (2026-07-15): acciones tipadas List/Read/Write/Delete/
+      Exists/MakeDir acotadas a la allow-list de rutas local (DPAPI, sin traversal) + expuesto por MCP
+      (`file.*`). Verificado E2E por hub y por MCP (sandbox ok; fuera de la allow-list bloqueado). Ver
+      recuadro en 3.2. **Pendiente**: binarios base64, UI de allow-list, read-only vs read-write.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en
