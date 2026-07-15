@@ -179,8 +179,63 @@ Un usuario **validado** por tenant (los demas del tenant siguen la misma regla):
 Super Admin de plataforma (prod): `admin@ecorex.local` (la clave es el secreto
 `ECOREX_SEED_ADMIN_PASSWORD` del `.env` del server, **NO** se documenta aqui).
 
-La lista completa de usuarios por tenant se deriva de db3dev (sucursal 01 / 00136);
-no se transcribe aqui para no multiplicar PII. Ver [[Conexion a la BD del sistema actual (db3dev)]].
+El **directorio completo de usuarios por tenant** (con el `tenant_id` de cada empresa)
+esta en la **seccion 12**. Las cedulas individuales NO se transcriben (repo publico);
+son la clave y se derivan de db3dev. Ver [[Conexion a la BD del sistema actual (db3dev)]].
+
+---
+
+## 12. Directorio de usuarios por tenant en PRODUCCION (2026-07-14)
+
+> Estado real de `http://10.0.0.3:5480/login` a 2026-07-14, un renglon por tenant con su
+> `tenant_id`. **REGLA DE ACCESO UNICA de los usuarios migrados/reales**: login = el correo
+> de la lista; **clave = documento de identidad (cedula) del usuario** (consta en db3dev),
+> que cada quien cambia en el primer ingreso.
+>
+> **Las cedulas NO se transcriben aqui: el repo es PUBLICO** (regla de la seccion 11 / de la
+> nota de db3dev). Hay 3 ejemplos listos-para-usar en la seccion 11; el resto se deriva de
+> db3dev. Excepcion: los usuarios demo `*@sky-system.local` usan la clave throwaway `Demo123*`.
+
+Todos `Active`. Cada usuario quedo con la vista de menu **Completo** (todas las opciones),
+salvo donde se indique.
+
+### BITCODE - `019f478d-1964-7892-89de-36a619b28e4b` (Standard, sucursal 01) - 13 usuarios, todos Owner
+`acuartas@bitcode.com.co`, `jmolina@bitcode.com.co`, `kelly@bitcode.com.co`,
+`lloaiza@bitcode.com.co`, `programador1@bitcode.com.co`, `soporte2@bitcode.com.co`,
+`soporte3@bitcode.com.co`, `bettyfbenavides@gml.com.co`, `jackelinemarin@flecto.com.co`,
+`stefania@flecto.com.co`, `andresdesarrollador4@gmail.com`, `diasflac1213@gmail.com`,
+`valeriauribecbo@gmail.com`
+
+### SOLDARCO - `e3519cc4-150f-4f63-a0cd-21eb9d59f1fa` (Standard, sucursal 02) - 25 usuarios, todos Owner (migrados 2026-07-14)
+`recepcion@soldarco.com`, `gerenciacomercial@soldarco.com`, `cartera@soldarco.com`,
+`cartera2@soldarco.com`, `soporteventas1@soldarco.com`, `soporteventas2@soldarco.com`,
+`comercial3@soldarco.com`, `comercial6@soldarco.com`, `comercial7@soldarco.com`,
+`comercial9@soldarco.com`, `comercial14@soldarco.com`, `comercial18@soldarco.com`,
+`contabilidad@soldarco.com`, `gestion@soldarco.com`, `auxiliaradmin@soldarco.com`,
+`administracion@soldarco.com`, `almacen@soldarco.com`, `postventa@soldarco.com`,
+`serviciotecnico1@soldarco.com`, `cristianddiaz@bitcode.com.co`, `freiderclondono@bitcode.com.co`
+(el correo real lleva enie), `hectorfrivera@bitcode.com.co`, `lauraccamila@bitcode.com.co`,
+`sharonfruiz@bitcode.com.co`, `gdiaz@autoliderazgoyliderazgodequipos.com`
+
+### AGROMETALICAS - `019f478d-6428-7283-a5cd-b7e35f802ef3` (Standard) - 1 usuario, Owner
+`calidad@agrometalicas.com`
+
+### CHUZO DE IVAN - `72450050-a07d-40a1-9df0-f611cfcfa48b` (Standard) - 0 usuarios
+Tenant recien creado (2026-07-14); aun sin usuarios (el cliente no los ha entregado).
+
+### PLATAFORMA ECOREX - `019f2d5f-cc42-7492-9eba-0217996338b1` (Internal) - 1 usuario
+`admin@ecorex.local` (Owner). Es tambien el Super Admin de plataforma; su clave es el secreto
+`ECOREX_SEED_ADMIN_PASSWORD` del `.env` del server, **NO** una cedula.
+
+### SKY SYSTEM - `019f2d5f-c4f3-737b-89dc-902eeebdb74b` (Demo/QA) - 18 usuarios
+- **Reales** (clave = cedula): `adriana.borrero@skysystem.com.co`, `fabian.perez@skysystem.com.co`,
+  `felipe.galeano@skysystem.com.co`, `josemiguel.buritica@skysystem.com.co`,
+  `mauricio.borrero@skysystem.com.co`, `mercadeo@skysystem.com.co` (todos Owner).
+- **Demo/seed** (clave `Demo123*`): `owner@` (Owner), `admin@` (Admin), `operator@`/`viewer@`/
+  `completo@`/`qa.usuario@` (Advisor) - todos con menu Completo; `simple@sky-system.local`
+  (Advisor) con vista **Simple** a proposito (para demostrar el filtrado de menus).
+- **QA E2E** (throwaway): `e2e-14ccd408@`, `e2e-50420b70@`, `e2e-934001c0@`, `e2e-c0c2eaf5@`
+  `@sky-system.local` (Supervisor). Mas `correo@correo.com` (Owner), dato de prueba.
 
 ---
 

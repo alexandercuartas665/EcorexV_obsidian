@@ -1,7 +1,7 @@
 ---
 tipo: plan-olas
 proyecto: Tareas de proceso - Arranque y encargado del flujo
-estado: EN CURSO (2026-07-14) - Olas 0/A/B HECHAS; faltan C, D y el deploy a prod
+estado: EN CURSO (2026-07-14) - Olas 0/A/B/C HECHAS; faltan Ola D (form por nodo) y el deploy a prod
 fecha: 2026-07-14
 ---
 
@@ -15,8 +15,8 @@ fecha: 2026-07-14
 > **HECHAS y validadas en Chrome local**: Ola 0 (decisiones), **A1** (resolver el encargado del 1er
 > nodo), **A2** (el wizard lo preselecciona), **A3** (el paso nace asignado + D2 en servidor),
 > **B1** (form-first abre el formulario directo), **B2** (el wizard queda con un solo camino).
-> **PENDIENTES**: **C1** (guardas + banner D3), **C2** (QA end-to-end), **Ola D** (formulario por
-> nodo), y el **deploy a produccion**. Ver la tabla "Resumen de olas" al final.
+> **HECHAS tambien**: **C1** (guardas + banner D3), **C2** (QA end-to-end). **PENDIENTES**: **Ola D**
+> (formulario por nodo) y el **deploy a produccion**. Ver la tabla "Resumen de olas" al final.
 
 Fuente de las brechas: [[00 - INDICE y estado actual vs objetivo]] seccion 4.
 Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]].
@@ -311,7 +311,7 @@ Guion (contra `ecorex_dev` local, nunca prod):
 | **B1** | ✅ HECHA | La hoja form-first abre el formulario del concepto directo (D1-a) | `9aee589` |
 | **B2** | ✅ HECHA | El wizard queda con un solo camino (no crea la tarea por adelantado) | `368c09b` |
 | **C1** | ✅ HECHA | Guardas: banner D3 en el arranque + chip "borrador" en el menu + no publicar flujo sin paso Task | (esta tanda) |
-| **C2** | PENDIENTE | QA end-to-end en Chrome (los 6 pasos del guion) | - |
+| **C2** | ✅ HECHA | QA end-to-end: arranque visual+BD (T00219 nace asignada a operator, visible en Pendientes mios) + ciclo runtime por `WorkflowInboxTests` 6/6 dual. Ver [[05. Pruebas/Historial de pruebas/00 - Registro de corridas]] 2026-07-14 | (verificacion) |
 | **D1** | PENDIENTE | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | - |
 | **D2** | PENDIENTE | Editor de flujos: formulario por nodo | - |
 | **D3** | PENDIENTE | Runtime: cada paso pide su formulario | - |
@@ -328,3 +328,17 @@ Guion (contra `ecorex_dev` local, nunca prod):
 - **Reasignacion de paso** por un supervisor (hoy existe en `WorkflowInboxService.cs:224`, pero sin
   UI dentro de la tarea).
 - **SLA / vencimiento por paso** (notificar si un paso lleva N dias sin atender).
+
+### Hallazgos de config del demo (Ola C2, no son bug de codigo)
+
+Al correr el E2E se vio que el flujo demo **COT-COM v1** ("Cotizacion de equipos") esta a medio
+configurar. No lo arreglo en codigo porque es **configuracion del tenant demo**, pero conviene
+cerrarlo para que el ciclo se pueda recorrer entero de punta a punta:
+
+- **Nodos `Facturacion` y `Entrega` sin cargo** -> al avanzar a esos pasos nacen sin candidato y
+  nadie los ve en "Pendientes mios" (el propio banner `SinCargo` de C1 lo advierte al crear).
+  Accion: asignarles un cargo en el editor de flujos.
+- **El concepto "Cotizacion de equipos" no tiene columna de cierre** (`TaskBoardColumnId = null`) por
+  ser un tablero **anterior** al auto-tablero de la commit `388e895`. Al terminar el flujo la tarea no
+  se auto-mueve a "Completado". Accion: fijar la columna de cierre del concepto (o re-guardarlo).
+  Nota: los conceptos nuevos ya nacen con columna de cierre desde `388e895`.
