@@ -187,8 +187,12 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       (esquema bearer "Agent" no-default; no toca la auth de cookies). Verificado E2E contra la BD
       dev: handshake rechaza invalidos, el agente conecta autenticado y responde a los `FetchRequest`
       del servidor. Detalle en doc 03 s9. **Pendiente**: `RunsViaAgent`+ingesta+scheduler+UI (doc 03).
-- [ ] **Ola C+**: ejecucion real de sub-agentes (Gateway -> Archivos -> Navegador), allow-list de
-      seguridad, instalador/servicio Windows.
+- [~] **Ola C (Gateway ejecuta real)** (2026-07-15): el sub-agente Gateway ejecuta el `FetchRequest`
+      contra SQL Server de la LAN (solo-lectura + whitelist `QueryGuard`, chunking), credencial local
+      cifrada con DPAPI (no viaja). Verificado E2E contra una BD real (`M700_GEN`, tabla `ciudades`):
+      20 filas reales de vuelta; no-SELECT rechazado. Detalle en doc 05 Ola 2. **Pendiente Ola C+**:
+      sub-agentes Archivos y Navegador, mas motores de BD, ingesta en servidor (doc 03), allow-list
+      avanzada, instalador/servicio Windows.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en

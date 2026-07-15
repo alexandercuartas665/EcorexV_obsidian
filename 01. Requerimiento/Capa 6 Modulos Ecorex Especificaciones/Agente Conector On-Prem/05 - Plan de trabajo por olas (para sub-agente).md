@@ -52,6 +52,17 @@ Agente (o un cliente de prueba temporal en .NET):
 - **Aceptacion**: con una BD SQL Server de prueba, el agente recibe una consulta, la ejecuta y
   responde las filas en chunks; una consulta no-SELECT o fuera de whitelist es rechazada.
 
+> **[CONSTRUIDO 2026-07-15] Ejecucion real del Gateway** (mapeado a la "Ola C" de la colmena; C#, no
+> VB.NET). `Services/SqlServerGatewayExecutor` (Microsoft.Data.SqlClient) + `QueryGuard` (whitelist
+> solo-SELECT, un solo statement, verbos de escritura/DDL/exec bloqueados) + `GatewaySourceStore`
+> (cadena de conexion cifrada con DPAPI LOCAL en el agente -opcion b: la credencial de la LAN NUNCA
+> viaja por el canal ni se versiona). En `RealHiveConnection`, un `FetchRequest` Database ejecuta la
+> consulta parametrizada, lee por lotes y devuelve `FetchResult` en chunks (fields en chunk 0).
+> Verificado E2E contra una BD SQL Server REAL de la LAN (`M700_GEN`): `SELECT TOP 20 * FROM ciudades`
+> -> 20 filas reales con sus columnas (DPTO, NOMBRE, PAIS, CODIGO_DIAN, DANE_DEP...); `DELETE` y
+> `SELECT ... INTO` -> `FetchFailed QUERY_REJECTED`. **Pendiente**: chunking probado con dataset grande,
+> mas motores (MySql/PostgreSql), y la ingesta en el servidor (doc 03 s6, Ola 3).
+
 ## Ola 3 - Ingesta reutilizable + conector via agente (servidor)
 
 - Extraer `IRowIngestService` de `ApiImportService` (Append/Replace/Upsert por clave) y hacer
