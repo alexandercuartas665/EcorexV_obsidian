@@ -1,7 +1,7 @@
 ---
 tipo: plan-olas
 proyecto: Tareas de proceso - Arranque y encargado del flujo
-estado: EN CURSO (2026-07-14) - Olas 0/A/B/C HECHAS; Ola D YA EXISTIA (verificada); falta 1 decision (precedencia) + el deploy a prod
+estado: CAPITULO FUNCIONAL COMPLETO (2026-07-14) - Olas 0/A/B/C/D cerradas; solo falta el DEPLOY a prod
 fecha: 2026-07-14
 ---
 
@@ -314,9 +314,12 @@ Guion (contra `ecorex_dev` local, nunca prod):
 - Hoy no hay precedencia: **coexisten**. Un concepto form-first cuyo PRIMER nodo tambien tenga
   formulario pediria dos (uno al arrancar, otro al atender el primer paso). Si son DISTINTOS es
   coherente (admision + paso); si es el MISMO, es redundante.
-- **Pendiente de decidir con el usuario** (ver [[00 - INDICE y estado actual vs objetivo]] seccion 5):
-  dejar ortogonal (recomendado; opcionalmente avisar si se configura el mismo form en ambos) vs.
-  construir que la respuesta del form-first SATISFAGA el primer paso cuando es el mismo formulario.
+- **DECISION DEL USUARIO (2026-07-14): dejarlos ORTOGONALES.** El del concepto = admision (crea la
+  actividad); el del nodo = completar el paso. Conviven, sin precedencia. **Sin codigo nuevo** (es lo
+  que ya funciona). Con esto la Ola D queda **CERRADA**.
+- **Micro-opcion NO construida (backlog)**: avisar en el editor/arranque si se configura el MISMO
+  formulario como admision del concepto Y como formulario del primer nodo (evita pedirlo dos veces).
+  Es un aviso, no un bloqueo; se construye solo si el usuario lo pide.
 
 ### Deuda menor (no bloquea)
 - Dos APIs escriben `WorkflowNodeForms`: `IFormDefinitionService.AssignToWorkflowNodeAsync` (sin
@@ -340,7 +343,7 @@ Guion (contra `ecorex_dev` local, nunca prod):
 | **D1** | ✅ YA EXISTIA | Dominio `WorkflowNodeForm` + migracion dual (AddDynamicForms, 2026-07-03) | (FASE 4) |
 | **D2** | ✅ YA EXISTIA | Editor: selector de formulario por nodo (FlowEditor Acordeon 2) | (FASE 4) |
 | **D3** | ✅ YA EXISTIA | Runtime: cada paso pide su formulario (GetTaskStepFormsAsync + TaskDetailModal). Verificado 16/16 dual | (FASE 4) |
-| **D.dec** | PENDIENTE (decision) | Precedencia form-first vs form-por-nodo (son ortogonales; decidir con el usuario) | - |
+| **D.dec** | ✅ DECIDIDO | Precedencia form-first vs form-por-nodo: **ORTOGONALES** (usuario 2026-07-14), sin codigo | - |
 | **DEPLOY** | PENDIENTE | Llevar A/B/C (y lo previo acumulado) a **produccion** (10.0.0.3) | - |
 
 > Ademas hay un **fix preexistente** ya commiteado en esta tanda (`433a1ba`): el host `Ecorex.Api`
