@@ -15,6 +15,33 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > [[06 - Decision de stack y expansion a colmena multi-agente]]. Los docs 01-05 de abajo siguen
 > validos como la spec del **sub-agente Gateway de datos**.
 
+> [!success] ESTADO DE AVANCE - 2026-07-15 (rama `feat/agente-colmena-gui`, repo EcorexV)
+> Construido y verificado E2E de punta a punta (agente WPF <-> hub real <-> SQL Server de la LAN <->
+> contenedor). Lo hecho:
+> - **Ola A - cascara visual (WPF)**: colmena de hexagonos (Config + Gateway/Archivos/Navegador),
+>   estados Vacio/Lleno/Atendiendo/Error, config con DPAPI, tray, demo mock. Seam `IHiveConnection`.
+> - **Ola B - canal SignalR real (agente)**: `RealHiveConnection` detras del seam (GUI sin cambios);
+>   protocolo compartido en `Ecorex.Contracts.Agent`; AgentHello + reconexion con backoff.
+> - **Hub real de servidor** (doc 03 / doc 05 Ola 1): `AgenteHub` `[Authorize]` + `IAgentRegistry` +
+>   `POST /api/agente/token` (HMAC del secreto de `DataClient` -> JWT). Esquema bearer "Agent"
+>   no-default (no toca la auth de cookies). En `Ecorex.SuperAdmin`.
+> - **Ola C - Gateway ejecuta real** (doc 05 Ola 2): consulta parametrizada solo-lectura (whitelist
+>   `QueryGuard`) contra SQL Server de la LAN + chunking; credencial local DPAPI (no viaja).
+>   Probado contra `M700_GEN`/`ciudades`.
+> - **Ola 3 - ingesta en el servidor** (doc 03 s6 / doc 05 Ola 3): `IRowIngestService` (nucleo EAV
+>   reutilizable) + `IAgentImportService` (pending-fetch + dispatch + on-result); el `FetchResult`
+>   aterriza como filas del contenedor (Replace/Upsert verificados).
+>
+> **Detalle por doc**: recuadros "[CONSTRUIDO]" en docs 03/05/06; bitacora en `PROGRESO.md` del repo.
+>
+> **Pendiente / NO iniciado**:
+> - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
+>   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario: primero hara ajustes en
+>   el modulo de contenedores.)*
+> - Follow-up: migrar `ApiImportService` (REST) al nucleo `IRowIngestService` (mecanico).
+> - Sub-agentes **Archivos** y **Navegador** (colmena, doc 06); mas motores de BD; empaque como
+>   Servicio Windows + instalador (doc 04); endurecimiento (doc 05 Ola 6).
+
 # Agente Conector On-Prem - Contenedor de datos
 
 > Capitulo nuevo. Especifica un **agente de escritorio (VB.NET + WPF, Windows)** que se
