@@ -11,12 +11,13 @@ fecha: 2026-07-14
 > Orden pensado para que el valor se vea temprano: **A** cierra el encargado (lo que mas duele),
 > **B** cierra el form-first, **C** pone las guardas y el QA.
 
-> [!success] Avance al 2026-07-14 (todo commiteado en `main` + `fase-0/clon-backbone`)
+> [!success] Avance al 2026-07-15 -- CAPITULO CERRADO (todo en `main` + `fase-0/clon-backbone` + PROD)
 > **HECHAS y validadas en Chrome local**: Ola 0 (decisiones), **A1** (resolver el encargado del 1er
 > nodo), **A2** (el wizard lo preselecciona), **A3** (el paso nace asignado + D2 en servidor),
-> **B1** (form-first abre el formulario directo), **B2** (el wizard queda con un solo camino).
-> **HECHAS tambien**: **C1** (guardas + banner D3), **C2** (QA end-to-end). **PENDIENTES**: **Ola D**
-> (formulario por nodo) y el **deploy a produccion**. Ver la tabla "Resumen de olas" al final.
+> **B1** (form-first abre el formulario directo), **B2** (el wizard queda con un solo camino),
+> **C1** (guardas + banner D3), **C2** (QA end-to-end). **Ola D** (formulario por nodo) YA EXISTIA
+> (FASE 4), con la decision de ortogonalidad + el **aviso de formulario duplicado** (`9a7982b`).
+> **Deploy a produccion HECHO** (`0bf057d`). Ver la tabla "Resumen de olas" al final.
 
 Fuente de las brechas: [[00 - INDICE y estado actual vs objetivo]] seccion 4.
 Detalle tecnico: [[01 - Arquitectura del arranque (menu, encargado, form-first)]].
@@ -317,9 +318,12 @@ Guion (contra `ecorex_dev` local, nunca prod):
 - **DECISION DEL USUARIO (2026-07-14): dejarlos ORTOGONALES.** El del concepto = admision (crea la
   actividad); el del nodo = completar el paso. Conviven, sin precedencia. **Sin codigo nuevo** (es lo
   que ya funciona). Con esto la Ola D queda **CERRADA**.
-- **Micro-opcion NO construida (backlog)**: avisar en el editor/arranque si se configura el MISMO
-  formulario como admision del concepto Y como formulario del primer nodo (evita pedirlo dos veces).
-  Es un aviso, no un bloqueo; se construye solo si el usuario lo pide.
+- **Micro-opcion CONSTRUIDA (2026-07-15, `9a7982b`)**: en el editor de Conceptos (000270), un **aviso
+  ambar no bloqueante** en "Gestion del inicio del proceso" cuando se configura el MISMO formulario
+  como admision del concepto Y como formulario del primer nodo (se pediria dos veces). Se calcula sobre
+  el flujo GUARDADO (`ResolveFirstStepAsync`->NodeId->`GetWorkflowNodeFormAsync`); al cambiar el flujo
+  en vivo se limpia la cache para no avisar en falso. Es aviso, no bloqueo (coherente con la decision
+  de ortogonalidad).
 
 ### Deuda menor (no bloquea)
 - Dos APIs escriben `WorkflowNodeForms`: `IFormDefinitionService.AssignToWorkflowNodeAsync` (sin
@@ -344,7 +348,8 @@ Guion (contra `ecorex_dev` local, nunca prod):
 | **D2** | ✅ YA EXISTIA | Editor: selector de formulario por nodo (FlowEditor Acordeon 2) | (FASE 4) |
 | **D3** | ✅ YA EXISTIA | Runtime: cada paso pide su formulario (GetTaskStepFormsAsync + TaskDetailModal). Verificado 16/16 dual | (FASE 4) |
 | **D.dec** | ✅ DECIDIDO | Precedencia form-first vs form-por-nodo: **ORTOGONALES** (usuario 2026-07-14), sin codigo | - |
-| **DEPLOY** | PENDIENTE | Llevar A/B/C (y lo previo acumulado) a **produccion** (10.0.0.3) | - |
+| **D.guard** | ✅ HECHA | Aviso ambar en Conceptos si admision del concepto == form del primer nodo (evita pedirlo dos veces) | `9a7982b` |
+| **DEPLOY** | ✅ HECHA | A/B/C/D + tareasprogramadas (000889) + IMenuProvisioning desplegados a **prod** (10.0.0.3) | `0bf057d` |
 
 > Ademas hay un **fix preexistente** ya commiteado en esta tanda (`433a1ba`): el host `Ecorex.Api`
 > no arrancaba porque `IFormRecordBroadcaster` no estaba registrado (venia del merge de formularios).
@@ -358,16 +363,15 @@ Guion (contra `ecorex_dev` local, nunca prod):
   UI dentro de la tarea).
 - **SLA / vencimiento por paso** (notificar si un paso lleva N dias sin atender).
 
-### Hallazgos de config del demo (Ola C2, no son bug de codigo)
+### Hallazgos de config del demo (Ola C2) -- RESUELTOS 2026-07-15 (demo local)
 
-Al correr el E2E se vio que el flujo demo **COT-COM v1** ("Cotizacion de equipos") esta a medio
-configurar. No lo arreglo en codigo porque es **configuracion del tenant demo**, pero conviene
-cerrarlo para que el ciclo se pueda recorrer entero de punta a punta:
+Al correr el E2E se vio que el flujo demo **COT-COM v1** ("Cotizacion de equipos") estaba a medio
+configurar. Se cerro por **SQL en el demo local** (es configuracion del tenant demo, no bug de
+codigo; en prod el demo no se siembra por `skipDemoSeed`):
 
-- **Nodos `Facturacion` y `Entrega` sin cargo** -> al avanzar a esos pasos nacen sin candidato y
-  nadie los ve en "Pendientes mios" (el propio banner `SinCargo` de C1 lo advierte al crear).
-  Accion: asignarles un cargo en el editor de flujos.
-- **El concepto "Cotizacion de equipos" no tiene columna de cierre** (`TaskBoardColumnId = null`) por
-  ser un tablero **anterior** al auto-tablero de la commit `388e895`. Al terminar el flujo la tarea no
-  se auto-mueve a "Completado". Accion: fijar la columna de cierre del concepto (o re-guardarlo).
-  Nota: los conceptos nuevos ya nacen con columna de cierre desde `388e895`.
+- ✅ **Nodos `Facturacion` y `Entrega` sin cargo** -> se insertaron 2 `WorkflowNodePolicy`
+  (Facturacion -> Aprobador/admin; Entrega -> Asesor Comercial/operator). Ahora los 4 nodos tienen
+  cargo y nacen con candidato visible en "Pendientes mios".
+- ✅ **El concepto "Cotizacion de equipos" sin columna de cierre** (`TaskBoardColumnId = null`, tablero
+  anterior a `388e895`) -> se fijo `TaskBoardColumnId` = **Completado**. Al terminar el flujo la tarea
+  ya se auto-mueve. Nota: los conceptos nuevos ya nacen con columna de cierre desde `388e895`.
