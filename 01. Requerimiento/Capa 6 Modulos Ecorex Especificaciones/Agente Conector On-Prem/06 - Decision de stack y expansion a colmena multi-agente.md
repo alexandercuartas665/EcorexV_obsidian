@@ -94,6 +94,15 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
   terminar, se **apaga**. Multiples necesidades simultaneas = multiples poligonos en paralelo.
 - La colmena es **monitoreo + configuracion**; la ejecucion la hace el orquestador (servicio).
 
+> **[CONSTRUIDO 2026-07-15] Ola A - cascara visual (WPF).** Rama `feat/agente-colmena-gui` en el
+> monorepo (`apps/agent/Ecorex.Agent.Gui` + contratos `libs/Ecorex.Contracts.Agent`). Ventana sin
+> borde, translucida, monocroma, arrastrable, con tray icon. Panal de hexagonos (`HexTile` +
+> `HoneycombPanel`) con estados Vacio/Lleno/Atendiendo(pulso)/Error; celda **Configuracion** siempre
+> llena que abre un flyout (ClientId/URL/Estado/"Probar conexion" stub + persistencia **DPAPI**). El
+> panal **crece/decrece** con workers efimeros. Seam `IHiveConnection` (mock en Ola A) listo para
+> enchufar el **SignalR real en la Ola B sin tocar la GUI**. Compila y corre; capturas de 3 estados
+> (idle / config / atendiendo). SIN SignalR real ni ejecucion de sub-agentes (olas siguientes).
+
 ### 3.4 Identidad y cliente (via WhatsApp)
 
 - La **app administrativa** carga el **ClientId** del cliente. Ese cliente es el que se conecta
@@ -149,6 +158,14 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
 2. **Orden de sub-agentes v1: CONFIRMADO** - **Gateway** (casi listo, docs 01-05) ->
    **Archivos** (acotado) -> **Navegador** (el mas complejo y riesgoso, ultimo).
 3. **Colmena en WPF (Windows)**: implicito en D7 (Windows-first).
+
+**Avance de construccion:**
+
+- [x] **Ola A - cascara visual (WPF)** (2026-07-15): panal + estados + config (DPAPI) + tray + mock.
+      Ver recuadro en 3.3. Rama `feat/agente-colmena-gui` (sin merge/push a compartida aun).
+- [ ] **Ola B**: cliente SignalR real detras de `IHiveConnection` (sin tocar GUI/VM).
+- [ ] **Ola C+**: ejecucion de sub-agentes (Gateway -> Archivos -> Navegador), allow-list de
+      seguridad, instalador/servicio Windows.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en
