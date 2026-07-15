@@ -72,6 +72,13 @@ Agente (o un cliente de prueba temporal en .NET):
 - **Aceptacion**: un `FetchResult` del agente termina como filas en la tabla del contenedor,
   con Append/Replace/Upsert funcionando igual que el import REST (mismos outcomes).
 
+> **[CONSTRUIDO 2026-07-15] Ingesta via agente**: `IRowIngestService` (nucleo EAV reutilizable) +
+> `IAgentImportService` (pending-fetch + dispatch + on-result/on-failed) cableado en `AgenteHub`.
+> Verificado E2E con `ciudades` (SQL Server real): Replace `ins=20`, 2o Replace `del/ins=20`, Upsert
+> `upd=20` sin duplicar. **Pendiente de esta ola**: migrar `ApiImportService` (REST) al nucleo
+> compartido (follow-up mecanico) y `DataConnector.RunsViaAgent`+consulta+migracion (se puede hacer
+> junto al scheduler de la Ola 4).
+
 ## Ola 4 - Scheduler + refresco inmediato
 
 - `ImportSchedulerService` en `Ecorex.Workers`: dispara `ImportProcess` (Intervalo/Cron) que

@@ -130,12 +130,26 @@ clave). Refactor recomendado:
 > conecta autenticado ("[AGENTE] En linea" + AgentHello con tenant), y un push del servidor -> el
 > agente responde `FetchResult` (round-trip). La colmena WPF marca "En linea" con Gateway encendido.
 
+> **[CONSTRUIDO 2026-07-15] Ingesta via agente (s6, doc 05 Ola 3).** El `FetchResult` del agente
+> termina como filas en un contenedor de datos reusando el motor EAV. Verificado E2E: `SELECT ... FROM
+> ciudades` (SQL Server real) -> 20 filas -> contenedor "Ciudades (agente)": Replace `ins=20`, 2o
+> Replace `del=20/ins=20`, Upsert por CODIGO_POSTAL `upd=20` sin duplicar (queda en 20). Falta el
+> Scheduler (Ola 4) y el `RunsViaAgent`+UI para disparar desde un `ImportProcess` real (hoy con un
+> endpoint dev). Nota de entorno: la BD dev tenia drift (faltaba fisicamente
+> `data_container_columns.referenced_container_id` pese al historial); se corrigio con un ALTER puntual
+> -no es bug del codigo; una BD limpia trae la columna via su migracion existente.
+
 - [x] Hub `/hubs/agente` con `[Authorize]` + grupos por client/tenant.
 - [x] `IAgentRegistry` (en linea/offline) + `IHubContext` para empujar.
 - [x] `POST /api/agente/token` (HMAC -> JWT corto). Handshake opcion A completo (nonce + ts +/-120s).
 - [ ] `DataConnector.RunsViaAgent` + `DataClientId` + consulta + migracion.
-- [ ] `IRowIngestService` extraido de `ApiImportService` (compartido).
-- [ ] `IAgentImportService` (dispatch + on-result + on-failed).
+- [x] `IRowIngestService` (nucleo de ingesta EAV Append/Replace/Upsert por sesion, en
+      `Ecorex.Application/DataContainers/RowIngestService.cs`). Usado por el importador via agente.
+      **Follow-up**: migrar `ApiImportService` (REST) a este nucleo (mecanico, se dejo intacto para no
+      tocar el path REST sin sus tests de integracion Docker).
+- [x] `IAgentImportService` (dispatch + on-result + on-failed) en `Ecorex.SuperAdmin/Agents/
+      AgentImportService.cs`: pending-fetch por correlationId, acumula chunks y en el ultimo ingiere
+      via `IRowIngestService` (scope propio con el tenant fijado). Cableado en `AgenteHub`.
 - [ ] `ImportSchedulerService` en `Ecorex.Workers` (Intervalo/Cron + offline handling).
 - [ ] UI: opcion "via agente", estado en linea, "Refrescar ahora".
 - [ ] Tests: unit (ingesta/upsert), integracion dual PG/SQLServer, y un test de canal con un

@@ -191,8 +191,11 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       contra SQL Server de la LAN (solo-lectura + whitelist `QueryGuard`, chunking), credencial local
       cifrada con DPAPI (no viaja). Verificado E2E contra una BD real (`M700_GEN`, tabla `ciudades`):
       20 filas reales de vuelta; no-SELECT rechazado. Detalle en doc 05 Ola 2. **Pendiente Ola C+**:
-      sub-agentes Archivos y Navegador, mas motores de BD, ingesta en servidor (doc 03), allow-list
-      avanzada, instalador/servicio Windows.
+      sub-agentes Archivos y Navegador, mas motores de BD, allow-list avanzada, instalador/servicio.
+- [x] **Ingesta en el servidor (doc 05 Ola 3)** (2026-07-15): el `FetchResult` del agente termina como
+      filas en un contenedor reusando el motor EAV (`IRowIngestService` + `IAgentImportService`).
+      Verificado E2E con `ciudades` (Replace/Upsert). Detalle en doc 03 s6/s9. **Pendiente**: scheduler
+      (Ola 4) + `RunsViaAgent`/UI + migrar el import REST al nucleo compartido.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en
