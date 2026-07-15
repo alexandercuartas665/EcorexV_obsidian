@@ -6,9 +6,9 @@ usuario_demo: 1048064705 (GUADALUPE.LA)
 url_local: http://localhost:47640/GestionMovil/Formularios/Modulos/Login/LoginBitcode.aspx
 url_prod: https://app.bitcode.com.co/Formularios/Modulos/Login/LoginBitcode.aspx
 base_datos_dev: db3dev (sql.bitcode.com.co,44566)
-total_docs: 56
+total_docs: 116
 carpetas: 8
-fecha_ultima_actualizacion: 2026-07-11
+fecha_ultima_actualizacion: 2026-07-15
 estado: adaptado a la vision del sistema destino .NET 10 (ORIGEN preservado como referencia ETL)
 nivel_completitud: 90 por ciento
 ---
@@ -91,7 +91,7 @@ OBSIDIAN.tareas/
   - [[Clases del nucleo de formularios (Documental)]] — las 9 clases `cl_*` (definicion EAV en `ENCUESTAS_MOV_*` + propiedades en `FORX_DATA`, motor de calculos por grafo `REG_ORIGEN->REG_DESTINO`, reglas por **reflexion**). Riesgo: secreto Azure embebido en `cl_Transcripcion_audio.vb`, SQL concatenado
   - [[Controles del constructor y renderers (Documental)]] — los 38 `.ascx`: disenador `ctrFormCreator` (WYSIWYG) + renderer vigente `crtCargaEncuestaII` (dispatch oculto en `cl_gestion_formularios.AdornoDetalle`) + catalogo de controles por tipo de campo (Quill, firma canvas, audio+transcripcion, GPS, reCAPTCHA, grid detalle, tabla hija)
   - [[FormCreatorMCP - Servidor MCP del constructor]] — endpoint `.ashx` que expone **20 herramientas** para que un agente de IA construya formularios de punta a punta; usa **Gemini 2.0 Flash Vision** (tool estrella `import_form_from_image`: imagen -> blueprint -> formulario). RPC JSON propietario (no MCP estandar). Vive en Capa 4 (construye formularios); su evolucion destino es el Copiloto de Configuracion de [[Agentes de IA - Arquitectura y Operacion|Capa 7]]. Riesgo: sin auth, CORS `*`, SQL por concatenacion
-- **Propiedades avanzadas (PROPUESTA, capitulo de 4 docs)** — el salto del motor a dato transaccional gobernado: [[00 - INDICE y objetivo (Formularios avanzados)]] (estado real + objetivo), [[01 - Arquitectura, decisiones y datos (Formularios avanzados)]] (formulario-modulo, transaccionalidad/consecutivo, lookups de datos con dominio del tenant, calculo/totales), [[02 - UX y paneles de propiedades (Formularios avanzados)]] y [[03 - Plan por olas y preguntas abiertas (Formularios avanzados)]]. Reutiliza infra existente (`TenantSequence`, `DataContainer`, Directorio, Inventario)
+- **Propiedades avanzadas (F1..F6 HECHO + desplegado a prod 2026-07-14; capitulo de 5 docs)** — el salto del motor a dato transaccional gobernado, YA CONSTRUIDO: [[00 - INDICE y objetivo (Formularios avanzados)]] (estado + objetivo), [[01 - Arquitectura, decisiones y datos (Formularios avanzados)]] (formulario-modulo, transaccionalidad/consecutivo, lookups, calculo/totales), [[02 - UX y paneles de propiedades (Formularios avanzados)]], [[03 - Plan por olas y preguntas abiertas (Formularios avanzados)]] (F1..F6 HECHO) y [[04 - Registro de tablas y cambios de esquema (Formularios avanzados)]] (bitacora de migraciones a prod). Reutiliza infra existente (`TenantSequence`, `DataContainer`, Directorio, Inventario)
 
 ### Capa 5 - Librerias Base
 - [[00 - Visión MotherData]] — DAL. Fichas: [[AdmDatos - Motor SQL Server]], [[AdmNpgsql - Motor PostgreSQL]], [[AdmCrypto - Cifrado simétrico]], [[CargaConfig - Decode Config.xml]], [[VariablesGlobales - Conexiones y Empresa]]
@@ -137,6 +137,7 @@ OBSIDIAN.tareas/
 - Modelo de pruebas: [[Plan de validacion del sistema]] — ORIGEN: checklist manual del legacy por modulo
 - Modelo de pruebas: [[CREDENCIALES - Usuarios y claves]] — plan de cuentas demo Development (sin secretos reales; passwords en .env)
 - Historial de pruebas: [[00 - Registro de corridas]] — bitacora de corridas
+- **QA por modulo (nuevo, transversal)**: [[00 - Politicas QA y Definition of Done]] — persona QA adversarial + DoD con dientes + reglas de rechazo + catalogo de modulos; y una carpeta por gran modulo (Formularios, Tareas y Proyectos, Flujos de Proceso, Reglas, Directorio, Inventario, Contenedor de datos, Gestion de tenant, Menu-Roles-Permisos, Agentes de IA), cada una con su `00 - Plan y veredicto QA` + `Historias de prueba` (Dado/Cuando/Entonces, ajustables). El QA no bloquea el merge: informa riesgos y retos con severidad
 
 ## 06. Deploy
 - [[Deploy a Produccion - Docker e hibrido]] — DESTINO: Docker + hibrido VPS/Railway, DAL dual, workers, checklist piloto
@@ -173,6 +174,23 @@ OBSIDIAN.tareas/
 ### Voy a planear la migracion
 1. [[HOJA DE RUTA DESARROLLO]] → 2. vault CUBOT.nails (esquema destino: DAL dual PostgreSQL/SQL Server + modulos base portados)
 
+## Novedades (2026-07-15)
+
+- **Formularios avanzados F1..F6 CONSTRUIDO + DESPLEGADO a prod** (2026-07-14): las 6 olas
+  (lookups, calculo, transaccionalidad, formulario-modulo, maestro-detalle, transversales) estan
+  hechas y en prod; el capitulo crecio a 5 docs (se agrego la bitacora de esquema, doc 04).
+- **Programa de QA transversal nuevo** en [[00 - Registro de corridas|05. Pruebas]]: capa de
+  enforcement de calidad ([[00 - Politicas QA y Definition of Done]]) + una carpeta por gran
+  modulo (10) con plan/veredicto e historias de prueba ajustables. Estreno: veredicto de
+  Formularios (CONSTRUIDO, no-HECHO por falta de matriz dual + cross-tenant al momento de escribir).
+- **Modulo "Programar actividad" (000889)** documentado en Capa 2
+  ([[Programar actividad - Motor de programaciones (000889)]]): scheduler de notificaciones/
+  actividades por reglas de recurrencia y canales; ORIGEN (`adm_programador`) quedo incompleto.
+- **Agente Conector On-Prem: expansion a colmena multi-agente** (Capa 6): stack **.NET 10 + C#**
+  confirmado (Windows-first), sub-agentes gateway/navegador/archivos, y prior-art del sistema Doom
+  minado ([[07 - Prior-art Doom (orquestador drone + sub-agente navegador WebView2 + MCP)]]).
+- **CLAUDE.md** agregado a la raiz (guia para futuras sesiones de Claude Code).
+
 ## Novedades (2026-07-11)
 
 - **Higiene de alcance de Capa 4 (formularios)**: se auditaron las notas de Capa 4 para dejarla
@@ -190,8 +208,10 @@ OBSIDIAN.tareas/
   identidad por **consecutivo** -reusa `TenantSequence`/`ISequenceService`- o **clave natural**
   tipo SKU/tercero), **campos con datos** (autocompletado desde `DataContainer`/Directorio/
   Inventario con autollenado), **calculo** (formulas, totales de tabla, roll-up) y **filtros/
-  KPIs**. Entrada: [[00 - INDICE y objetivo (Formularios avanzados)]]. Nada construido aun;
-  plan por olas F1..F6 + preguntas abiertas en el doc 03.
+  KPIs**. Entrada: [[00 - INDICE y objetivo (Formularios avanzados)]]. **ACTUALIZACION
+  2026-07-15: F1..F6 CONSTRUIDO y DESPLEGADO a prod (2026-07-14)**; capitulo crecio a 5 docs
+  (se agrego el 04, bitacora de esquema). Diferido: PDF con plantilla, webhooks/botones-con-reglas,
+  object storage.
 - **Ingenieria inversa profunda del motor de formularios (`Bootstrap/.../Documental/`)**:
   se documentaron las 4 carpetas del codigo VB real que sostiene el constructor
   (61 archivos, ~1.2 MB) en 4 notas nuevas de Capa 4, cada una con doble encuadre
