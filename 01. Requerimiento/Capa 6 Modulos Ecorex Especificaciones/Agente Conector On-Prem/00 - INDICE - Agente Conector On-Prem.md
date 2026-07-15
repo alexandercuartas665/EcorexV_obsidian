@@ -31,9 +31,10 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > - **Ola 3 - ingesta en el servidor** (doc 03 s6 / doc 05 Ola 3): `IRowIngestService` (nucleo EAV
 >   reutilizable) + `IAgentImportService` (pending-fetch + dispatch + on-result); el `FetchResult`
 >   aterriza como filas del contenedor (Replace/Upsert verificados).
-> - **Sub-agente Navegador (base)** (doc 06 s3.2 / prior-art doc 07): WebView2 + acciones tipadas
->   (navigate/eval/wait/screenshot/html) + allow-list de dominios local (DPAPI). Verificado E2E
->   (navega example.com, inyecta JS, captura; dominio no permitido -> bloqueado).
+> - **Sub-agente Navegador** (doc 06 s3.2 / prior-art doc 07): WebView2 + las 7 acciones tipadas
+>   (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios local (DPAPI) +
+>   **servidor MCP localhost** (JSON-RPC, tools/list + tools/call) para clientes/IA locales.
+>   Verificado E2E por el hub y por MCP (navega + inyecta JS + captura; dominio no permitido bloqueado).
 >
 > **Detalle por doc**: recuadros "[CONSTRUIDO]" en docs 03/05/06; bitacora en `PROGRESO.md` del repo.
 >

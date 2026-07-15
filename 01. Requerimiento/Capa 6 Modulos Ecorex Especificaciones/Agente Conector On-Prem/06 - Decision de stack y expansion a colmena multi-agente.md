@@ -93,8 +93,17 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
 > pida. Cableado en `RealHiveConnection` (marshala al hilo UI) + `AgenteHub.BrowserResult` + endpoint
 > dev. Verificado E2E: el servidor ordena navegar a example.com -> el agente abre WebView2, `Eval`
 > `document.title` -> "Example Domain", captura el PNG real; navegar a un dominio NO permitido ->
-> `Navigate ok=False` (bloqueado). **Pendiente**: servidor MCP localhost (7 tools), `browser.mouse`/
-> `browser.downloads`, JS firmado/versionado por el servidor, y UI de la allow-list en la colmena.
+> `Navigate ok=False` (bloqueado).
+>
+> **[CONSTRUIDO 2026-07-15] Nav-4 - servidor MCP + las 7 tools.** `BrowserMcpServer` (TcpListener
+> **solo 127.0.0.1**, JSON-RPC 2.0: `initialize`/`tools/list`/`tools/call`) expone el catalogo
+> completo del doc 07: `browser.navigate`, `browser.eval`, `browser.wait`, `browser.screenshot`,
+> `browser.html`, `browser.mouse` (MouseBot: guion JSON click/type por selector), `browser.downloads`
+> (historial). Comparte la MISMA instancia WebView2 que el hub y marshala al hilo de UI; respeta la
+> allow-list. Devuelve contenido MCP (texto + imagen PNG). Verificado por JSON-RPC: `tools/list` = 7
+> tools; `tools/call` navigate+eval+screenshot ok; navegar a un dominio no permitido -> `isError:true`.
+> **Pendiente**: JS firmado/versionado por el servidor, UI de la allow-list en la colmena, y el
+> sub-agente Archivos.
 
 ### 3.3 GUI colmena (aspecto de panal)
 
@@ -208,10 +217,11 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       filas en un contenedor reusando el motor EAV (`IRowIngestService` + `IAgentImportService`).
       Verificado E2E con `ciudades` (Replace/Upsert). Detalle en doc 03 s6/s9. **Pendiente**: scheduler
       (Ola 4) + `RunsViaAgent`/UI + migrar el import REST al nucleo compartido.
-- [~] **Sub-agente Navegador (base, Nav-1/2/3)** (2026-07-15): WebView2 + acciones tipadas
-      (navigate/eval/wait/screenshot/html) + allow-list de dominios local (DPAPI). Verificado E2E
-      (example.com: navega, `Eval` titulo, screenshot; dominio no permitido -> bloqueado). Ver recuadro
-      en 3.2. **Pendiente**: servidor MCP localhost (7 tools), mouse/downloads, JS firmado, UI allow-list.
+- [~] **Sub-agente Navegador (Nav-1/2/3/4)** (2026-07-15): WebView2 + las 7 acciones tipadas del
+      catalogo browser.* (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios
+      local (DPAPI) + **servidor MCP localhost** (JSON-RPC, `tools/list`/`tools/call`) para clientes/IA
+      locales. Verificado E2E por el hub y por MCP (example.com ok; dominio no permitido -> bloqueado).
+      Ver recuadros en 3.2. **Pendiente**: JS firmado/versionado por el servidor, UI de allow-list.
 - [ ] **Sub-agente Archivos** (colmena, doc 06 s3.2): lee/escribe rutas permitidas (allow-list). Falta.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
