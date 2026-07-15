@@ -1,7 +1,7 @@
 ---
 tipo: plan-olas
 proyecto: Tareas de proceso - Arranque y encargado del flujo
-estado: EN CURSO (2026-07-14) - Olas 0/A/B/C HECHAS; faltan Ola D (form por nodo) y el deploy a prod
+estado: EN CURSO (2026-07-14) - Olas 0/A/B/C HECHAS; Ola D YA EXISTIA (verificada); falta 1 decision (precedencia) + el deploy a prod
 fecha: 2026-07-14
 ---
 
@@ -268,35 +268,60 @@ Guion (contra `ecorex_dev` local, nunca prod):
 
 ---
 
-## OLA D - Formulario por NODO del flujo (comprometida por D1, va DESPUES de A/B/C)
+## OLA D - Formulario por NODO del flujo  -- YA EXISTIA (verificado 2026-07-14)
 
-> Por decision D1, esto **no es backlog difuso**: es una ola planificada. Se hace **despues** de
-> que A/B/C esten verdes, porque toca dominio y no debe bloquear el valor inmediato.
+> [!success] HALLAZGO: la Ola D ya estaba construida (FASE 4 forms, ADR-0015, desde 2026-07-03)
+> Al ir a implementarla se descubrio que el **formulario por nodo YA existe completo**, con OTRO
+> mecanismo (mejor) que el que la propuesta D1 asumia. La propuesta hablaba de
+> `WorkflowNodePolicy.FormDefinitionId`; la realidad es una **entidad join dedicada**
+> `WorkflowNodeForm` (indice unico por nodo), que es mas limpia. NO se construyo nada nuevo:
+> hacerlo habria sido redundante.
 
-### Ola D1 - Dominio + migracion dual
+### D1 - Dominio + migracion  -- YA EXISTIA
+- Entidad `WorkflowNodeForm` (`Ecorex.Domain/Entities/WorkflowNodeForm.cs`): `NodeId`, `DefinitionId`,
+  `TenantId`. Indice **unico por NodeId** (un nodo, a lo sumo un formulario). `DbSet` en
+  `IApplicationDbContext`. Tabla `workflow_node_forms` creada en la migracion `AddDynamicForms`
+  (**2026-07-03**), en PG **y** SQL Server. Ya aplicada.
 
-- `WorkflowNodePolicy.FormDefinitionId (Guid?)` -> FK a `FormDefinition`. Migracion **PG + SQL
-  Server** (regla DAL dual).
-- Regla de precedencia: **el formulario del NODO gana**; si el nodo no tiene, se usa el del
-  **concepto** (compatibilidad hacia atras con todo lo construido en B1).
-- **Aceptacion**: migracion aplicada en ambos motores; tests de integracion dual verdes; nada de lo
-  existente se rompe (los flujos actuales, sin formulario por nodo, siguen usando el del concepto).
+### D2 - Editor de flujos: asignar formulario al nodo  -- YA EXISTIA
+- `FlowEditor.razor`, panel de propiedades del nodo, **Acordeon 2 "Recursos y componentes"**: chip del
+  formulario asignado + boton "+ Agregar" que abre un picker de formularios `Active`. Cablea a
+  `IWorkflowDesignService.SetNodeFormAsync(nodeId, formId)` / `RemoveNodeFormAsync(nodeId)`, que hacen
+  upsert/borrado en `WorkflowNodeForms` (valida form Active y no archivado). El vinculo se preserva al
+  clonar/versionar flujos.
 
-### Ola D2 - Editor de flujos: asignar formulario al nodo
+### D3 - Runtime: cada paso pide su formulario  -- YA EXISTIA
+- `FormResponseService.GetTaskStepFormsAsync` lee `WorkflowNodeForms` por los nodos de los pasos
+  **Pending**, crea el draft anclado al numero de tarea + `FormFlowLink`, y resuelve la compuerta
+  adelante (opciones de decision). `TaskDetailModal.razor` lo pinta en la seccion **"Formularios del
+  paso"** con boton **"Diligenciar"**; al enviar el formulario se completa el paso (con la decision
+  del gateway si aplica).
 
-- En `/flujos`, el panel de propiedades del nodo (donde hoy se elige el **cargo**) suma un selector
-  de **Formulario**.
-- **Aceptacion (Chrome)**: en el flujo de Compras, al nodo "Cotizar" se le asigna un formulario
-  distinto al del concepto; se publica; queda persistido.
+### Verificacion (2026-07-14)
+- **`DynamicFormsTests` 16/16 en matriz dual** (PG + SQL Server). El caso clave (lineas 296-325) hace
+  el ciclo completo: `AssignToWorkflowNodeAsync(Task_Cot, form)` -> crear tarea -> avanzar a Cotizacion
+  -> `GetTaskStepFormsAsync` devuelve el form del nodo **con gateway adelante y opciones
+  Aprobada/Rechazada** -> enviar con decision "Aprobada" -> el paso se completa y el flujo avanza a
+  Facturacion. Eso ES exactamente lo que D1/D2/D3 pedian.
 
-### Ola D3 - Runtime: cada paso pide SU formulario
+### UNICO punto abierto: precedencia form-first (concepto) vs form-por-nodo -- DECISION DE PRODUCTO
+- La propuesta D1 decia "gana el del nodo, si no cae al del concepto". Pero eso se penso creyendo que
+  el form-por-nodo NO existia y REEMPLAZARIA al del concepto. La realidad es que son **fases
+  ortogonales**:
+  - **Form-first (concepto)** = formulario de ADMISION: se llena ANTES de crear la actividad; su
+    validacion habilita la creacion (Ola B1).
+  - **Form-por-nodo** = formulario de PASO: se llena DENTRO de la tarea para COMPLETAR cada paso (D3).
+- Hoy no hay precedencia: **coexisten**. Un concepto form-first cuyo PRIMER nodo tambien tenga
+  formulario pediria dos (uno al arrancar, otro al atender el primer paso). Si son DISTINTOS es
+  coherente (admision + paso); si es el MISMO, es redundante.
+- **Pendiente de decidir con el usuario** (ver [[00 - INDICE y estado actual vs objetivo]] seccion 5):
+  dejar ortogonal (recomendado; opcionalmente avisar si se configura el mismo form en ambos) vs.
+  construir que la respuesta del form-first SATISFAGA el primer paso cuando es el mismo formulario.
 
-- La seccion **Flujo** dentro de la tarea (ADR-0038) renderiza el formulario del **paso actual**
-  (el del nodo, o el del concepto si el nodo no tiene).
-- El arranque form-first (Ola B1) usa el formulario del **primer nodo** si lo tiene.
-- **Aceptacion (Chrome)**: Beto atiende "Cotizar" y ve **el formulario del nodo**; Carla atiende
-  "Aprobar" y ve **otro** formulario. Cada `FormResponse` queda enlazada al **paso**, no solo a la
-  tarea.
+### Deuda menor (no bloquea)
+- Dos APIs escriben `WorkflowNodeForms`: `IFormDefinitionService.AssignToWorkflowNodeAsync` (sin
+  consumidor de UI, la usan tests) y `IWorkflowDesignService.SetNodeFormAsync` (la del editor).
+  Conviene declarar cual es canonica y unificar. No es bug.
 
 ---
 
@@ -312,10 +337,11 @@ Guion (contra `ecorex_dev` local, nunca prod):
 | **B2** | ✅ HECHA | El wizard queda con un solo camino (no crea la tarea por adelantado) | `368c09b` |
 | **C1** | ✅ HECHA | Guardas: banner D3 en el arranque + chip "borrador" en el menu + no publicar flujo sin paso Task | (esta tanda) |
 | **C2** | ✅ HECHA | QA end-to-end: arranque visual+BD (T00219 nace asignada a operator, visible en Pendientes mios) + ciclo runtime por `WorkflowInboxTests` 6/6 dual. Ver [[05. Pruebas/Historial de pruebas/00 - Registro de corridas]] 2026-07-14 | (verificacion) |
-| **D1** | PENDIENTE | Dominio: `WorkflowNodePolicy.FormDefinitionId` + migracion dual | - |
-| **D2** | PENDIENTE | Editor de flujos: formulario por nodo | - |
-| **D3** | PENDIENTE | Runtime: cada paso pide su formulario | - |
-| **DEPLOY** | PENDIENTE | Llevar A/B (y lo previo acumulado) a **produccion** (10.0.0.3) | - |
+| **D1** | ✅ YA EXISTIA | Dominio `WorkflowNodeForm` + migracion dual (AddDynamicForms, 2026-07-03) | (FASE 4) |
+| **D2** | ✅ YA EXISTIA | Editor: selector de formulario por nodo (FlowEditor Acordeon 2) | (FASE 4) |
+| **D3** | ✅ YA EXISTIA | Runtime: cada paso pide su formulario (GetTaskStepFormsAsync + TaskDetailModal). Verificado 16/16 dual | (FASE 4) |
+| **D.dec** | PENDIENTE (decision) | Precedencia form-first vs form-por-nodo (son ortogonales; decidir con el usuario) | - |
+| **DEPLOY** | PENDIENTE | Llevar A/B/C (y lo previo acumulado) a **produccion** (10.0.0.3) | - |
 
 > Ademas hay un **fix preexistente** ya commiteado en esta tanda (`433a1ba`): el host `Ecorex.Api`
 > no arrancaba porque `IFormRecordBroadcaster` no estaba registrado (venia del merge de formularios).
