@@ -59,7 +59,7 @@ detalle de cada sesion en `PROGRESO.md` y las corridas de prueba en el vault
 | Nucleo tareas (TaskItem, estados, worklog, kanban, wizard) | 000038/000636 | CONSTRUIDO | ADR-0013; consecutivos por tenant; concurrencia optimista |
 | Tableros unificados (indice + detalle + filtros + alcances + vistas Tablero/Lista/Calendario/Gantt) | 000636 | CONSTRUIDO | ADR-0021; "Administrar actividades" y el menu rapido del rail son EL MISMO sistema de tableros |
 | Proyectos (con ACL de miembros) | 000042 | CONSTRUIDO (base) | Familia DOC_PROYECTOS_* extendida pendiente de ETL |
-| WorkflowEngine (motor BPMN) + editor canvas | 000291 | CONSTRUIDO | ADR-0014/0022; editor canvas propio funcional; BpmnXml regenerado (portable bpmn.io) |
+| WorkflowEngine (motor BPMN) + editor bpmn-js + runtime + reglas | 000291 | CONSTRUIDO + EN PROD | ADR-0014/0022/0038; editor bpmn-js (paleta/context pad/color/nota); motor (gateways/rechazo/reinicios/tx); asignacion por cargo; bandeja + runtime embebido en la tarea; form por paso; arranque de tareas-proceso (olas A-D). Desplegado `0bf057d`. Suites dual verdes; falta gate QA formal. Ver [[00 - Visión Flujos]] seccion D0 |
 | DynamicFormRenderer + constructor + visor por token | 000131 | CONSTRUIDO | ADR-0015/0021; constructor drag-and-drop funcional; tipos multimedia avanzados pendientes |
 | RulesEngine (verbos tipados) + modulo Gestion de reglas | 000802 | CONSTRUIDO | ADR-0016/0023; layout 3 paneles + PARAM_XML editable; verbos IA/importacion pendientes |
 | Conceptos de actividad | 000270 | CONSTRUIDO | ADR-0024a; sobre ActivityType real |

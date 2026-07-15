@@ -20,6 +20,37 @@ stack_destino: .NET 10 / ASP.NET Core / EF Core 10 / Blazor / bpmn-js / SignalR
 > `DOC_PROCESOS*`) como plano del ETL. Enlaza con [[Visión y entorno]] (vision
 > maestra) y [[Visión y entorno|Prototipo Final ECOREX]] (aspecto y navegacion).
 
+## D0. Estado de implementacion destino (.NET 10) -- al 2026-07-15
+
+> [!success] El motor de flujos esta CONSTRUIDO y DESPLEGADO A PRODUCCION (`0bf057d`, 10.0.0.3)
+> Las tres piezas de D1 (editor visual, motor de ejecucion, motor de reglas) existen y funcionan
+> punta a punta; el arranque de tareas-proceso y la bandeja tambien. Detalle por pieza abajo.
+
+| Pieza | Estado | Materializacion en codigo (`apps/backend`) |
+|---|---|---|
+| **Editor visual (bpmn-js)** | ✅ Operativo | `Flujos.razor` (000291) + `WorkflowDesignService`; parser/writer/merger propios (`BpmnProcessParser`, `BpmnXmlWriter`, `BpmnXmlMerger`), auto-layout, paleta completa (14 entradas), context pad, color y nota post-it por nodo. **La semantica que no viaja en el XML (cargo, formulario, reglas, reinicio) se CONSERVA** emparejando por `BpmnElementId` al guardar. |
+| **Motor de ejecucion (`WorkflowEngine`)** | ✅ Operativo | `WorkflowEngine.cs` = port de `AdmWorkflow`: `AdvanceAsync`/`ResolveOutgoing` en transaccion, gateways (aprobado/rechazado enrutan), rechazo que reactiva el paso previo, **reinicios por `RestartNodeId`** (ciclo con `CycleIndex`), concurrencia optimista. Instancia + historial: `WorkflowInstance` / `WorkflowStepHistory` (append-only). |
+| **Motor de reglas (`RulesEngine`)** | ✅ Operativo | `RulesEngine.cs` + 5 verbos tipados (`AsignarConsecutivo`, `BloquearCampoPorCondicion`, `GenerarTareasDesdeTabla`, `Notificar`, `PasarCampos`), enganchado por nodo via `WorkflowNodeRule` + `WorkflowRuleHook`. |
+| **Asignacion por nodo -> cargo -> usuarios** | ✅ Operativo | `WorkflowNodePolicy` (ACL por nodo) + `INodeAssigneeResolver` (organigrama 000850). El primer paso nace asignado y notificado. |
+| **Bandeja / runtime dentro de la tarea** | ✅ Operativo | `WorkflowInboxService` (reclamar/atender/aprobar/rechazar/reasignar); el runtime va EMBEBIDO en el detalle de la tarea (ADR-0038), descubrimiento por el alcance "Pendientes mios" del tablero. |
+| **Formulario por paso** | ✅ Operativo | `WorkflowNodeForm` (form por nodo, migracion `AddDynamicForms`) + runtime `GetTaskStepFormsAsync`; un paso con formulario bloquea el avance hasta enviarlo (misma tx). |
+| **Arranque de tareas-proceso** | ✅ Operativo | `WorkflowStartService` (resuelve el 1er nodo/encargado en seco), wizard con encargado restringido, arranque **form-first** (admision) y guardas (avisa si el flujo no es publicable/utilizable). Capitulo [[03 - Plan por olas pequenas|Tareas de proceso - Arranque y encargado]] CERRADO. |
+| **Versionado del flujo** | ✅ Corrige el origen | `WorkflowDefinition` versionada + `PublishAsync` (bloquea publicar un flujo sin nodo Task); cada caso fija su version. |
+| **DAL dual + multi-tenant** | ✅ | Todas las entidades `workflow_*` con `TenantId` + `HasQueryFilter`; migraciones **duales** (PG + SQL Server) aplicadas en prod al arrancar. |
+
+**Cobertura de pruebas (suites verdes en la ultima corrida, integracion = dual PG + SQL Server):**
+`WorkflowEngineTests` (10), `WorkflowDesignServiceTests` (8), `WorkflowStartServiceTests` (10),
+`WorkflowInboxTests` (3), `DynamicFormsTests` (8, union form+flujo), `RulesEngineTests` (7) +
+unitarias `Bpmn*Tests`, `WorkflowConditionEvaluatorTests`, `WorkflowInboxProjectionTests`, `RuleVerbTests`.
+Veredicto QA formal: ver [[00 - Plan y veredicto QA - Flujos de Proceso]].
+
+> [!todo] Pendientes reales (no bloquean el uso)
+> - **Auditoria QA formal** del motor contra historias + DoD (hoy hay suites verdes, falta el gate).
+> - **Reasignacion de paso con UI** dentro de la tarea (el servicio ya existe, `WorkflowInboxService`).
+> - **SLA / vencimiento por paso** (recordatorio/escalamiento si un paso lleva N dias).
+> - **Integracion IA** para sugerir/generar flujos (`GPT_CODE` del origen) -- aun no portada.
+> - **Refresco en vivo del badge** por SignalR y **canal EMAIL** de notificaciones (backlog transversal).
+
 ## D1. Que es en el destino
 
 El modulo de Flujos es el nucleo diferenciador de ECOREX (seccion 7 de

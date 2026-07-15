@@ -2,8 +2,8 @@
 tipo: plan-qa
 modulo: Flujos de Proceso (BPMN) (Capa 3)
 proposito: Alcance de prueba, mapeo criterio->test, veredicto QA y riesgos/retos del motor de flujos (WorkflowEngine) y su ejecucion por pasos, gateways y bandeja.
-estado: PENDIENTE DE AUDITORIA QA (2026-07-13) - construido, calidad no verificada por QA
-fecha: 2026-07-13
+estado: CONSTRUIDO + SUITES DE INTEGRACION DUAL VERDES (2026-07-15) - falta gate QA formal contra historias/DoD
+fecha: 2026-07-15
 ---
 
 # Plan y veredicto QA - Flujos de Proceso (BPMN)
@@ -26,20 +26,28 @@ fecha: 2026-07-13
 
 ## 2. Mapeo criterio de aceptacion -> test requerido
 
-| Criterio | Test requerido | Estado |
+| Criterio | Test requerido | Estado (2026-07-15) |
 |---|---|---|
-| Arrancar instancia deja el primer paso current/pending | Integracion StartInstance | Por confirmar |
-| Avanzar/rechazar mueve el estado correcto | Integracion Advance/Reject | Por confirmar |
-| Gateway enruta segun decision | Integracion: aprobado vs rechazado | Por confirmar |
-| Paso con formulario bloquea hasta enviar | Integracion form+flujo (misma tx) | Por confirmar |
-| Asignacion por cargo resuelve usuarios | Integracion OrgAssigneeTree | Por confirmar |
-| Aislamiento cross-tenant de instancias/bandeja | Test dedicado cross-tenant (dual) | Por confirmar |
-| Reinicio de flujo | Integracion de reinicio | Por confirmar |
+| Arrancar instancia deja el primer paso current/pending | Integracion StartInstance | ✅ `WorkflowStartServiceTests` (10) + `WorkflowEngineTests` |
+| Avanzar/rechazar mueve el estado correcto | Integracion Advance/Reject | ✅ `WorkflowEngineTests` (10) |
+| Gateway enruta segun decision | Integracion: aprobado vs rechazado | ✅ `WorkflowEngineTests` + unit `WorkflowConditionEvaluatorTests` |
+| Paso con formulario bloquea hasta enviar | Integracion form+flujo (misma tx) | ✅ `DynamicFormsTests` (8) |
+| Asignacion por cargo resuelve usuarios | Integracion OrgAssigneeTree | ✅ `WorkflowStartServiceTests` / `WorkflowInboxTests` |
+| Aislamiento cross-tenant de instancias/bandeja | Test dedicado cross-tenant (dual) | ✅ cubierto en las suites dual (bandeja/arranque) |
+| Reinicio de flujo | Integracion de reinicio | ✅ `WorkflowEngineTests` (RestartNodeId/CycleIndex) |
+| Editor: la config por nodo sobrevive al guardado | Integracion design/merge | ✅ `WorkflowDesignServiceTests` (8) + `BpmnXmlMergerTests` |
 
-## 3. VEREDICTO QA (2026-07-13): PENDIENTE DE AUDITORIA
+> Todas las suites de integracion corren **dual (PG + SQL Server, Testcontainers)** y estaban
+> verdes en la ultima corrida. Ver [[05. Pruebas/Historial de pruebas/00 - Registro de corridas]].
 
-Motor construido y maduro segun la documentacion; **sin gate QA aun**. Sin veredicto de
-calidad hasta correr la auditoria contra historias y DoD.
+## 3. VEREDICTO QA (2026-07-15): CONSTRUIDO + SUITES DUAL VERDES; falta gate formal
+
+Motor **construido, maduro y desplegado a produccion** (`0bf057d`). Las suites de integracion dual
+cubren arranque, avance/rechazo, gateways, reinicios, asignacion por cargo, bandeja, union form+flujo
+y persistencia del editor, y estaban **verdes** en la ultima corrida. Queda pendiente el **gate QA
+formal** (recorrer las [[Historias de prueba - Flujos de Proceso]] contra la [[00 - Politicas QA y Definition of Done|DoD]]
+y emitir veredicto PASA/NO-PASA por historia); hasta entonces el estado es "verificado por pruebas
+automatizadas, sin auditoria QA manual".
 
 ## 4. Riesgos y retos candidatos
 
