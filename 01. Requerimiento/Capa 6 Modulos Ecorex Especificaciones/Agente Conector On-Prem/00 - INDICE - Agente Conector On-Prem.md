@@ -2,8 +2,8 @@
 tipo: indice-proyecto
 proyecto: Agente Conector On-Prem para Contenedor de datos
 modulo_web: contenedor-datos (Sistema . Datos personalizados)
-estado: especificacion (por construir). ALCANCE EN EXPANSION 2026-07-15 - de agente unico a colmena multi-agente (ver doc 06)
-fecha: 2026-07-11 (actualizado 2026-07-15)
+estado: CONSTRUIDO y verificado (Olas A/B/C + 3 + Navegador + Archivos + MCP + 5a-5d). Pendientes: Ola 4 (scheduler, en pausa) y Ola 6 (endurecimiento, a medias - ver su tabla de estado en el doc 05)
+fecha: 2026-07-11 (auditado contra el codigo y actualizado 2026-07-16)
 autor: documentado por agente IA a partir de decisiones del usuario
 ---
 
@@ -71,17 +71,26 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
 >   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario.)* NO bloquea la Ola 5:
 >   son lados opuestos del cable (Ola 4 = servidor, Ola 5 = empaque del agente).
-> - Cerrar la aceptacion de 5d: instalar de verdad (consola de administrador) y comprobar que el
->   servicio reconecta tras reinicio. Luego `.iss` + firma del ejecutable.
-> - Mas motores de BD; endurecimiento (doc 05 Ola 6).
+> - **Ola 6 - Endurecimiento: A MEDIAS** (auditada contra el codigo el 2026-07-16; tabla punto por
+>   punto en el doc 05). En corto: **hecho** todo lo que protege de un servidor comprometido
+>   (solo-SELECT, allow-lists fail-closed, credencial que no viaja, JS firmado, consentimiento, boveda
+>   con ACL, mutar exige administrador). **Falta** lo de integridad y operacion: **dedup de chunks**
+>   (hoy un chunk reenviado tras reconexion DUPLICA filas), **timeout del pending fetch** (hoy un fetch
+>   sin respuesta espera para siempre), **`Cancel`** (declarado en el contrato pero NO manejado),
+>   **`AgentFetchLog`** (no existe), limites por plan y backplane Redis. **Dedup y timeout son los dos
+>   que muerden en produccion.**
+> - Mas motores de BD (hoy solo SQL Server); `.iss` + firma del ejecutable; arranque tras reinicio real.
 
 # Agente Conector On-Prem - Contenedor de datos
 
-> Capitulo nuevo. Especifica un **agente de escritorio (VB.NET + WPF, Windows)** que se
-> instala en la red del cliente y **alimenta con datos** el modulo "Contenedor de datos"
-> de ECOREX Tareas, disparado por los **horarios que se configuran en el sistema web**
-> o por **refresco inmediato bajo demanda**. La comunicacion es por **WebSocket (SignalR)**.
-> Documentacion auto-contenida para que un sub-agente pueda construirlo sin mas contexto.
+> Especifica un **agente de escritorio Windows (C# / .NET 10)** que se instala en la red del cliente y
+> **alimenta con datos** el modulo "Contenedor de datos" de ECOREX Tareas, disparado por los
+> **horarios que se configuran en el sistema web** o por **refresco inmediato bajo demanda**. La
+> comunicacion es por **WebSocket (SignalR)**. Documentacion auto-contenida para que un sub-agente
+> pueda construirlo sin mas contexto.
+>
+> *(El texto original decia "VB.NET + WPF": corregido el 2026-07-16, D7 confirmo C# + .NET 10. El
+> agente hoy son DOS piezas -Servicio headless + colmena WPF-, ver ADR-0039 y el doc 04.)*
 
 ## 1. En una frase
 
@@ -129,7 +138,7 @@ WPF** en si.
 | [[01 - Vision, arquitectura y decisiones]] | Actores, diagrama, prior-art (Doom WPF legacy), modelo de seguridad, casos de uso |
 | [[02 - Protocolo SignalR (mensajes, handshake, secuencias)]] | Contrato del canal: metodos del hub, mensajes, handshake, secuencias (horario / refresco / offline / chunking) |
 | [[03 - Servidor (Hub + Scheduler + Ingesta)]] | Implementacion servidor: Hub, `Ecorex.Workers` scheduler, conector tipo Agente, ingesta reusando el motor existente |
-| [[04 - Cliente VB.NET WPF (Servicio Windows + config)]] | Arquitectura del agente: Servicio Windows + WPF, cliente SignalR .NET, ejecucion contra fuente local, empaque/instalador |
+| [[04 - Cliente (Servicio Windows + colmena WPF)]] | Arquitectura del agente: Servicio Windows + WPF, cliente SignalR .NET, ejecucion contra fuente local, empaque/instalador |
 | [[05 - Plan de trabajo por olas (para sub-agente)]] | Backlog en olas con criterios de aceptacion; contrato de trabajo para el sub-agente |
 | [[06 - Decision de stack y expansion a colmena multi-agente]] | **(2026-07-15)** Resuelve la duda de stack (.NET 10 / C# / WPF / navegador en Linux -> Windows-first, **D7 CONFIRMADA**) y encuadra la expansion a colmena: orquestador + sub-agentes (gateway / navegador+JS+MCP / archivos), GUI panal, identidad por ClientId (WhatsApp), seguridad de la superficie ampliada |
 | [[07 - Prior-art Doom (orquestador drone + sub-agente navegador WebView2 + MCP)]] | **(2026-07-15)** Ingenieria inversa del sistema Doom (VB.NET 4.8) que el usuario ya construyo: orquestador `ucClienteDrone` que abre sub-agentes, transporte `DroneClientService` (SignalR), y sub-agente navegador `consumoweb_webserver` (WebView2 + inyeccion de JS + servidor MCP con 7 herramientas `browser.*`). Mapeo ORIGEN -> DESTINO |

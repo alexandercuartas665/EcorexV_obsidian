@@ -142,5 +142,5 @@ orquestador abre uno por necesidad y lo cierra al terminar.
 
 Relacionado: [[06 - Decision de stack y expansion a colmena multi-agente]],
 [[01 - Vision, arquitectura y decisiones]], [[02 - Protocolo SignalR (mensajes, handshake, secuencias)]],
-[[04 - Cliente VB.NET WPF (Servicio Windows + config)]],
+[[04 - Cliente (Servicio Windows + colmena WPF)]],
 [[NEWFRONT_web_scraping - Spec para reconstruir]].

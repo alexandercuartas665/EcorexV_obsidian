@@ -206,16 +206,23 @@ salvo donde se indique.
 `stefania@flecto.com.co`, `andresdesarrollador4@gmail.com`, `diasflac1213@gmail.com`,
 `valeriauribecbo@gmail.com`
 
-### SOLDARCO - `e3519cc4-150f-4f63-a0cd-21eb9d59f1fa` (Standard, sucursal 02) - 25 usuarios, todos Owner (migrados 2026-07-14)
-`recepcion@soldarco.com`, `gerenciacomercial@soldarco.com`, `cartera@soldarco.com`,
-`cartera2@soldarco.com`, `soporteventas1@soldarco.com`, `soporteventas2@soldarco.com`,
-`comercial3@soldarco.com`, `comercial6@soldarco.com`, `comercial7@soldarco.com`,
-`comercial9@soldarco.com`, `comercial14@soldarco.com`, `comercial18@soldarco.com`,
-`contabilidad@soldarco.com`, `gestion@soldarco.com`, `auxiliaradmin@soldarco.com`,
-`administracion@soldarco.com`, `almacen@soldarco.com`, `postventa@soldarco.com`,
-`serviciotecnico1@soldarco.com`, `cristianddiaz@bitcode.com.co`, `freiderclondono@bitcode.com.co`
-(el correo real lleva enie), `hectorfrivera@bitcode.com.co`, `lauraccamila@bitcode.com.co`,
-`sharonfruiz@bitcode.com.co`, `gdiaz@autoliderazgoyliderazgodequipos.com`
+### SOLDARCO - `e3519cc4-150f-4f63-a0cd-21eb9d59f1fa` (Standard) - 19 usuarios, todos Owner (recargado 2026-07-14)
+> OJO: SOLDARCO **no** sale de db3dev. Su sistema vive en **otro servidor** (`192.168.0.8`, BD
+> `M700_GEN`, tabla `USUARIO`). El primer cargue (25 usuarios desde db3dev sucursal 02) fue del
+> servidor EQUIVOCADO y se borro por completo; este es el padron bueno.
+
+`gerenciacomercial@soldarco.com`, `acuartas@bitcode.com.co`, `almacen@soldarco.com`,
+`recepcion@soldarco.com`, `cartera@soldarco.com`, `cartera2@soldarco.com`,
+`comercial3@soldarco.com`, `comercial7@soldarco.com`, `comercial18@soldarco.com`,
+`soporteventas1@soldarco.com`, `serviciotecnico1@soldarco.com`, `marketing@soldarco.com`,
+`auxiliarlogistica@soldarco.com`, `administracion@soldarco.com`, `david.plaza@dtruestar.com.co`
+(externo/proveedor), y 4 con login DERIVADO de su cedula: `94533986@`, `1089508259@`,
+`1144031427@`, `1113684162@` `soldarco.com`.
+
+Notas: (a) `acuartas@bitcode.com.co` es la MISMA cuenta que en BITCODE (multi-tenant real: un usuario
+en 2 empresas). (b) Los 4 logins numericos son de gente que en el origen no tenia correo, o lo tenia
+mal formado, o lo compartia con otra persona. (c) 6 usuarios del origen NO se pudieron crear por no
+tener NI correo NI cedula.
 
 ### AGROMETALICAS - `019f478d-6428-7283-a5cd-b7e35f802ef3` (Standard) - 1 usuario, Owner
 `calidad@agrometalicas.com`

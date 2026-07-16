@@ -54,7 +54,7 @@ Linux mas adelante NO sea un reescribir.
 | Canal | **SignalR/WebSocket** saliente | ya decidido (D1); sin puertos entrantes |
 | Navegador | **Playwright .NET** (Chromium) | headless por defecto; headful opcional en Windows |
 | Archivos | System.IO + capa OS abstraida | portable |
-| Gateway BD | proveedores por motor (SqlClient/Npgsql/MySqlConnector/Oracle) | ya en [[04 - Cliente VB.NET WPF (Servicio Windows + config)|doc 04]] |
+| Gateway BD | proveedores por motor (SqlClient/Npgsql/MySqlConnector/Oracle) | ya en [[04 - Cliente (Servicio Windows + colmena WPF)|doc 04]] |
 
 > Cambio vs docs previos: el doc 04 decia "VB.NET + .NET 8". La recomendacion actualizada es
 > **.NET 10 + C#**. Se deja como D7 a confirmar antes de tocar el doc 04 a fondo.
@@ -283,6 +283,6 @@ navegador del sistema Doom (VB.NET 4.8) -> documentado en
 el prior-art del **sub-agente Archivos** (dir de codigo, si existe).
 
 Relacionado: [[00 - INDICE - Agente Conector On-Prem]], [[01 - Vision, arquitectura y decisiones]],
-[[04 - Cliente VB.NET WPF (Servicio Windows + config)]],
+[[04 - Cliente (Servicio Windows + colmena WPF)]],
 [[Programar actividad - Motor de programaciones (000889)]],
 [[NEWFRONT_web_scraping - Spec para reconstruir]].

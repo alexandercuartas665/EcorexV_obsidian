@@ -46,9 +46,9 @@ Agente (o un cliente de prueba temporal en .NET):
 
 ## Ola 2 - Ejecucion real contra BD local (agente)
 
-- `EcorexAgent.Core` (VB.NET): ejecuta `FetchRequest.query` parametrizado contra la fuente
+- `Ecorex.Agent.Core` (C# / .NET 10): ejecuta `FetchRequest.query` parametrizado contra la fuente
   segun `dbEngine` (empezar por SQL Server), lectura por lotes, chunking, whitelist + solo-lectura.
-- Devuelve filas como `Dictionary(Of String,String)`.
+- Devuelve filas como `Dictionary<string,string>`.
 - **Aceptacion**: con una BD SQL Server de prueba, el agente recibe una consulta, la ejecuta y
   responde las filas en chunks; una consulta no-SELECT o fuera de whitelist es rechazada.
 
@@ -200,6 +200,32 @@ Agente (o un cliente de prueba temporal en .NET):
 - Multi-instancia del hub (backplane Redis) si aplica.
 - **Aceptacion**: pruebas de seguridad (rechazo de no-SELECT, fuera de whitelist, cert
   invalido); pruebas de resiliencia (reconexion, chunk duplicado, timeout).
+
+> **ESTADO REAL (auditado 2026-07-16 contra el codigo, no de memoria).** La ola esta **a medias sin
+> que nadie lo hubiera anotado**: la seguridad se fue construyendo por el camino, pero la
+> **robustez/auditoria sigue intacta**. Punto por punto:
+>
+> | Punto de la Ola 6 | Estado |
+> |---|---|
+> | Credencial gestionada por el agente (opcion b) | **HECHO** (Ola C): vive en la boveda, no viaja |
+> | Rechazo de no-SELECT | **HECHO** (`QueryGuard`), verificado |
+> | Rechazo fuera de allow-list (dominios y rutas) | **HECHO**, fail-closed, verificado |
+> | Reconexion | **HECHO** (backoff 0/2/5/10/30/60s), verificada |
+> | *(extra, no estaba en la lista)* JS del servidor **firmado** | **HECHO** (doc 06 s4) |
+> | *(extra)* Consentimiento local por capacidad | **HECHO** |
+> | *(extra)* Boveda con DPAPI de **maquina** + ACL SYSTEM/Admins | **HECHO** (Ola 5b) |
+> | *(extra)* **Mutar config exige Administrador** (impersonacion en el pipe) | **HECHO** (Ola 5c) |
+> | **TLS estricto** | **PENDIENTE**. La validacion de certificados de .NET esta activa y nadie la desactiva (o sea: un cert invalido YA se rechaza), pero **no se exige https**: hoy un `http://` se acepta sin chistar. Falta el rechazo explicito + la prueba con cert invalido. |
+> | **Dedup de chunks** por (`correlationId`,`chunkIndex`) | **PENDIENTE**. Hoy un chunk reenviado tras una reconexion se **ingesta dos veces**: duplica filas. |
+> | **Timeout del pending fetch** | **PENDIENTE**. Un `FetchRequest` sin respuesta queda esperando **para siempre** (fuga de memoria + import colgado). El doc 02 s10 lo pedia (5 min). |
+> | **Cancelacion** | **PENDIENTE, y con trampa**: `Cancel` esta **declarado en el contrato pero el agente NO lo maneja**. El protocolo anuncia algo que no existe. |
+> | **Auditoria `AgentFetchLog`** | **PENDIENTE**: no existe la entidad. Hoy no queda rastro persistente de que pidio el servidor ni que devolvio el agente. |
+> | **Limites por plan** (cupos de filas/frecuencia) | **PENDIENTE** |
+> | **Backplane Redis** (multi-instancia del hub) | **PENDIENTE**. Hoy `InMemoryAgentRegistry` -> con 2+ instancias del servidor, una no sabe de los agentes de la otra. Solo importa si se escala horizontal. |
+>
+> **Lectura**: lo que protege de un **servidor comprometido** (que era el miedo original) esta hecho.
+> Lo que falta es **integridad de datos** (dedup), **no quedarse colgado** (timeout/cancel) y **poder
+> auditar** (`AgentFetchLog`). El dedup y el timeout son los dos que muerden en produccion.
 
 ## Backlog (post v1)
 

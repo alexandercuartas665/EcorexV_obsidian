@@ -79,5 +79,5 @@ que un sub-agente lo construya. Ver subcarpeta `Agente Conector On-Prem/`:
 - [[01 - Vision, arquitectura y decisiones]]
 - [[02 - Protocolo SignalR (mensajes, handshake, secuencias)]]
 - [[03 - Servidor (Hub + Scheduler + Ingesta)]]
-- [[04 - Cliente VB.NET WPF (Servicio Windows + config)]]
+- [[04 - Cliente (Servicio Windows + colmena WPF)]]
 - [[05 - Plan de trabajo por olas (para sub-agente)]]

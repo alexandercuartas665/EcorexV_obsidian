@@ -12,6 +12,20 @@ proposito: Vision, actores, diagrama, prior-art, seguridad y casos de uso del ag
 > local; ver [[06 - Decision de stack y expansion a colmena multi-agente]]. Este Gateway es una
 > de las capacidades de esa colmena.
 
+> [!success] CONSTRUIDO (actualizado 2026-07-16)
+> La vision de este doc **se cumplio**: el agente conecta saliente, el servidor le empuja ordenes y las
+> filas aterrizan en el contenedor. Verificado E2E contra SQL Server real de la LAN.
+>
+> El texto de abajo ya quedo corregido en lo que habia envejecido (decia "VB.NET + WPF"; el stack real
+> es **C# + .NET 10**, D7). Lo unico que el diagrama de la s3 sigue simplificando: el agente son **dos
+> piezas** (ADR-0039), un **Servicio** dueno de identidad/canal/boveda que corre aunque nadie inicie
+> sesion, y la **colmena WPF que es su CLIENTE** y le presta el escritorio al Navegador. La colmena ya
+> no configura por su cuenta: se lo pide al servicio, que exige administrador para aceptarlo. Detalle
+> en [[04 - Cliente (Servicio Windows + colmena WPF)]].
+>
+> De la **s7 (politica de credencial)** se implemento la **opcion (b)**: la credencial de la fuente
+> vive solo en el agente y **nunca viaja** por el canal.
+
 ## 1. Problema
 
 El "Contenedor de datos" ya sabe importar desde Excel y desde APIs REST publicas
@@ -25,7 +39,9 @@ en el cliente y sin exponer su BD a internet.
 
 - **Servidor ECOREX (web)**: dueno de la configuracion (contenedores, conectores, horarios,
   credenciales cifradas) y de la ingesta. Corre el **Hub SignalR** y el **scheduler**.
-- **Agente On-Prem (cliente)**: app Windows (VB.NET + WPF) instalada en la red del cliente.
+- **Agente On-Prem (cliente)**: Windows, **C# / .NET 10**, instalado en la red del cliente. Son DOS
+  piezas (ADR-0039): un **Servicio** headless (LocalSystem) que sostiene el canal aunque nadie inicie
+  sesion, y la **colmena WPF** que lo muestra y le presta el escritorio al Navegador.
   Marca una conexion SignalR **saliente** al servidor y queda a la espera de ordenes. Es
   **tonto**: no sabe de horarios; solo ejecuta la consulta que le mandan contra la fuente
   local y devuelve filas.
@@ -68,8 +84,7 @@ Diferencias del nuevo diseno (moderniza el patron):
   (el servidor ordena en tiempo real; soporta refresco inmediato).
 - Antes: configuracion en tablas propias. Ahora: reusa `DataConnector`/`ImportProcess`/
   `DataClient` del Contenedor de datos ya construido.
-- Antes: .NET Framework 4.8.1. Ahora: agente en **.NET moderno** recomendado (ver doc 04),
-  aunque VB.NET + WPF sigue siendo viable.
+- Antes: .NET Framework 4.8.1. Ahora: **.NET 10 + C#** (D7 confirmada; ver doc 04).
 
 ## 5. Modelo de "cliente tonto" (clave del diseno)
 
@@ -130,5 +145,5 @@ El agente SI contiene (minimo local):
 
 - Protocolo detallado: [[02 - Protocolo SignalR (mensajes, handshake, secuencias)]]
 - Servidor: [[03 - Servidor (Hub + Scheduler + Ingesta)]]
-- Cliente: [[04 - Cliente VB.NET WPF (Servicio Windows + config)]]
+- Cliente: [[04 - Cliente (Servicio Windows + colmena WPF)]]
 - Plan de construccion: [[05 - Plan de trabajo por olas (para sub-agente)]]
