@@ -220,8 +220,15 @@ salvo donde se indique.
 ### AGROMETALICAS - `019f478d-6428-7283-a5cd-b7e35f802ef3` (Standard) - 1 usuario, Owner
 `calidad@agrometalicas.com`
 
-### CHUZO DE IVAN - `72450050-a07d-40a1-9df0-f611cfcfa48b` (Standard) - 0 usuarios
-Tenant recien creado (2026-07-14); aun sin usuarios (el cliente no los ha entregado).
+### CHUZO DE IVAN - `72450050-a07d-40a1-9df0-f611cfcfa48b` (Standard) - 1 usuario, Owner
+`sml1144@hotmail.com` (Samantha Mora), alta manual 2026-07-14. El resto de usuarios aun no los entrega el cliente.
+
+### EPRING - (Standard, sucursal 00004) - 7 usuarios, todos Owner (creado 2026-07-14)
+`asisgerencial@epring.co`, `proyectos6@epring.co`, `ventas8@epring.co`, `ventas5@epring.co`,
+`1114058282@epring.co`, `1144076414@epring.co`, `agente@epring.com.co`.
+Notas: (a) los 2 logins numericos son de usuarios que en el legacy tenian correo `@equipelco.com`;
+por decision del usuario su login se derivo de la cedula sobre `@epring.co` (la clave sigue siendo la
+cedula). (b) `agente@epring.com.co` es una cuenta de AGENTE (no persona) y su clave NO es una cedula.
 
 ### PLATAFORMA ECOREX - `019f2d5f-cc42-7492-9eba-0217996338b1` (Internal) - 1 usuario
 `admin@ecorex.local` (Owner). Es tambien el Super Admin de plataforma; su clave es el secreto

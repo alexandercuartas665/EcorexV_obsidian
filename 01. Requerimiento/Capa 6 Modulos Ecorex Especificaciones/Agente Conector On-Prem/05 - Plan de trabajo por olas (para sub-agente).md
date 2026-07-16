@@ -175,12 +175,23 @@ Agente (o un cliente de prueba temporal en .NET):
 > **No hay Inno ni WiX en la maquina**: un `.iss` seria codigo imposible de compilar o probar, asi que
 > el instalador PowerShell ES el entregable (y es lo que un `.iss` acabaria invocando).
 >
-> **NO verificado**: la instalacion en si (el UAC se cancelo; no se registro ningun servicio). Queda
-> pendiente la aceptacion de esta ola: "instalable en Windows limpio; el servicio reconecta tras
-> reinicio; la colmena muestra el estado real".
+> **ACEPTACION CERRADA (2026-07-16, instalado y desinstalado de verdad)**: servicio **Running**, Auto,
+> LocalSystem y **sin consola**; el hub le **despacha ordenes** (solo despacha a agentes en linea); la
+> colmena instalada muestra **"En linea"** con el estado que le publica el servicio por el pipe; el
+> desinstalador no deja rastro y **conserva la boveda**.
 >
-> **Pendiente**: `.iss` + firma del ejecutable; y bajar los 271 MB (ReadyToRun / framework-dependent)
-> si se acepta exigir el runtime.
+> **Dos bugs reales corregidos** (rompian promesas del propio README):
+> - **El Visor de eventos estaba MUDO**: el origen no existia (crear uno exige privilegio y el
+>   proveedor de EventLog no avisa, solo deja de escribir) **y** el proveedor filtra en `Warning` por
+>   defecto, asi que "Conectado a X como Y" se descartaba. Ahora el instalador registra el origen y el
+>   servicio baja el filtro a Information.
+> - El desinstalador dejaba `C:\Program Files\ECOREX` huerfana.
+>
+> **NO verificado**: el arranque tras REINICIO real del equipo. Consta `StartMode=Auto` (el mecanismo)
+> y que el servicio arranca y conecta solo.
+>
+> **Pendiente**: `.iss` + firma del ejecutable. El peso (271 MB) **se queda asi** por decision del
+> usuario (2026-07-16): esta bien a cambio de no exigir el runtime en la maquina del cliente.
 
 ## Ola 6 - Endurecimiento (seguridad + robustez)
 

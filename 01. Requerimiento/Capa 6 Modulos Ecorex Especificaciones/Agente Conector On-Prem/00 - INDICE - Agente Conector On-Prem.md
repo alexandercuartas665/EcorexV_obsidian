@@ -60,7 +60,12 @@ autor: documentado por agente IA a partir de decisiones del usuario
 >   - **5c** canal local (named pipe): la colmena es CLIENTE del servicio, pinta el estado real,
 >     configura (solo administradores) y le **presta el escritorio al Navegador**. Verificado E2E.
 >   - **5d** instalador en `deploy/agent/` (publish autocontenido + install + uninstall + README).
->     **La instalacion en si quedo sin verificar** (UAC cancelado).
+>     **Aceptacion CERRADA**: instalado y desinstalado de verdad en una maquina; servicio Running/Auto/
+>     LocalSystem y sin consola, el hub le despacha ordenes, la colmena instalada muestra "En linea" y
+>     el desinstalador no deja rastro (conservando la boveda). Falta solo el `.iss` + firma.
+>
+> **La Ola 5 esta COMPLETA y verificada** (salvo el arranque tras reinicio real del equipo, para el que
+> consta `StartMode=Auto` y que el servicio arranca y conecta solo).
 >
 > **Pendiente / NO iniciado**:
 > - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
