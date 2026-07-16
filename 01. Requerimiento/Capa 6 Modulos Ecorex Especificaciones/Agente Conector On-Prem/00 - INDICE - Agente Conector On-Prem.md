@@ -40,6 +40,9 @@ autor: documentado por agente IA a partir de decisiones del usuario
 >   `file.*`) para que un cliente/IA local maneje el navegador y los archivos, respetando las allow-lists.
 > - **Endurecimiento del Navegador** (doc 06 s4): el JS del hub va FIRMADO (HMAC del secreto sobre
 >   correlationId|payload) y el agente lo verifica fail-closed; el JS por MCP local va sin firma.
+> - **Consentimiento local + UI de allow-lists** (doc 06 s4): el operador habilita cada capacidad
+>   sensible y edita su allow-list desde un flyout de la colmena; fail-closed por defecto (hub y MCP).
+>   Con esto quedan implementados TODOS los guardrails de seguridad de s4.
 >
 > **Detalle por doc**: recuadros "[CONSTRUIDO]" en docs 03/05/06; bitacora en `PROGRESO.md` del repo.
 >

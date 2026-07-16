@@ -190,6 +190,10 @@ remotamente. Debe tratarse como tal (esto es lo que MAS hay que cuidar):
   solo accede a las rutas permitidas.
 - **Consentimiento local explicito**: activar capacidades sensibles (archivos / navegador)
   exige que el operador lo habilite en la colmena, no basta que la nube lo pida.
+  **[IMPLEMENTADO 2026-07-15]**: `CapabilityConsent` (DPAPI, fail-closed por defecto); el operador
+  habilita cada capacidad y edita su allow-list desde un flyout de la colmena (clic en la celda
+  Navegador/Archivos). Los sub-agentes rechazan toda orden -del hub Y del MCP local- si la capacidad
+  no esta habilitada. Verificado: sin habilitar -> bloqueado; al habilitar -> funciona.
 - **Base ya definida** (aplica a TODOS los sub-agentes): handshake autenticado (HMAC del
   secreto), tenant scoping, WSS/TLS siempre, auditoria total (ver [[01 - Vision, arquitectura y decisiones]] s7).
 
@@ -244,12 +248,13 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       catalogo browser.* (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios
       local (DPAPI) + **servidor MCP localhost** (JSON-RPC, `tools/list`/`tools/call`) para clientes/IA
       locales. Verificado E2E por el hub y por MCP (example.com ok; dominio no permitido -> bloqueado).
-      Ver recuadros en 3.2. Endurecido: **JS del hub firmado (HMAC), verificado fail-closed**.
-      **Pendiente**: UI de allow-list en la colmena.
+      Ver recuadros en 3.2. Endurecido: **JS del hub firmado (HMAC)** + **consentimiento local +
+      allow-list editable desde la colmena** (fail-closed). Sin pendientes de seguridad de §4.
 - [~] **Sub-agente Archivos (Files-1/2/3)** (2026-07-15): acciones tipadas List/Read/Write/Delete/
       Exists/MakeDir acotadas a la allow-list de rutas local (DPAPI, sin traversal) + expuesto por MCP
       (`file.*`). Verificado E2E por hub y por MCP (sandbox ok; fuera de la allow-list bloqueado). Ver
-      recuadro en 3.2. **Pendiente**: binarios base64, UI de allow-list, read-only vs read-write.
+      recuadro en 3.2. Consentimiento + allow-list de rutas editables desde la colmena (fail-closed).
+      **Pendiente**: binarios base64, read-only vs read-write por raiz.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en
