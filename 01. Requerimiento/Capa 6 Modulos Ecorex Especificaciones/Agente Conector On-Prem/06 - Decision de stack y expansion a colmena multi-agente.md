@@ -123,7 +123,12 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
 > `AgenteHub.FileResult` + endpoint dev; y expuesto por el **servidor MCP** como `file.*` (6 tools),
 > junto a las `browser.*` (`AgentMcpServer` publica 13 tools). Verificado E2E por el hub y por MCP:
 > write/list/read dentro del sandbox ok; leer `C:\Windows\win.ini` (fuera de la allow-list) -> bloqueado.
-> **Pendiente**: lectura de binarios (base64), UI de allow-list, read-only vs read-write por raiz.
+>
+> **[AMPLIADO 2026-07-15]** `ReadBytes` (binarios -> base64, tope 5 MB; tool MCP `file.readBytes`) y
+> **permisos POR RAIZ** (least privilege): una raiz es de **solo lectura** por defecto y admite
+> escritura solo con el prefijo **`rw:`** (ej. `C:\Datos` = ro, `rw:C:\Salida` = rw). `Write`/`Delete`/
+> `MakeDir` exigen raiz `rw:`. Verificado: readBytes de un PNG -> base64 ok; read en raiz ro -> ok;
+> write en raiz ro -> rechazado ("exige una raiz marcada 'rw:'"); write en raiz rw -> ok.
 
 ### 3.3 GUI colmena (aspecto de panal)
 
@@ -254,7 +259,8 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       Exists/MakeDir acotadas a la allow-list de rutas local (DPAPI, sin traversal) + expuesto por MCP
       (`file.*`). Verificado E2E por hub y por MCP (sandbox ok; fuera de la allow-list bloqueado). Ver
       recuadro en 3.2. Consentimiento + allow-list de rutas editables desde la colmena (fail-closed).
-      **Pendiente**: binarios base64, read-only vs read-write por raiz.
+      Ampliado: **binarios en base64** (`ReadBytes`) y **permisos por raiz** (solo lectura por defecto;
+      `rw:` habilita escritura). Sin pendientes conocidos.
 
 Prior-art minado (2026-07-15): el usuario entrego el codigo del orquestador y del sub-agente
 navegador del sistema Doom (VB.NET 4.8) -> documentado en

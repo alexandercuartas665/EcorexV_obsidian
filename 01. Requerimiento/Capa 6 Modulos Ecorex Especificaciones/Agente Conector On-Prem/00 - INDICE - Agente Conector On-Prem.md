@@ -34,8 +34,9 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > - **Sub-agente Navegador** (doc 06 s3.2 / prior-art doc 07): WebView2 + las 7 acciones tipadas
 >   (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios local (DPAPI).
 >   Verificado E2E por el hub y por MCP (navega + inyecta JS + captura; dominio no permitido bloqueado).
-> - **Sub-agente Archivos** (doc 06 s3.2): acciones tipadas List/Read/Write/Delete/Exists/MakeDir
->   acotadas a la allow-list de rutas local (DPAPI, sin traversal). Verificado E2E por hub y por MCP.
+> - **Sub-agente Archivos** (doc 06 s3.2): acciones tipadas List/Read/ReadBytes(base64)/Write/Delete/
+>   Exists/MakeDir acotadas a la allow-list de rutas local (DPAPI, sin traversal), con **permisos por
+>   raiz** (solo lectura por defecto; `rw:` habilita escritura). Verificado E2E por hub y por MCP.
 > - **Servidor MCP local** (`AgentMcpServer`, 127.0.0.1, JSON-RPC): publica 13 tools (`browser.*` +
 >   `file.*`) para que un cliente/IA local maneje el navegador y los archivos, respetando las allow-lists.
 > - **Endurecimiento del Navegador** (doc 06 s4): el JS del hub va FIRMADO (HMAC del secreto sobre
