@@ -75,9 +75,16 @@ Agente (o un cliente de prueba temporal en .NET):
 > **[CONSTRUIDO 2026-07-15] Ingesta via agente**: `IRowIngestService` (nucleo EAV reutilizable) +
 > `IAgentImportService` (pending-fetch + dispatch + on-result/on-failed) cableado en `AgenteHub`.
 > Verificado E2E con `ciudades` (SQL Server real): Replace `ins=20`, 2o Replace `del/ins=20`, Upsert
-> `upd=20` sin duplicar. **Pendiente de esta ola**: migrar `ApiImportService` (REST) al nucleo
-> compartido (follow-up mecanico) y `DataConnector.RunsViaAgent`+consulta+migracion (se puede hacer
-> junto al scheduler de la Ola 4).
+> `upd=20` sin duplicar.
+>
+> **[CONSTRUIDO 2026-07-16] REST migrado al nucleo**: `ApiImportService` ya no escribe filas por su
+> cuenta (se borraron sus `InsertRow`/`DeleteAllRowsAsync`): abre una sesion del nucleo, `PrepareAsync`
+> y manda cada pagina como chunk, conservando un SaveChanges por pagina y el tope de 5000 filas. Con
+> esto se cumple la aceptacion "mismos outcomes que el import REST" por construccion: es el MISMO
+> codigo. Cubierto por 5 tests unit del nucleo (`RowIngestServiceTests`, EF InMemory).
+>
+> **Pendiente de esta ola**: `DataConnector.RunsViaAgent`+consulta+migracion (se puede hacer junto al
+> scheduler de la Ola 4).
 
 ## Ola 4 - Scheduler + refresco inmediato
 

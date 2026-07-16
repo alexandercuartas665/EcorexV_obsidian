@@ -144,13 +144,17 @@ clave). Refactor recomendado:
 - [x] `POST /api/agente/token` (HMAC -> JWT corto). Handshake opcion A completo (nonce + ts +/-120s).
 - [ ] `DataConnector.RunsViaAgent` + `DataClientId` + consulta + migracion.
 - [x] `IRowIngestService` (nucleo de ingesta EAV Append/Replace/Upsert por sesion, en
-      `Ecorex.Application/DataContainers/RowIngestService.cs`). Usado por el importador via agente.
-      **Follow-up**: migrar `ApiImportService` (REST) a este nucleo (mecanico, se dejo intacto para no
-      tocar el path REST sin sus tests de integracion Docker).
+      `Ecorex.Application/DataContainers/RowIngestService.cs`). **Un solo camino de escritura**: lo usan
+      TANTO el importador via agente COMO `ApiImportService` (REST), migrado el 2026-07-16. El REST abre
+      la sesion, `PrepareAsync` (Replace: vacia; Upsert: precarga la clave) y manda cada pagina como un
+      chunk (un SaveChanges por pagina, igual que antes); los contadores salen de la sesion.
+- [x] Tests unit del nucleo: `tests/Ecorex.Application.Tests/RowIngestServiceTests.cs` (5, EF InMemory):
+      Append (fila+celdas, TenantId), Append en 2 chunks, Replace (vacia antes), Upsert (actualiza por
+      clave sin duplicar) y Upsert con claves repetidas en la misma corrida (gana la ultima).
 - [x] `IAgentImportService` (dispatch + on-result + on-failed) en `Ecorex.SuperAdmin/Agents/
       AgentImportService.cs`: pending-fetch por correlationId, acumula chunks y en el ultimo ingiere
       via `IRowIngestService` (scope propio con el tenant fijado). Cableado en `AgenteHub`.
 - [ ] `ImportSchedulerService` en `Ecorex.Workers` (Intervalo/Cron + offline handling).
 - [ ] UI: opcion "via agente", estado en linea, "Refrescar ahora".
-- [ ] Tests: unit (ingesta/upsert), integracion dual PG/SQLServer, y un test de canal con un
-      agente fake (cliente SignalR de prueba).
+- [ ] Tests: ~~unit (ingesta/upsert)~~ HECHO (ver arriba); falta integracion dual PG/SQLServer y un
+      test de canal con un agente fake (cliente SignalR de prueba).

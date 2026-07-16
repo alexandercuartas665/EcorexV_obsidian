@@ -30,7 +30,9 @@ autor: documentado por agente IA a partir de decisiones del usuario
 >   Probado contra `M700_GEN`/`ciudades`.
 > - **Ola 3 - ingesta en el servidor** (doc 03 s6 / doc 05 Ola 3): `IRowIngestService` (nucleo EAV
 >   reutilizable) + `IAgentImportService` (pending-fetch + dispatch + on-result); el `FetchResult`
->   aterriza como filas del contenedor (Replace/Upsert verificados).
+>   aterriza como filas del contenedor (Replace/Upsert verificados). **Cerrada el 2026-07-16**: el
+>   import REST (`ApiImportService`) tambien migro al nucleo, asi que agente y REST escriben por el
+>   MISMO camino, con 5 tests unit que fijan Append/Replace/Upsert.
 > - **Sub-agente Navegador** (doc 06 s3.2 / prior-art doc 07): WebView2 + las 7 acciones tipadas
 >   (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios local (DPAPI).
 >   Verificado E2E por el hub y por MCP (navega + inyecta JS + captura; dominio no permitido bloqueado).
@@ -51,8 +53,7 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
 >   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario: primero hara ajustes en
 >   el modulo de contenedores.)*
-> - Follow-up: migrar `ApiImportService` (REST) al nucleo `IRowIngestService` (mecanico).
-> - Sub-agentes **Archivos** y **Navegador** (colmena, doc 06); mas motores de BD; empaque como
+> - Mas motores de BD; empaque como
 >   Servicio Windows + instalador (doc 04); endurecimiento (doc 05 Ola 6).
 
 # Agente Conector On-Prem - Contenedor de datos
