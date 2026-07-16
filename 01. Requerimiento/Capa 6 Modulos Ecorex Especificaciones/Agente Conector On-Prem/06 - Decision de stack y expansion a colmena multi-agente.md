@@ -102,7 +102,17 @@ Es extensible: capacidades nuevas = sub-agentes nuevos, sin tocar el orquestador
 > (historial). Comparte la MISMA instancia WebView2 que el hub y marshala al hilo de UI; respeta la
 > allow-list. Devuelve contenido MCP (texto + imagen PNG). Verificado por JSON-RPC: `tools/list` = 7
 > tools; `tools/call` navigate+eval+screenshot ok; navegar a un dominio no permitido -> `isError:true`.
-> **Pendiente**: JS firmado/versionado por el servidor, UI de la allow-list en la colmena.
+> **Pendiente**: UI de la allow-list en la colmena.
+
+> **[CONSTRUIDO 2026-07-15] Endurecimiento - JS firmado por el servidor (doc 06 s4).** El JS que el
+> servidor inyecta por el HUB (`Eval`, `Mouse`, `Wait` con condicion) debe venir FIRMADO: HMAC-SHA256
+> del secreto del `DataClient` sobre `correlationId|payload` (`AgentSign`, en los contratos; ligar al
+> correlationId da anti-replay/versionado). `RealHiveConnection` verifica en tiempo constante ANTES de
+> ejecutar; **fail-closed**: sin firma valida (o sin secreto local) no corre nada. El JS por **MCP
+> local** (loopback) va SIN firma (confianza local). El servidor firma con `ISecretProtector`+el
+> secreto del cliente. Verificado E2E: firmado -> ejecuta (Eval "Example Domain" + screenshot);
+> `nosign` -> `Firma de JS invalida o ausente para la accion Eval` (rechazado). Ademas se subio el
+> limite de mensaje del `AgenteHub` a 32 MB (los `BrowserResult`/`FetchResult` grandes pasaban de 32 KB).
 
 > **[CONSTRUIDO 2026-07-15] Sub-agente Archivos - Files-1/2/3.** Tercera capacidad de la colmena.
 > `FileSubAgent` ejecuta acciones TIPADAS: `List`, `Read` (tope 1 MB), `Write`, `Delete`, `Exists`,
@@ -173,6 +183,9 @@ remotamente. Debe tratarse como tal (esto es lo que MAS hay que cuidar):
   (herramientas MCP acotadas), NO un canal generico "ejecuta lo que te diga".
 - **JS inyectado con limites**: idealmente **firmado/versionado** por el servidor y acotado a
   dominios permitidos; nunca JS arbitrario en cualquier pagina (banca, correo, etc.).
+  **[IMPLEMENTADO 2026-07-15]**: el JS del HUB (`Eval`/`Mouse`/`Wait`-condicion) va firmado con HMAC
+  del secreto del cliente sobre `correlationId|payload` y el agente lo verifica fail-closed; el JS por
+  MCP local (loopback) va sin firma. Ver recuadro en 3.2. Acotado a la allow-list de dominios (ya).
 - **Least privilege**: el servicio corre con el minimo de permisos; el sub-agente de archivos
   solo accede a las rutas permitidas.
 - **Consentimiento local explicito**: activar capacidades sensibles (archivos / navegador)
@@ -231,7 +244,8 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
       catalogo browser.* (navigate/eval/wait/screenshot/html/mouse/downloads) + allow-list de dominios
       local (DPAPI) + **servidor MCP localhost** (JSON-RPC, `tools/list`/`tools/call`) para clientes/IA
       locales. Verificado E2E por el hub y por MCP (example.com ok; dominio no permitido -> bloqueado).
-      Ver recuadros en 3.2. **Pendiente**: JS firmado/versionado por el servidor, UI de allow-list.
+      Ver recuadros en 3.2. Endurecido: **JS del hub firmado (HMAC), verificado fail-closed**.
+      **Pendiente**: UI de allow-list en la colmena.
 - [~] **Sub-agente Archivos (Files-1/2/3)** (2026-07-15): acciones tipadas List/Read/Write/Delete/
       Exists/MakeDir acotadas a la allow-list de rutas local (DPAPI, sin traversal) + expuesto por MCP
       (`file.*`). Verificado E2E por hub y por MCP (sandbox ok; fuera de la allow-list bloqueado). Ver
