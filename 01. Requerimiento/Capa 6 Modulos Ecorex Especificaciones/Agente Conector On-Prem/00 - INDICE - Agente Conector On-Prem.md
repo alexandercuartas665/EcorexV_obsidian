@@ -53,12 +53,21 @@ autor: documentado por agente IA a partir de decisiones del usuario
 >
 > **Detalle por doc**: recuadros "[CONSTRUIDO]" en docs 03/05/06; bitacora en `PROGRESO.md` del repo.
 >
+> - **Ola 5 - empaque COMPLETA** (ADR-0039; D8 despliegue = ambos escenarios, D9 cuenta = LocalSystem):
+>   - **5a** nucleo `Ecorex.Agent.Core` sin WPF + seam `IBrowserSubAgent`.
+>   - **5b** boveda de MAQUINA (`%ProgramData%` + DPAPI de maquina + ACL) unificada en `AgentVault`
+>     (el P/Invoke estaba duplicado en los 5 stores) + `Ecorex.Agent.Service` (Worker, LocalSystem).
+>   - **5c** canal local (named pipe): la colmena es CLIENTE del servicio, pinta el estado real,
+>     configura (solo administradores) y le **presta el escritorio al Navegador**. Verificado E2E.
+>   - **5d** instalador en `deploy/agent/` (publish autocontenido + install + uninstall + README).
+>     **La instalacion en si quedo sin verificar** (UAC cancelado).
+>
 > **Pendiente / NO iniciado**:
 > - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
 >   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario.)* NO bloquea la Ola 5:
 >   son lados opuestos del cable (Ola 4 = servidor, Ola 5 = empaque del agente).
-> - **Ola 5b/5c/5d** - Worker Service + store de maquina; IPC named pipe (estado/config/delegacion del
->   Navegador); instalador. Gobernadas por **ADR-0039** (ver D8 en doc 06 s6).
+> - Cerrar la aceptacion de 5d: instalar de verdad (consola de administrador) y comprobar que el
+>   servicio reconecta tras reinicio. Luego `.iss` + firma del ejecutable.
 > - Mas motores de BD; endurecimiento (doc 05 Ola 6).
 
 # Agente Conector On-Prem - Contenedor de datos

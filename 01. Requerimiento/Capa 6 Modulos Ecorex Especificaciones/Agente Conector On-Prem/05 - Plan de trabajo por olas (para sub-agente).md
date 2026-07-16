@@ -141,12 +141,46 @@ Agente (o un cliente de prueba temporal en .NET):
 > el agente hasta que exista el pipe (5c)**. 5b y 5c estan acoplados; entre medias se configura con
 > `--save-config` desde consola de administrador (lo mismo que hara el instalador).
 >
-> **NO verificado aun**: el servicio CONECTADO al hub de punta a punta (se cancelo el UAC en la
-> prueba). El handshake HMAC contra el hub real si esta verificado por separado.
+> **Cerrado el 2026-07-16**: el servicio CONECTA al hub de punta a punta leyendo su identidad de la
+> boveda de maquina (`Conectado a .../hubs/agente como cli_dev_agent`).
+
+> **[CONSTRUIDO 2026-07-16] Ola 5c - canal local (named pipe)**. Confirmo lo previsto: sin este canal
+> NO se puede configurar el agente, porque la colmena ya no abre la boveda. No fue cirugia: los dos
+> seams ya existian, asi que son dos implementaciones nuevas (`PipeHiveConnection : IHiveConnection`
+> -> **el ViewModel y el panal no cambiaron**; `DelegatedBrowserSubAgent : IBrowserSubAgent` -> el
+> canal y el MCP no se enteran de que el navegador vive en otro proceso).
+> - **Seguridad**: el servicio es LocalSystem, asi que el pipe es superficie privilegiada (ensanchar
+>   la allow-list de Archivos = abrirle a la nube el disco como SYSTEM). Leer estado y prestar
+>   escritorio = cualquier usuario interactivo; **MUTAR = solo Administradores**, comprobado
+>   impersonando al cliente del pipe. El **secreto no viaja al cliente**: se escribe, no se lee.
+> - **`BrowserPolicy`**: el consentimiento y la allow-list los EMPUJA el servicio con el estado; la
+>   colmena tiene escritorio pero no boveda, asi que sola fallaria cerrada siempre.
+> - **Tres bugs reales** hallados probando (todos tapados por `catch` mudos, ya corregidos): ACL sin
+>   `Synchronize` (se disfraza de **timeout**, no de acceso denegado, porque `Connect` reintenta);
+>   **buffers del pipe en 0** (cada escritura espera al lector -> saludo abrazado a si mismo:
+>   conexion viva y canal mudo); y falta de `CreateNewInstance` (anadir instancias a un pipe
+>   existente lo exige sobre el DACL ya puesto -> servia a UNA colmena y la siguiente quedaba fuera).
+> - **Verificado E2E**: colmena sin elevar conecta e identifica bien al no-admin; estado publicado;
+>   **navegacion exitosa** (`OK 3 acciones`) recorriendo hub -> servicio -> pipe -> colmena ->
+>   WebView2 -> vuelta; sin colmena, falla con motivo y no se cuelga; `set-consent` de un no-admin
+>   RECHAZADO con su motivo.
+
+> **[CONSTRUIDO 2026-07-16] Ola 5d - instalador**. En `deploy/agent/`: `publish.ps1` (autocontenido,
+> **271 MB**: la aceptacion dice "maquina limpia" y exigir el runtime de .NET no es eso),
+> `install.ps1` (**crea la boveda el**, owner=Administradores + ACL cerrada, por el hallazgo de
+> propiedad del directorio de ADR-0039; registra `EcorexAgent` LocalSystem automatico con reintentos
+> escalonados; colmena en auto-arranque de sesion), `uninstall.ps1` (**conserva la boveda** salvo
+> `-RemoveVault`) y `README.md`.
 >
-> **Pendiente**: cerrar la prueba de conexion de 5b; 5c (IPC named pipe: estado, config y delegacion
-> del Navegador); 5d (instalador; **debe crear la boveda el**, ver hallazgo de propiedad del
-> directorio en ADR-0039).
+> **No hay Inno ni WiX en la maquina**: un `.iss` seria codigo imposible de compilar o probar, asi que
+> el instalador PowerShell ES el entregable (y es lo que un `.iss` acabaria invocando).
+>
+> **NO verificado**: la instalacion en si (el UAC se cancelo; no se registro ningun servicio). Queda
+> pendiente la aceptacion de esta ola: "instalable en Windows limpio; el servicio reconecta tras
+> reinicio; la colmena muestra el estado real".
+>
+> **Pendiente**: `.iss` + firma del ejecutable; y bajar los 271 MB (ReadyToRun / framework-dependent)
+> si se acepta exigir el runtime.
 
 ## Ola 6 - Endurecimiento (seguridad + robustez)
 
