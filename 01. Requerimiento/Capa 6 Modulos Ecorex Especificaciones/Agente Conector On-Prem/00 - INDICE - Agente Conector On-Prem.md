@@ -46,15 +46,20 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > - **Consentimiento local + UI de allow-lists** (doc 06 s4): el operador habilita cada capacidad
 >   sensible y edita su allow-list desde un flyout de la colmena; fail-closed por defecto (hub y MCP).
 >   Con esto quedan implementados TODOS los guardrails de seguridad de s4.
+> - **Ola 5a - nucleo sin WPF** (doc 05 Ola 5 / ADR-0039): seam `IBrowserSubAgent` + proyecto
+>   `Ecorex.Agent.Core` (`UseWPF=false`) con 11 de 12 servicios (canal, Gateway, Archivos, stores,
+>   allow-lists, consentimiento, MCP). Deja al Core hospedable por igual desde la colmena WPF y desde
+>   un Worker Service headless. Sin cambio de comportamiento; verificado en runtime.
 >
 > **Detalle por doc**: recuadros "[CONSTRUIDO]" en docs 03/05/06; bitacora en `PROGRESO.md` del repo.
 >
 > **Pendiente / NO iniciado**:
 > - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
->   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario: primero hara ajustes en
->   el modulo de contenedores.)*
-> - Mas motores de BD; empaque como
->   Servicio Windows + instalador (doc 04); endurecimiento (doc 05 Ola 6).
+>   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario.)* NO bloquea la Ola 5:
+>   son lados opuestos del cable (Ola 4 = servidor, Ola 5 = empaque del agente).
+> - **Ola 5b/5c/5d** - Worker Service + store de maquina; IPC named pipe (estado/config/delegacion del
+>   Navegador); instalador. Gobernadas por **ADR-0039** (ver D8 en doc 06 s6).
+> - Mas motores de BD; endurecimiento (doc 05 Ola 6).
 
 # Agente Conector On-Prem - Contenedor de datos
 

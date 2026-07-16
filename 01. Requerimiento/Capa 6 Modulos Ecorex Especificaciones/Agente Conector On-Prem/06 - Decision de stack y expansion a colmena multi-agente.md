@@ -223,6 +223,16 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
 2. **Orden de sub-agentes v1: CONFIRMADO** - **Gateway** (casi listo, docs 01-05) ->
    **Archivos** (acotado) -> **Navegador** (el mas complejo y riesgoso, ultimo).
 3. **Colmena en WPF (Windows)**: implicito en D7 (Windows-first).
+4. **D8 escenario de despliegue: CONFIRMADO (2026-07-16)** - son **AMBOS**: hay clientes con estacion
+   y usuario logueado, y hay servidores 24/7 sin sesion. Esto obliga a revisar la D4
+   ("Servicio Windows headless + WPF de config"), que se decidio ANTES de la colmena: ver
+   **ADR-0039** en el repo. Resumen: el **Servicio** es el unico dueno de identidad, canal y store
+   (que pasa a `ProgramData` + DPAPI de MAQUINA + ACL, porque el DPAPI de USUARIO de hoy es
+   ilegible para un servicio); la **colmena WPF** es su CLIENTE por named pipe y le **presta el
+   escritorio** al Navegador (WebView2 no vive en la sesion 0). Sin colmena presente, Gateway y
+   Archivos siguen atendiendo y el Navegador falla con motivo claro. **Correccion a s2**: se
+   conserva **WebView2**, no Playwright; Playwright headless queda como add-on SI algun dia se
+   necesita navegador en un servidor sin sesion (el seam `IBrowserSubAgent` admite ambos).
 
 **Avance de construccion:**
 

@@ -96,13 +96,35 @@ Agente (o un cliente de prueba temporal en .NET):
   ahora" carga al instante; con el agente apagado, el proceso queda "pendiente offline" y se
   ejecuta al reconectar.
 
-## Ola 5 - Empaque del agente (Servicio Windows + WPF + instalador)
+## Ola 5 - Empaque del agente (Servicio Windows + colmena WPF + instalador)
 
-- `EcorexAgent.Service` (Worker Service) que mantiene el Core 24/7.
-- `EcorexAgent.Config` (WPF): identidad, whitelist, estado, log, "probar conexion".
-- Instalador (WiX/Inno) que registra el servicio.
+> **REVISADA 2026-07-16 por ADR-0039** (D8: el despliegue real es AMBOS escenarios). El plan de
+> abajo se escribio pre-colmena y asumia dos piezas sueltas. Choca con dos hechos: el store cifra
+> con DPAPI de USUARIO en `%APPDATA%` (un servicio corre con otro perfil/llave y **no puede leerlo**),
+> y WebView2 no vive en la sesion 0 de un servicio. Modelo vigente: **el Servicio es dueno de
+> identidad, canal y store; la colmena WPF es su CLIENTE por named pipe y le presta el escritorio al
+> Navegador**. Sub-olas 5a-5d abajo.
+
+- `Ecorex.Agent.Service` (Worker Service) que mantiene el Core 24/7 (canal + Gateway + Archivos).
+- `Ecorex.Agent.Gui` (colmena WPF): identidad, allow-lists, consentimiento, estado, y **ejecuta el
+  Navegador** por delegacion del servicio.
+- Instalador (WiX/Inno) que registra el servicio, crea `ProgramData` con su ACL y deja la colmena
+  con auto-arranque al inicio de sesion.
 - **Aceptacion**: instalable en una maquina Windows limpia; el servicio reconecta tras
-  reinicio; la WPF configura identidad/whitelist y muestra el estado real.
+  reinicio; la WPF configura identidad/allow-lists y muestra el estado real; en un servidor SIN
+  sesion, Gateway y Archivos atienden y el Navegador falla con motivo claro (no cuelga).
+
+> **[CONSTRUIDO 2026-07-16] Ola 5a - seam del Navegador + nucleo sin WPF**: `IBrowserSubAgent` en
+> Contracts (el marshalling al Dispatcher se escondio DENTRO de la impl WebView2, asi que el canal y
+> el MCP ya no dependen de WPF) + proyecto **`Ecorex.Agent.Core`** (net10.0-windows, `UseWPF=false`)
+> con 11 de los 12 servicios (~1400 de 1850 lineas): canal, Gateway, Archivos, stores DPAPI,
+> allow-lists, consentimiento, QueryGuard y MCP. La Gui queda con WebView2 + UI. Que el Core compile
+> con `UseWPF=false` ES la prueba del desacople. Verificado en runtime: 14 tools MCP,
+> `browser.navigate` OK atravesando MCP(Core) -> seam -> WebView2 en hilo de UI; Archivos lee dentro
+> de su raiz y sigue rechazando fuera. **Sin cambio de comportamiento.**
+>
+> **Pendiente**: 5b (`Ecorex.Agent.Service` + store en `ProgramData` con DPAPI de maquina + ACL),
+> 5c (IPC named pipe: estado, config y delegacion del Navegador), 5d (instalador).
 
 ## Ola 6 - Endurecimiento (seguridad + robustez)
 
