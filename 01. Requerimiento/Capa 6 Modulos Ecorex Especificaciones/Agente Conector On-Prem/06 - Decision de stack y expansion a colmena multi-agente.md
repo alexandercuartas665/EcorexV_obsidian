@@ -233,6 +233,11 @@ Decisiones CONFIRMADAS por el usuario (2026-07-15):
    Archivos siguen atendiendo y el Navegador falla con motivo claro. **Correccion a s2**: se
    conserva **WebView2**, no Playwright; Playwright headless queda como add-on SI algun dia se
    necesita navegador en un servidor sin sesion (el seam `IBrowserSubAgent` admite ambos).
+5. **D9 cuenta del servicio: CONFIRMADO (2026-07-16)** - **LocalSystem**. Consecuencia asumida: con
+   DPAPI de maquina la llave no cuelga del usuario, asi que **el ACL del archivo es la unica puerta**;
+   un administrador local puede llegar al secreto del tenant. A cambio, el instalador no pide
+   contrasena de cuenta. Escalon futuro para least-privilege: cuenta virtual `NT SERVICE\EcorexAgent`
+   (no cambia el codigo, solo el instalador). Ver ADR-0039 s2.
 
 **Avance de construccion:**
 

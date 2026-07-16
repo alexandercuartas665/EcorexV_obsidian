@@ -123,8 +123,30 @@ Agente (o un cliente de prueba temporal en .NET):
 > `browser.navigate` OK atravesando MCP(Core) -> seam -> WebView2 en hilo de UI; Archivos lee dentro
 > de su raiz y sigue rechazando fuera. **Sin cambio de comportamiento.**
 >
-> **Pendiente**: 5b (`Ecorex.Agent.Service` + store en `ProgramData` con DPAPI de maquina + ACL),
-> 5c (IPC named pipe: estado, config y delegacion del Navegador), 5d (instalador).
+> **[PARCIAL 2026-07-16] Ola 5b - boveda de maquina + Worker Service**. Cuenta del servicio:
+> **LocalSystem** (D9, decidida por el usuario). Hecho:
+> - **`AgentVault`**: el P/Invoke a DPAPI y la ruta estaban duplicados en los **5** stores; ahora hay
+>   un solo lugar. Boveda = `%ProgramData%\Ecorex\Agent` + DPAPI de **maquina** + **ACL** (rompe
+>   herencia, solo SYSTEM+Administradores). Comprobado en maquina real con `Get-Acl`.
+> - **`Ecorex.Agent.Service`** (Worker, `UseWindowsService`): hospeda el Core headless; el mismo
+>   binario corre como servicio (log al Visor de eventos) o como consola. El Navegador responde NO con
+>   motivo explicito (`UnavailableBrowserSubAgent`) en vez de colgar la peticion.
+> - **`--save-config` es del SERVICIO**, no de la colmena (el dueno del store es el servicio), y
+>   normaliza la URL al hub completo.
+> - **Bug real corregido**: el canal se tragaba el motivo del fallo de conexion; headless eso es
+>   indepurable. Ahora `LastError` explica el handshake (secreto, ClientId, reloj >120s).
+>
+> **Confirmado por la prueba (importante)**: al mudar la boveda, la colmena (proceso sin elevar) deja
+> de poder leerla o escribirla -que es lo que el ADR quiere- y por tanto **no hay forma de configurar
+> el agente hasta que exista el pipe (5c)**. 5b y 5c estan acoplados; entre medias se configura con
+> `--save-config` desde consola de administrador (lo mismo que hara el instalador).
+>
+> **NO verificado aun**: el servicio CONECTADO al hub de punta a punta (se cancelo el UAC en la
+> prueba). El handshake HMAC contra el hub real si esta verificado por separado.
+>
+> **Pendiente**: cerrar la prueba de conexion de 5b; 5c (IPC named pipe: estado, config y delegacion
+> del Navegador); 5d (instalador; **debe crear la boveda el**, ver hallazgo de propiedad del
+> directorio en ADR-0039).
 
 ## Ola 6 - Endurecimiento (seguridad + robustez)
 
