@@ -139,10 +139,20 @@ clave). Refactor recomendado:
 > `data_container_columns.referenced_container_id` pese al historial); se corrigio con un ALTER puntual
 > -no es bug del codigo; una BD limpia trae la columna via su migracion existente.
 
+> **[CONSTRUIDO 2026-07-17] Scheduler + refresco + bitacora (Ola 4).** El scheduler vive en
+> `Ecorex.SuperAdmin` (`RealTime/ImportSchedulerWorker.cs`), NO en `Ecorex.Workers` (prod solo levanta
+> ese servicio). `RunsViaAgent` NO se implemento: "via agente" = el `ImportProcess` tiene cliente; lo
+> que faltaba era la CONSULTA, agregada como `DataConnector.Query`. Recurrencia con **Cronos**
+> (ADR-0041), no el motor de 000889. Bitacora `ImportRun` (indice unico de idempotencia como
+> `ScheduledJobRun`) cierra la corrida contra el `correlationId`, que ahora genera el runner. Verificado
+> en vivo en los dos motores (intervalo/SQL Server, cron/PostgreSQL). Detalle en el doc 05 Ola 4.
+
 - [x] Hub `/hubs/agente` con `[Authorize]` + grupos por client/tenant.
 - [x] `IAgentRegistry` (en linea/offline) + `IHubContext` para empujar.
 - [x] `POST /api/agente/token` (HMAC -> JWT corto). Handshake opcion A completo (nonce + ts +/-120s).
-- [ ] `DataConnector.RunsViaAgent` + `DataClientId` + consulta + migracion.
+- [x] ~~`DataConnector.RunsViaAgent` + `DataClientId`~~ **descartado**: "via agente" = el
+      `ImportProcess` tiene cliente (no hizo falta campo nuevo). SI se agrego `DataConnector.Query`
+      (la consulta) + migracion dual `AddConnectorQuery`.
 - [x] `IRowIngestService` (nucleo de ingesta EAV Append/Replace/Upsert por sesion, en
       `Ecorex.Application/DataContainers/RowIngestService.cs`). **Un solo camino de escritura**: lo usan
       TANTO el importador via agente COMO `ApiImportService` (REST), migrado el 2026-07-16. El REST abre
@@ -154,7 +164,12 @@ clave). Refactor recomendado:
 - [x] `IAgentImportService` (dispatch + on-result + on-failed) en `Ecorex.SuperAdmin/Agents/
       AgentImportService.cs`: pending-fetch por correlationId, acumula chunks y en el ultimo ingiere
       via `IRowIngestService` (scope propio con el tenant fijado). Cableado en `AgenteHub`.
-- [ ] `ImportSchedulerService` en `Ecorex.Workers` (Intervalo/Cron + offline handling).
-- [ ] UI: opcion "via agente", estado en linea, "Refrescar ahora".
-- [ ] Tests: ~~unit (ingesta/upsert)~~ HECHO (ver arriba); falta integracion dual PG/SQLServer y un
-      test de canal con un agente fake (cliente SignalR de prueba).
+- [x] `ImportSchedulerWorker` (Intervalo/Cron) **en `Ecorex.SuperAdmin`, no `Ecorex.Workers`** +
+      `ImportScheduleDispatcher` + `ImportRecurrence` (Cronos) + bitacora `ImportRun`. Offline: la
+      corrida queda `Error` con motivo (el reintento-al-reconectar del UC3 NO se implemento; simplif.).
+- [x] UI: config de BD + consulta desde la web; estado en linea ("Probar conexion" por cliente);
+      boton **"Actualizar datos"**; en Procesos, proxima ventana, motivo de desactivacion y
+      **"Ultimas ejecuciones"** (la bitacora).
+- [x] Dedup de chunks + timeout del pending fetch (Ola 6, 2026-07-17): `SeenChunks` + `SweepAsync`.
+- [ ] TLS estricto (**BLOQUEANTE**, ADR-0040) + `Cancel` (declarado sin implementar) + `AgentFetchLog`
+      completo (hoy `ImportRun` cubre el caso de negocio) + integracion dual PG/SQLServer del canal.

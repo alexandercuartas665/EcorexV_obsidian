@@ -96,6 +96,55 @@ Agente (o un cliente de prueba temporal en .NET):
   ahora" carga al instante; con el agente apagado, el proceso queda "pendiente offline" y se
   ejecuta al reconectar.
 
+> **[CONSTRUIDO 2026-07-17] Ola 4 COMPLETA y verificada en vivo.** El horario dispara solo y cada
+> corrida deja bitacora. Difiere del plan de arriba en tres puntos, todos a mejor:
+>
+> - **Vive en `Ecorex.SuperAdmin`, no en `Ecorex.Workers`** (`RealTime/ImportSchedulerWorker.cs`),
+>   por el mismo motivo que el worker de 000889: el compose de prod solo levanta `ecorex-app`, asi que
+>   un hosted service en `Ecorex.Workers` NUNCA correria en prod. Copia el patron probado de
+>   `ScheduledJobWorker`: `PeriodicTimer` 1 min, barrido cross-tenant que devuelve solo `TenantId`s,
+>   luego scope propio + `AmbientTenantContext.Begin`, `Take(200)`.
+> - **NO se uso `DataConnector.RunsViaAgent` + `DataClientId`**. El modelo ya lo resolvia sin campo
+>   nuevo: **"via agente" = un `ImportProcess` que tiene cliente** (`ClientId`). Lo unico que faltaba
+>   en el conector era la **consulta**: se agrego `DataConnector.Query` (ni el DTO ni el servicio ni la
+>   UI la transportaban, aunque la columna existia; el boton era inejecutable y solo se via al usarlo).
+> - **El boton se llama "Actualizar datos"** (no "Refrescar ahora") y el horario y el boton llaman al
+>   **MISMO `IProcessRunner`**: si el horario tuviera su propia version, las dos acabarian
+>   comportandose distinto.
+>
+> **Recurrencia (ADR-0041)**: `ImportRecurrence` calcula la proxima ventana para Intervalo (a mano) y
+> Cron (**Cronos**, paquete MIT nuevo). NO reusa el motor de 000889: aquel recibe un `ScheduledJobRule`
+> concreto y razona en frecuencias de calendario (Daily/Weekly/Monthly), que no contemplan ni "cada N
+> minutos" ni cron. Se reusa lo comun: `ResolveTimeZone` y los patrones de bitacora y worker. El cron
+> se interpreta **en hora del tenant**; tras una caida larga **NO se dispara la rafaga atrasada** (se
+> salta al futuro); un horario invalido **desactiva la programacion con el motivo a la vista** en vez
+> de dejarla "activa" sin disparar nunca.
+>
+> **Bitacora `ImportRun`** (esto es lo que el usuario pidio como "log de trabajos"): copia el patron de
+> `ScheduledJobRun`, **incluido el indice unico `(TenantId, ProcessId, FiredAt)`** que da idempotencia
+> -dos workers en la misma ventana chocan al guardar en vez de pedir el mismo refresco dos veces; por
+> eso `FiredAt` es la ventana, no "ahora"-. La corrida nace en `Running` y la cierra `IImportRunLog`
+> contra el `correlationId`, que ahora genera el **runner** (no el canal): si lo generara el canal, un
+> agente rapido podria responder antes de que la corrida supiera su propio id.
+>
+> **Verificado E2E, dos veces, en los DOS motores**:
+> - Intervalo "cada 1 minuto" sobre SQL Server (`prueba_cargas.dbo.PRODUCTOS`): disparo dos veces
+>   seguidas sin tocar nada, `trigger=Scheduled`, `result=Ok`, separadas un minuto exacto.
+> - Cron `9 7 * * *` sobre PostgreSQL: **disparo a las 12:09:00 UTC exactas** (07:09 Bogota), cargo 2
+>   filas en una tabla vaciada a proposito, reprogramo sola para el dia siguiente.
+>
+> **Bug real, imposible de ver sin correr**: guardar un cron reventaba (`Cannot write DateTimeOffset
+> with Offset=-05:00 to PostgreSQL 'timestamp with time zone'`): Cronos devuelve la hora con el desfase
+> de la zona y Npgsql exige desfase 0. Las 12 pruebas del motor NO lo veian porque `DateTimeOffset`
+> compara instantes (`08:00Z == 03:00-05:00`). Arreglado + 2 pruebas que afirman sobre `.Offset`.
+> Leccion anotada: para fechas con destino Postgres, un `Assert.Equal` de instantes no basta.
+>
+> **Manejo de agente offline**: el runner comprueba `IsOnline` DESPUES de abrir la corrida (a
+> proposito: "el agente no estaba conectado a la hora que tocaba" SI es una ejecucion fallida y tiene
+> que quedar en la bitacora). Lo que NO se implemento es el reintento automatico al reconectar del
+> UC3/doc 02 s8: hoy la corrida queda `Error` con su motivo y el operador reintenta con el boton (o la
+> vuelve a tomar el siguiente tick del horario). Es una simplificacion consciente, no un olvido.
+
 ## Ola 5 - Empaque del agente (Servicio Windows + colmena WPF + instalador)
 
 > **REVISADA 2026-07-16 por ADR-0039** (D8: el despliegue real es AMBOS escenarios). El plan de
@@ -215,17 +264,19 @@ Agente (o un cliente de prueba temporal en .NET):
 > | *(extra)* Consentimiento local por capacidad | **HECHO** |
 > | *(extra)* Boveda con DPAPI de **maquina** + ACL SYSTEM/Admins | **HECHO** (Ola 5b) |
 > | *(extra)* **Mutar config exige Administrador** (impersonacion en el pipe) | **HECHO** (Ola 5c) |
-> | **TLS estricto** | **PENDIENTE**. La validacion de certificados de .NET esta activa y nadie la desactiva (o sea: un cert invalido YA se rechaza), pero **no se exige https**: hoy un `http://` se acepta sin chistar. Falta el rechazo explicito + la prueba con cert invalido. |
-> | **Dedup de chunks** por (`correlationId`,`chunkIndex`) | **PENDIENTE**. Hoy un chunk reenviado tras una reconexion se **ingesta dos veces**: duplica filas. |
-> | **Timeout del pending fetch** | **PENDIENTE**. Un `FetchRequest` sin respuesta queda esperando **para siempre** (fuga de memoria + import colgado). El doc 02 s10 lo pedia (5 min). |
+> | **TLS estricto** | **PENDIENTE, y ahora BLOQUEANTE (ADR-0040)**. La validacion de certificados de .NET esta activa (un cert invalido YA se rechaza), pero **no se exige https**: hoy un `http://` se acepta sin chistar. Subio de prioridad porque con la Ola 4 (credencial opcion a, ADR-0040) la **contrasena de la BD del cliente viaja por el canal cada N minutos**. Falta el rechazo explicito de esquemas no-TLS (salvo `localhost` en dev) + la prueba con cert invalido. |
+> | **Dedup de chunks** por (`correlationId`,`chunkIndex`) | **HECHO (2026-07-17)**. `Pending.SeenChunks` (HashSet por `ChunkIndex` bajo lock); un chunk repetido se descarta con log en vez de duplicar filas. |
+> | **Timeout del pending fetch** | **HECHO (2026-07-17)**. `PendingTtl` 10 min + `AgentImportService.SweepAsync` en cada ciclo del worker: expira la peticion, libera sus filas y **cierra la corrida en la bitacora** aunque nadie tenga la pagina abierta. `_outcomes` tambien caduca (30 min); antes ninguno de los dos se limpiaba. |
 > | **Cancelacion** | **PENDIENTE, y con trampa**: `Cancel` esta **declarado en el contrato pero el agente NO lo maneja**. El protocolo anuncia algo que no existe. |
-> | **Auditoria `AgentFetchLog`** | **PENDIENTE**: no existe la entidad. Hoy no queda rastro persistente de que pidio el servidor ni que devolvio el agente. |
+> | **Auditoria `AgentFetchLog`** | **CUBIERTO en parte por `ImportRun` (2026-07-17)**, con matices. La bitacora de la Ola 4 registra por corrida: trigger, resultado, filas ins/upd/del, `correlationId`, motivo del fallo, y sobrevive al proceso. Lo que `ImportRun` NO cubre y `AgentFetchLog` si preveia: corridas que ni llegan a ser `ImportProcess` (el endpoint dev de la Ola 3) y metricas de latencia (ms). Para el caso de negocio -horarios- ya hay rastro persistente. |
 > | **Limites por plan** (cupos de filas/frecuencia) | **PENDIENTE** |
 > | **Backplane Redis** (multi-instancia del hub) | **PENDIENTE**. Hoy `InMemoryAgentRegistry` -> con 2+ instancias del servidor, una no sabe de los agentes de la otra. Solo importa si se escala horizontal. |
 >
-> **Lectura**: lo que protege de un **servidor comprometido** (que era el miedo original) esta hecho.
-> Lo que falta es **integridad de datos** (dedup), **no quedarse colgado** (timeout/cancel) y **poder
-> auditar** (`AgentFetchLog`). El dedup y el timeout son los dos que muerden en produccion.
+> **Lectura (actualizada 2026-07-17)**: lo que protege de un **servidor comprometido** esta hecho, y
+> ya se cerraron **los dos que muerden en produccion** (dedup y timeout). Lo que queda es, por orden de
+> urgencia: **(1) TLS estricto** -ahora bloqueante, porque la credencial de la fuente viaja cada N
+> minutos-; **(2) `Cancel`** -el contrato miente hasta que se implemente o se quite del protocolo-;
+> y **(3)** cosas de escala/plan (limites, Redis) que solo importan al crecer.
 
 ## Backlog (post v1)
 

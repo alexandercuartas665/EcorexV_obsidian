@@ -23,8 +23,15 @@ proposito: Vision, actores, diagrama, prior-art, seguridad y casos de uso del ag
 > no configura por su cuenta: se lo pide al servicio, que exige administrador para aceptarlo. Detalle
 > en [[04 - Cliente (Servicio Windows + colmena WPF)]].
 >
-> De la **s7 (politica de credencial)** se implemento la **opcion (b)**: la credencial de la fuente
-> vive solo en el agente y **nunca viaja** por el canal.
+> De la **s7 (politica de credencial)**: primero se implemento la **opcion (b)** (la credencial vive
+> solo en el agente), pero con la Ola 4 se volvio a la **opcion (a)** (**ADR-0040, 2026-07-17**): la
+> credencial de la fuente se configura y se cifra EN LA WEB y **viaja** en el `FetchRequest`. El motivo
+> fue concreto: el usuario pidio administrar la conexion (host/usuario/clave) desde el modulo web, y
+> con (b) esos campos quedaban muertos. La eleccion es **por conector** -si un conector no guarda
+> credencial en la web, el agente cae a su cadena local (b)-, no global. **Consecuencia directa: el TLS
+> estricto pasa de deseable a BLOQUEANTE** para produccion, porque ahora por el canal viaja la
+> contrasena de la BD del cliente. `QueryGuard` (solo-SELECT) sigue siendo la defensa que impide
+> escribir en la fuente, venga la credencial de donde venga.
 
 ## 1. Problema
 

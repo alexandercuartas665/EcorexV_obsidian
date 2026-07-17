@@ -2,8 +2,8 @@
 tipo: indice-proyecto
 proyecto: Agente Conector On-Prem para Contenedor de datos
 modulo_web: contenedor-datos (Sistema . Datos personalizados)
-estado: CONSTRUIDO y verificado (Olas A/B/C + 3 + Navegador + Archivos + MCP + 5a-5d). Pendientes: Ola 4 (scheduler, en pausa) y Ola 6 (endurecimiento, a medias - ver su tabla de estado en el doc 05)
-fecha: 2026-07-11 (auditado contra el codigo y actualizado 2026-07-16)
+estado: CONSTRUIDO y verificado (Olas A/B/C + 3 + Navegador + Archivos + MCP + 5a-5d + 4). Pendiente principal: Ola 6 casi cerrada - solo falta TLS estricto (BLOQUEANTE) y Cancel. Ver la tabla de estado en el doc 05.
+fecha: 2026-07-11 (auditado contra el codigo y actualizado 2026-07-17)
 autor: documentado por agente IA a partir de decisiones del usuario
 ---
 
@@ -67,19 +67,33 @@ autor: documentado por agente IA a partir de decisiones del usuario
 > **La Ola 5 esta COMPLETA y verificada** (salvo el arranque tras reinicio real del equipo, para el que
 > consta `StartMode=Auto` y que el servicio arranca y conecta solo).
 >
-> **Pendiente / NO iniciado**:
-> - **Ola 4 - Scheduler** (`ImportSchedulerService` en `Ecorex.Workers`) + `DataConnector.RunsViaAgent`
->   + UI "Refrescar ahora"/estado en linea. *(En pausa a peticion del usuario.)* NO bloquea la Ola 5:
->   son lados opuestos del cable (Ola 4 = servidor, Ola 5 = empaque del agente).
-> - **Ola 6 - Endurecimiento: A MEDIAS** (auditada contra el codigo el 2026-07-16; tabla punto por
->   punto en el doc 05). En corto: **hecho** todo lo que protege de un servidor comprometido
->   (solo-SELECT, allow-lists fail-closed, credencial que no viaja, JS firmado, consentimiento, boveda
->   con ACL, mutar exige administrador). **Falta** lo de integridad y operacion: **dedup de chunks**
->   (hoy un chunk reenviado tras reconexion DUPLICA filas), **timeout del pending fetch** (hoy un fetch
->   sin respuesta espera para siempre), **`Cancel`** (declarado en el contrato pero NO manejado),
->   **`AgentFetchLog`** (no existe), limites por plan y backplane Redis. **Dedup y timeout son los dos
->   que muerden en produccion.**
-> - Mas motores de BD (hoy solo SQL Server); `.iss` + firma del ejecutable; arranque tras reinicio real.
+> [!success] ACTUALIZACION 2026-07-17 - Ola 4 COMPLETA + Ola 6 casi cerrada
+> - **Ola 4 - Scheduler: CONSTRUIDA y verificada en vivo** (ya no esta en pausa). El horario dispara
+>   solo y cada corrida deja **bitacora** (`ImportRun`) -esto es el "log de trabajos" que pidio el
+>   usuario-. Vive en `Ecorex.SuperAdmin` (no `Ecorex.Workers`). NO se uso `RunsViaAgent` ("via agente"
+>   = el proceso tiene cliente); si se agrego `DataConnector.Query`. Cron con **Cronos** (ADR-0041, no
+>   el motor de 000889); el boton se llama **"Actualizar datos"** y comparte `IProcessRunner` con el
+>   horario. Probado en los DOS motores: intervalo "cada 1 min" sobre SQL Server (2 disparos exactos) y
+>   cron `9 7 * * *` sobre PostgreSQL (disparo a las 12:09:00 UTC exactas). Detalle en el doc 05 Ola 4.
+> - **La credencial de la fuente VUELVE A VIAJAR** (ADR-0040): se configura y cifra en la web y va en el
+>   `FetchRequest` (antes: opcion b, vivia solo en el agente). Por conector. Consecuencia: **TLS
+>   estricto sube a BLOQUEANTE**.
+> - **Ola 6: dedup de chunks y timeout del pending fetch, HECHOS** (eran "los dos que muerden en
+>   produccion"). `AgentFetchLog` queda **cubierto en parte** por `ImportRun` para el caso de negocio.
+> - **Motor PostgreSQL en el agente** (Npgsql): antes solo SQL Server. Un solo `GatewayExecutor` elige
+>   por `DbEngine`.
+>
+> **Lo que QUEDA (por urgencia)**:
+> 1. **TLS estricto - BLOQUEANTE para produccion** (ADR-0040): exigir https/wss y rechazar lo demas
+>    (salvo `localhost` en dev) + prueba con cert invalido. Es lo mas urgente: la contrasena de la BD
+>    del cliente viaja por el canal cada N minutos.
+> 2. **`Cancel`**: declarado en el contrato pero el agente NO lo maneja. El protocolo miente hasta
+>    implementarlo o quitarlo.
+> 3. Reintento-al-reconectar del agente offline (UC3): hoy la corrida queda `Error` y se reintenta a
+>    mano o al siguiente tick.
+> 4. Escala/plan: limites por plan (cupos), backplane Redis (multi-instancia del hub) - solo al crecer.
+> 5. Empaque/otros: `.iss` + firma del ejecutable; arranque tras reinicio real; mas motores (MySql/
+>    Oracle); integracion dual PG/SQLServer del canal.
 
 # Agente Conector On-Prem - Contenedor de datos
 

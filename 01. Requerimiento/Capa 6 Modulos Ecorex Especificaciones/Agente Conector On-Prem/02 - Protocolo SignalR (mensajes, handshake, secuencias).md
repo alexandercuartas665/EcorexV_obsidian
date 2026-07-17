@@ -20,10 +20,17 @@ proposito: Contrato del canal SignalR entre servidor y agente: endpoint, handsha
 > `FetchRequest` viajan **`BrowserRequest`/`BrowserResult`** y **`FileRequest`/`FileResult`**, con sus
 > acciones tipadas; y el JS que el servidor inyecta va **FIRMADO** (ver s5.1 abajo).
 >
-> **Lo que sigue PENDIENTE de este doc** (todo cae en la Ola 6): la **deduplicacion de chunks** por
-> (`correlationId`,`chunkIndex`) de s10, el **timeout del pending fetch** de s10, y `Cancel`, que
-> **esta declarado en el contrato pero el agente NO lo maneja** (o sea: hoy el protocolo anuncia algo
-> que no existe). El `protocolVersion` de s11 tampoco se usa aun para rechazar agentes viejos.
+> **Cerrado el 2026-07-17** (con la Ola 4): la **deduplicacion de chunks** por
+> (`correlationId`,`chunkIndex`) de s10 (HashSet `SeenChunks`) y el **timeout del pending fetch** de
+> s10 (10 min + sweep del worker, que ademas cierra la corrida en la bitacora). El `correlationId`
+> ahora lo genera QUIEN DESPACHA (el runner), no el canal, porque la corrida tiene que guardarse con el
+> antes de despachar.
+>
+> **Lo que sigue PENDIENTE de este doc**: `Cancel`, que **esta declarado en el contrato pero el agente
+> NO lo maneja** (o sea: hoy el protocolo anuncia algo que no existe); hay que implementarlo o quitarlo
+> del contrato. El `protocolVersion` de s11 tampoco se usa aun para rechazar agentes viejos. Y el
+> transporte deberia exigir **WSS estricto** (ADR-0040, ahora bloqueante: la credencial de la fuente
+> viaja por aqui).
 
 ## 1. Endpoint
 
