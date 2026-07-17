@@ -28,9 +28,10 @@ proposito: Contrato del canal SignalR entre servidor y agente: endpoint, handsha
 >
 > **Lo que sigue PENDIENTE de este doc**: `Cancel`, que **esta declarado en el contrato pero el agente
 > NO lo maneja** (o sea: hoy el protocolo anuncia algo que no existe); hay que implementarlo o quitarlo
-> del contrato. El `protocolVersion` de s11 tampoco se usa aun para rechazar agentes viejos. Y el
-> transporte deberia exigir **WSS estricto** (ADR-0040, ahora bloqueante: la credencial de la fuente
-> viaja por aqui).
+> del contrato. El `protocolVersion` de s11 tampoco se usa aun para rechazar agentes viejos. Sobre
+> **WSS**: el cifrado lo da el despliegue detras de HTTPS (el agente conecta por `wss://`); lo que
+> falta es un guardrail -que el agente RECHACE una URL no-TLS- como defensa contra config
+> erronea/downgrade (ADR-0040, encuadre corregido: no es bloqueante si prod es HTTPS).
 
 ## 1. Endpoint
 

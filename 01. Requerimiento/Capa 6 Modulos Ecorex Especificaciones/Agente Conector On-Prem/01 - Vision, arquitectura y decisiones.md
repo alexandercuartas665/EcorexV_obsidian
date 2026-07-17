@@ -28,10 +28,13 @@ proposito: Vision, actores, diagrama, prior-art, seguridad y casos de uso del ag
 > credencial de la fuente se configura y se cifra EN LA WEB y **viaja** en el `FetchRequest`. El motivo
 > fue concreto: el usuario pidio administrar la conexion (host/usuario/clave) desde el modulo web, y
 > con (b) esos campos quedaban muertos. La eleccion es **por conector** -si un conector no guarda
-> credencial en la web, el agente cae a su cadena local (b)-, no global. **Consecuencia directa: el TLS
-> estricto pasa de deseable a BLOQUEANTE** para produccion, porque ahora por el canal viaja la
-> contrasena de la BD del cliente. `QueryGuard` (solo-SELECT) sigue siendo la defensa que impide
-> escribir en la fuente, venga la credencial de donde venga.
+> credencial en la web, el agente cae a su cadena local (b)-, no global. **Sobre el TLS** (encuadre
+> corregido 2026-07-17): el cifrado del canal lo da el **despliegue detras de HTTPS** -el agente
+> conecta por `wss://` y la credencial va cifrada en transito-, asi que el riesgo de "viaja en claro"
+> se resuelve al desplegar en HTTPS, sin tocar el agente. Lo unico que queda es un **guardrail**: que
+> el agente RECHACE una URL no-TLS (hoy acepta `http://`), como defensa contra configuracion
+> erronea/downgrade. Es hardening barato, no un bloqueante. `QueryGuard` (solo-SELECT) sigue siendo la
+> defensa que impide escribir en la fuente, venga la credencial de donde venga.
 
 ## 1. Problema
 

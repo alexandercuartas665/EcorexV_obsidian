@@ -139,11 +139,15 @@ Agente (o un cliente de prueba temporal en .NET):
 > compara instantes (`08:00Z == 03:00-05:00`). Arreglado + 2 pruebas que afirman sobre `.Offset`.
 > Leccion anotada: para fechas con destino Postgres, un `Assert.Equal` de instantes no basta.
 >
-> **Manejo de agente offline**: el runner comprueba `IsOnline` DESPUES de abrir la corrida (a
-> proposito: "el agente no estaba conectado a la hora que tocaba" SI es una ejecucion fallida y tiene
-> que quedar en la bitacora). Lo que NO se implemento es el reintento automatico al reconectar del
-> UC3/doc 02 s8: hoy la corrida queda `Error` con su motivo y el operador reintenta con el boton (o la
-> vuelve a tomar el siguiente tick del horario). Es una simplificacion consciente, no un olvido.
+> **Manejo de agente offline (UC3): HECHO y verificado en vivo (2026-07-17).** El runner comprueba
+> `IsOnline` DESPUES de abrir la corrida y, si el agente no esta, la marca `PendingOffline` (NO `Error`:
+> es un "no llegue a intentarlo") y **parquea la programacion** con `ImportProcess.PendingSince`. El
+> worker tiene un pase de reintento -gateado por `IsOnline`- que reintenta las parqueadas SOLO cuando su
+> agente vuelve; el gate evita generar una corrida cada minuto mientras sigue caido. Verificado con el
+> reintento AISLADO del horario (se empujo `next_run_at` a +1h para que solo el reintento pudiera
+> dispararlo): agente apagado -> `PendingOffline` + parqueo; agente encendido -> a los <70s el worker lo
+> puso al dia solo (log *"agente reconecto, carga pendiente reintentada"*), bitacora `Ok`, `PendingSince`
+> limpio. Migracion dual `AddImportPendingOffline`; la UI muestra "Esperando al agente desde X".
 
 ## Ola 5 - Empaque del agente (Servicio Windows + colmena WPF + instalador)
 
@@ -264,7 +268,7 @@ Agente (o un cliente de prueba temporal en .NET):
 > | *(extra)* Consentimiento local por capacidad | **HECHO** |
 > | *(extra)* Boveda con DPAPI de **maquina** + ACL SYSTEM/Admins | **HECHO** (Ola 5b) |
 > | *(extra)* **Mutar config exige Administrador** (impersonacion en el pipe) | **HECHO** (Ola 5c) |
-> | **TLS estricto** | **PENDIENTE, y ahora BLOQUEANTE (ADR-0040)**. La validacion de certificados de .NET esta activa (un cert invalido YA se rechaza), pero **no se exige https**: hoy un `http://` se acepta sin chistar. Subio de prioridad porque con la Ola 4 (credencial opcion a, ADR-0040) la **contrasena de la BD del cliente viaja por el canal cada N minutos**. Falta el rechazo explicito de esquemas no-TLS (salvo `localhost` en dev) + la prueba con cert invalido. |
+> | **TLS estricto** | **PENDIENTE - guardrail, NO bloqueante (encuadre corregido 2026-07-17)**. El cifrado del canal lo da el **despliegue detras de HTTPS**: el agente conecta por `wss://` y la credencial va cifrada en transito, sin tocar el agente. La validacion de certificados de .NET ademas esta activa (un cert invalido YA se rechaza). Lo que falta es solo que el agente **RECHACE** una URL no-TLS (hoy acepta `http://`), como defensa contra config erronea/downgrade (salvo `localhost` en dev) + prueba con cert invalido. Barato; no es riesgo activo si prod es HTTPS. |
 > | **Dedup de chunks** por (`correlationId`,`chunkIndex`) | **HECHO (2026-07-17)**. `Pending.SeenChunks` (HashSet por `ChunkIndex` bajo lock); un chunk repetido se descarta con log en vez de duplicar filas. |
 > | **Timeout del pending fetch** | **HECHO (2026-07-17)**. `PendingTtl` 10 min + `AgentImportService.SweepAsync` en cada ciclo del worker: expira la peticion, libera sus filas y **cierra la corrida en la bitacora** aunque nadie tenga la pagina abierta. `_outcomes` tambien caduca (30 min); antes ninguno de los dos se limpiaba. |
 > | **Cancelacion** | **PENDIENTE, y con trampa**: `Cancel` esta **declarado en el contrato pero el agente NO lo maneja**. El protocolo anuncia algo que no existe. |
@@ -272,11 +276,12 @@ Agente (o un cliente de prueba temporal en .NET):
 > | **Limites por plan** (cupos de filas/frecuencia) | **PENDIENTE** |
 > | **Backplane Redis** (multi-instancia del hub) | **PENDIENTE**. Hoy `InMemoryAgentRegistry` -> con 2+ instancias del servidor, una no sabe de los agentes de la otra. Solo importa si se escala horizontal. |
 >
-> **Lectura (actualizada 2026-07-17)**: lo que protege de un **servidor comprometido** esta hecho, y
-> ya se cerraron **los dos que muerden en produccion** (dedup y timeout). Lo que queda es, por orden de
-> urgencia: **(1) TLS estricto** -ahora bloqueante, porque la credencial de la fuente viaja cada N
-> minutos-; **(2) `Cancel`** -el contrato miente hasta que se implemente o se quite del protocolo-;
-> y **(3)** cosas de escala/plan (limites, Redis) que solo importan al crecer.
+> **Lectura (corregida 2026-07-17)**: lo que protege de un **servidor comprometido** esta hecho, y ya
+> se cerraron **los dos que muerden en produccion** (dedup y timeout). Lo que queda, por urgencia:
+> **(1) `Cancel`** -el contrato miente hasta que se implemente o se quite del protocolo-; **(2) TLS
+> estricto** -guardrail del cliente, NO bloqueante: el cifrado lo da el despliegue HTTPS, esto solo
+> impide que un agente mal configurado use `http://`-; **(3)** escala/plan (limites, Redis) que solo
+> importan al crecer.
 
 ## Backlog (post v1)
 

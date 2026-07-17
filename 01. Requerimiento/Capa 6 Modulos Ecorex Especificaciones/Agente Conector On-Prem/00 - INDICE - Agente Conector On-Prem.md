@@ -2,7 +2,7 @@
 tipo: indice-proyecto
 proyecto: Agente Conector On-Prem para Contenedor de datos
 modulo_web: contenedor-datos (Sistema . Datos personalizados)
-estado: CONSTRUIDO y verificado (Olas A/B/C + 3 + Navegador + Archivos + MCP + 5a-5d + 4). Pendiente principal: Ola 6 casi cerrada - solo falta TLS estricto (BLOQUEANTE) y Cancel. Ver la tabla de estado en el doc 05.
+estado: CONSTRUIDO y verificado (Olas A/B/C + 3 + Navegador + Archivos + MCP + 5a-5d + 4 + reintento offline). Pendiente principal: Ola 6 casi cerrada - guardrail de TLS estricto (lo cubre el despliegue HTTPS; el resto es hardening del cliente) y Cancel. Ver la tabla de estado en el doc 05.
 fecha: 2026-07-11 (auditado contra el codigo y actualizado 2026-07-17)
 autor: documentado por agente IA a partir de decisiones del usuario
 ---
@@ -76,23 +76,25 @@ autor: documentado por agente IA a partir de decisiones del usuario
 >   horario. Probado en los DOS motores: intervalo "cada 1 min" sobre SQL Server (2 disparos exactos) y
 >   cron `9 7 * * *` sobre PostgreSQL (disparo a las 12:09:00 UTC exactas). Detalle en el doc 05 Ola 4.
 > - **La credencial de la fuente VUELVE A VIAJAR** (ADR-0040): se configura y cifra en la web y va en el
->   `FetchRequest` (antes: opcion b, vivia solo en el agente). Por conector. Consecuencia: **TLS
->   estricto sube a BLOQUEANTE**.
+>   `FetchRequest` (antes: opcion b, vivia solo en el agente). Por conector.
 > - **Ola 6: dedup de chunks y timeout del pending fetch, HECHOS** (eran "los dos que muerden en
 >   produccion"). `AgentFetchLog` queda **cubierto en parte** por `ImportRun` para el caso de negocio.
+> - **Reintento del agente offline (UC3): HECHO** (2026-07-17). Si el horario dispara con el agente
+>   caido, la corrida queda `PendingOffline` y el proceso se marca "esperando al agente"; el worker lo
+>   **reintenta solo cuando el agente vuelve** (gateado por `IsOnline` para no generar spam mientras
+>   sigue caido). Verificado E2E.
 > - **Motor PostgreSQL en el agente** (Npgsql): antes solo SQL Server. Un solo `GatewayExecutor` elige
 >   por `DbEngine`.
 >
-> **Lo que QUEDA (por urgencia)**:
-> 1. **TLS estricto - BLOQUEANTE para produccion** (ADR-0040): exigir https/wss y rechazar lo demas
->    (salvo `localhost` en dev) + prueba con cert invalido. Es lo mas urgente: la contrasena de la BD
->    del cliente viaja por el canal cada N minutos.
-> 2. **`Cancel`**: declarado en el contrato pero el agente NO lo maneja. El protocolo miente hasta
->    implementarlo o quitarlo.
-> 3. Reintento-al-reconectar del agente offline (UC3): hoy la corrida queda `Error` y se reintenta a
->    mano o al siguiente tick.
-> 4. Escala/plan: limites por plan (cupos), backplane Redis (multi-instancia del hub) - solo al crecer.
-> 5. Empaque/otros: `.iss` + firma del ejecutable; arranque tras reinicio real; mas motores (MySql/
+> **Lo que QUEDA (por urgencia, corregido 2026-07-17)**:
+> 1. **`Cancel`**: declarado en el contrato pero el agente NO lo maneja. El protocolo miente hasta
+>    implementarlo o quitarlo. Es la deuda mas honesta que queda.
+> 2. **TLS estricto - GUARDRAIL, no bloqueante** (ADR-0040, encuadre corregido): el cifrado del canal
+>    lo da el **despliegue detras de HTTPS** (el agente conecta por `wss://`); el "estricto" es solo que
+>    el agente RECHACE una URL no-TLS, defensa contra configuracion erronea/downgrade. Barato, se hace
+>    cuando convenga; no es un riesgo activo si prod es HTTPS.
+> 3. Escala/plan: limites por plan (cupos), backplane Redis (multi-instancia del hub) - solo al crecer.
+> 4. Empaque/otros: `.iss` + firma del ejecutable; arranque tras reinicio real; mas motores (MySql/
 >    Oracle); integracion dual PG/SQLServer del canal.
 
 # Agente Conector On-Prem - Contenedor de datos
