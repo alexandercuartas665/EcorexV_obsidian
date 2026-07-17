@@ -142,6 +142,7 @@ WPF** en si.
 | [[05 - Plan de trabajo por olas (para sub-agente)]] | Backlog en olas con criterios de aceptacion; contrato de trabajo para el sub-agente |
 | [[06 - Decision de stack y expansion a colmena multi-agente]] | **(2026-07-15)** Resuelve la duda de stack (.NET 10 / C# / WPF / navegador en Linux -> Windows-first, **D7 CONFIRMADA**) y encuadra la expansion a colmena: orquestador + sub-agentes (gateway / navegador+JS+MCP / archivos), GUI panal, identidad por ClientId (WhatsApp), seguridad de la superficie ampliada |
 | [[07 - Prior-art Doom (orquestador drone + sub-agente navegador WebView2 + MCP)]] | **(2026-07-15)** Ingenieria inversa del sistema Doom (VB.NET 4.8) que el usuario ya construyo: orquestador `ucClienteDrone` que abre sub-agentes, transporte `DroneClientService` (SignalR), y sub-agente navegador `consumoweb_webserver` (WebView2 + inyeccion de JS + servidor MCP con 7 herramientas `browser.*`). Mapeo ORIGEN -> DESTINO |
+| [[08 - Prompt de arranque Ola A (colmena WPF)]] | **(2026-07-15)** Prompt auto-contenido para delegar la **Ola A**: la cascara visual de la colmena en WPF (hexagonos, fondo transparente, poligono Configuracion siempre lleno, sub-agentes que se llenan al activarse). Sin logica real; deja el ViewModel listo para la Ola B (SignalR) |
 
 ## 5. Opinion de arquitectura (resumen)
 
