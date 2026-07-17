@@ -26,12 +26,17 @@ proposito: Contrato del canal SignalR entre servidor y agente: endpoint, handsha
 > ahora lo genera QUIEN DESPACHA (el runner), no el canal, porque la corrida tiene que guardarse con el
 > antes de despachar.
 >
-> **Lo que sigue PENDIENTE de este doc**: `Cancel`, que **esta declarado en el contrato pero el agente
-> NO lo maneja** (o sea: hoy el protocolo anuncia algo que no existe); hay que implementarlo o quitarlo
-> del contrato. El `protocolVersion` de s11 tampoco se usa aun para rechazar agentes viejos. Sobre
-> **WSS**: el cifrado lo da el despliegue detras de HTTPS (el agente conecta por `wss://`); lo que
-> falta es un guardrail -que el agente RECHACE una URL no-TLS- como defensa contra config
-> erronea/downgrade (ADR-0040, encuadre corregido: no es bloqueante si prod es HTTPS).
+> **`Cancel` HECHO (2026-07-17)**: ya no es una cascara. `CancelMsg(CorrelationId, Reason?)` tipado;
+> el agente guarda un `CancellationTokenSource` por correlationId y `On(Cancel)` lo cancela, con el
+> token llegando hasta el `GatewayExecutor` (aborta la consulta EN LA BD, no solo el bucle de envio);
+> al cancelar manda `FetchFailed CANCELLED`. El servidor lo empuja desde `AgentImportService.CancelAsync`
+> y desde el timeout sweep. Verificado que Npgsql aborta un `pg_sleep(25)` a los 3s al cancelar el
+> token.
+>
+> **Lo que sigue PENDIENTE de este doc**: el `protocolVersion` de s11 no se usa aun para rechazar
+> agentes viejos. Sobre **WSS**: el cifrado lo da el despliegue detras de HTTPS (el agente conecta por
+> `wss://`); lo que falta es un guardrail -que el agente RECHACE una URL no-TLS- como defensa contra
+> config erronea/downgrade (ADR-0040, encuadre corregido: no es bloqueante si prod es HTTPS).
 
 ## 1. Endpoint
 
@@ -83,7 +88,7 @@ On("FetchRequest", FetchRequest req)     // "traeme estos datos ya"
 On("Ping")                               // sanity/keepalive de aplicacion
 On("BrowserRequest", BrowserRequestMsg)  // [COLMENA] secuencia de acciones tipadas del Navegador
 On("FileRequest", FileRequestMsg)        // [COLMENA] accion tipada de Archivos
-On("Cancel", { correlationId })          // DECLARADO PERO NO MANEJADO por el agente (Ola 6)
+On("Cancel", CancelMsg)                  // HECHO: aborta el fetch en curso con ese correlationId
 ```
 
 ## 5. Mensajes (forma JSON)
