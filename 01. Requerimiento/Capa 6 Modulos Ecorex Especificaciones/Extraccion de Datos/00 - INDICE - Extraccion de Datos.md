@@ -3,8 +3,8 @@ tipo: indice-proyecto
 proyecto: Extraccion de Datos (automatizacion de navegador)
 modulo_web: extraccion-datos (Sistema . General)
 modulo_legacy: 000730 - NEWFRONT_web_scraping
-estado: EN DISENO. El modulo /extraccion-datos EXISTE hoy como un scraper HTTP simple (ADR-0025); este capitulo documenta su EVOLUCION a configurador de flujos ejecutados por el sub-agente Navegador de la colmena. Alcance actual: SOLO la configuracion (no el runtime).
-fecha: 2026-07-17
+estado: CONSTRUIDO (Olas 1-5) + E2E del runtime determinista. El modulo /extraccion-datos evoluciono de scraper HTTP simple (ADR-0025) a configurador de flujos ejecutados por el sub-agente Navegador; config + runtime determinista + paso de IA + programacion/paginacion/advertencias hechos y probados hasta donde el entorno de dev permite (sin colmena WebView2 ni proveedor de IA con llave). Ver [[05 - Estado de construccion y E2E]].
+fecha: 2026-07-17 (actualizado 2026-07-18)
 autor: documentado por agente IA a partir de decisiones del usuario
 ---
 
@@ -57,7 +57,8 @@ sub-agente. El scraper actual pasa a ser un caso particular (un flujo de un paso
 | [[01 - Vision, arquitectura y decisiones (Extraccion)]] | Problema, actores, como encaja con la colmena y el Contenedor de datos, que hay hoy vs objetivo, principios de seguridad heredados |
 | [[02 - Modelo de configuracion (flujo, pasos, variables)]] | El modelo de dominio a construir: `ScrapeFlow` / `ScrapeStep` / `ScrapeVariable`, tipos de paso, mapeo a `BrowserAction`, que se reusa vs que es nuevo |
 | [[03 - Runtime - el sub-agente Navegador ejecuta el flujo]] | Contrato de ejecucion (DIFERIDO; el alcance ahora es la config): como un flujo se compila a una secuencia de acciones + el paso de IA por MCP; gobierno (JS firmado, allow-list, cifrado, bitacora) |
-| [[04 - Plan de trabajo por olas (Extraccion)]] | Backlog en olas con criterios de aceptacion |
+| [[04 - Plan de trabajo por olas (Extraccion)]] | Backlog en olas con criterios de aceptacion (Olas 1-5 marcadas HECHAS) |
+| [[05 - Estado de construccion y E2E]] | **Estado REAL**: que se construyo ola por ola, el E2E del runtime determinista (agente stand-in por SignalR: auth + firma + ingesta + bitacora), pruebas, y lo que falta (colmena WebView2 + proveedor IA) |
 | [[NEWFRONT_web_scraping - Spec para reconstruir]] | **Prior-art**: la spec del modulo legacy `NEWFRONT_web_scraping` (000730) tal cual estaba en WebForms + runtime WPF "Doom". Referencia del modelo de datos y los tipos de paso originales |
 
 ## 5. Relacion con el resto del ecosistema
