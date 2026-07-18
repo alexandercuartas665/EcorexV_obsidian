@@ -59,20 +59,35 @@ proposito: Backlog por olas con criterios de aceptacion. La v1 llega hasta la CO
   colmena on-prem conectada (WebView2), fuera del entorno de dev, y queda cubierto por los tests del
   compilador/parseo + el `IRowIngestService` ya probado. Paso de IA -> Ola 4.
 
-## Ola 4 - Paso de IA
+## Ola 4 - Paso de IA [HECHO 2026-07-18]
 
 - Orquestacion agente<->navegador por el MCP local, con el modelo del AI Provider Gateway (entre los
   habilitados por el Super Admin), acotada por allow-list de tools + tope de pasos/tiempo. Ingesta del
   resultado.
 - **Aceptacion**: un paso de IA resuelve una pagina que un selector fijo no aguantaria, respeta los
   topes, y su resultado aterriza en el contenedor. Cupo por plan verificado.
+- **Estado**: construido y probado con fakes. Decision de construccion (ADR-0043 del repo): la
+  orquestacion corre SERVER-SIDE reusando el tool-calling del AI Provider Gateway
+  (`IAiProviderClient.CompleteWithToolsAsync`), con las acciones del navegador como tools ejecutadas por
+  un canal request/response sobre el hub; como ese canal pasa por el hub (no el MCP loopback del doc 03
+  s2), el servidor FIRMA el JS que genera la IA (el agente lo rechaza sin firma). Contencion: allow-list
+  de tools (default seguro sin eval/clic) + topes + allow-list de dominios; consumo via `IAiUsageService`
+  con cupo. Runtime unificado a ejecucion SECUENCIAL (canal await-por-tramo). 5 tests con fakes (bucle,
+  allow-list, firma, topes, ingesta). El E2E con LLM real manejando el navegador exige proveedor
+  habilitado + colmena conectada, fuera del entorno de dev.
 
-## Ola 5 - Programacion + endurecimiento
+## Ola 5 - Programacion + endurecimiento [HECHO 2026-07-18]
 
 - Programacion reusada (horario/manual) probada en vivo, como se hizo con el Contenedor de datos.
 - Paginacion controlada, advertencias (etiqueta -> notificar/detener), historico rico, panel de salud.
 - Decidir absorcion vs coexistencia con `ScrapeSource`/`ScrapeRun` (ADR-0025).
 - **Aceptacion**: un flujo programado corre solo y deja bitacora; las advertencias detienen/notifican.
+- **Estado**: construido. `ImportProcess` gana `FlowId` y el dispatcher ramifica a `RunFlowNowAsync`
+  (bitacora `ScrapeFlowRun`), reusando recurrencia + offline del Contenedor. Paginacion (`{{PAGINA}}` +
+  rango, con techo) y advertencias (etiqueta -> Notify/Stop) en el runtime + UI. Coexistir con
+  `ScrapeSource` (ADR-0044 del repo: no absorber hasta que el runtime este probado E2E). Verificado en
+  Chrome: la tarjeta "Programacion" crea el `ImportProcess` del flujo y calcula la proxima corrida. El
+  disparo programado real y la paginacion/advertencias en vivo exigen la colmena conectada.
 
 ## Criterios transversales (toda ola)
 
