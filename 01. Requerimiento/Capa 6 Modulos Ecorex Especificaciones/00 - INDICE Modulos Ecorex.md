@@ -13,13 +13,13 @@ auditado: si
 
 ## Los 5 modulos documentados
 
-| # | Modulo | Codigo | Carpeta | Spec | Prototipo HTML |
-|---|--------|--------|---------|------|----------------|
-| 1 | NEWFRONT_tar_conceptos | 000270 | Tareas | [[NEWFRONT_tar_conceptos - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_tar_conceptos.html) |
-| 2 | gen_reglas | 000802 | General | [[gen_reglas - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_gen_reglas.html) |
-| 3 | NEWFRONT_adm_empresas | 000072 | Configuracion | [[NEWFRONT_adm_empresas - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_adm_empresas.html) |
-| 4 | NEWFRONT_web_scraping | 000730 | Utilidades | [[NEWFRONT_web_scraping - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_web_scraping.html) |
-| 5 | comer_ContactLoader | 000873 | Comercial | [[comer_ContactLoader - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_contact_loader.html) |
+| #   | Modulo                 | Codigo | Carpeta       | Spec                                                     | Prototipo HTML                                                              |
+| --- | ---------------------- | ------ | ------------- | -------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 1   | NEWFRONT_tar_conceptos | 000270 | Tareas        | [[NEWFRONT_tar_conceptos - Spec para reconstruir\|spec]] | [prototipo](../Prototipo/conceptos-claude-design/proto_tar_conceptos.html)  |
+| 2   | gen_reglas             | 000802 | General       | [[gen_reglas - Spec para reconstruir\|spec]]             | [prototipo](../Prototipo/conceptos-claude-design/proto_gen_reglas.html)     |
+| 3   | NEWFRONT_adm_empresas  | 000072 | Configuracion | [[NEWFRONT_adm_empresas - Spec para reconstruir\|spec]]  | [prototipo](../Prototipo/conceptos-claude-design/proto_adm_empresas.html)   |
+| 4   | NEWFRONT_web_scraping  | 000730 | Utilidades    | [[NEWFRONT_web_scraping - Spec para reconstruir\|spec]] (ahora en su capitulo, ver abajo) | [prototipo](../Prototipo/conceptos-claude-design/proto_web_scraping.html)   |
+| 5   | comer_ContactLoader    | 000873 | Comercial     | [[comer_ContactLoader - Spec para reconstruir\|spec]]    | [prototipo](../Prototipo/conceptos-claude-design/proto_contact_loader.html) |
 
 **Nota**: los prototipos HTML son visuales navegables con datos demo realistas
 (Soldarco, Andina Vidrios, TeamTravels, BitCode IT, FacturaTech). Ver directorio
@@ -81,3 +81,19 @@ que un sub-agente lo construya. Ver subcarpeta `Agente Conector On-Prem/`:
 - [[03 - Servidor (Hub + Scheduler + Ingesta)]]
 - [[04 - Cliente (Servicio Windows + colmena WPF)]]
 - [[05 - Plan de trabajo por olas (para sub-agente)]]
+
+## Capitulo nuevo (2026-07-17) - Extraccion de Datos (automatizacion de navegador)
+
+EVOLUCION del modulo 000730 (`NEWFRONT_web_scraping`, hoy "Extraccion de datos"): de un scraper HTTP
+simple (ADR-0025) a un **configurador de flujos de automatizacion de navegador** cuyo runtime es el
+**sub-agente Navegador de la colmena** (ver el capitulo del Agente). Los datos aterrizan en un
+Contenedor de datos y los flujos reusan la programacion/bitacora ya construida. Alcance actual: SOLO
+la configuracion. La spec del modulo legacy se movio dentro de esta subcarpeta como prior-art. Ver
+`Extraccion de Datos/`:
+
+- [[00 - INDICE - Extraccion de Datos|Indice del proyecto]]
+- [[01 - Vision, arquitectura y decisiones (Extraccion)]]
+- [[02 - Modelo de configuracion (flujo, pasos, variables)]]
+- [[03 - Runtime - el sub-agente Navegador ejecuta el flujo]]
+- [[04 - Plan de trabajo por olas (Extraccion)]]
+- [[NEWFRONT_web_scraping - Spec para reconstruir]] (prior-art del modulo legacy)
