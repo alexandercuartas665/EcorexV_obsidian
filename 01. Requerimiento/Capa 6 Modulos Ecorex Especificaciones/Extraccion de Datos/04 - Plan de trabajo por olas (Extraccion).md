@@ -40,14 +40,24 @@ proposito: Backlog por olas con criterios de aceptacion. La v1 llega hasta la CO
 - **Aceptacion**: el operador disena un flujo completo desde la web, con los dos tipos de paso, y queda
   guardado. Verificado en Chrome contra el tenant demo.
 
-## Ola 3 - Runtime determinista (cablear al Navegador)
+## Ola 3 - Runtime determinista (cablear al Navegador) [HECHO 2026-07-18]
 
 - Compilar un flujo a `BrowserAction[]`, sustituir variables, FIRMAR el JS, empujar `BrowserRequest`
   al agente, recibir `BrowserResult`, ingerir los pasos `Extract` con `IRowIngestService`, cerrar la
-  corrida en `ImportRun`. Manejo offline reusado.
+  corrida. Manejo offline reusado.
 - **Aceptacion**: un flujo real (login + navegar + extraer) corre en un agente de la colmena y las filas
   aterrizan en el contenedor; la bitacora lo registra; el JS sin firma se rechaza; un dominio fuera de
   la allow-list se bloquea. E2E.
+- **Estado**: construido y probado. `ScrapeFlowCompiler` (flujo -> `BrowserAction[]`, sustitucion +
+  firma), `IBrowserRunService` (despacho + correlacion + ingesta + sweep, espejo de `AgentImportService`),
+  bitacora DEDICADA `ScrapeFlowRun` en vez de reusar `ImportRun` (decision de construccion, ADR-0042 del
+  repo: `ImportRun` cuelga de `ImportProcess`, que es la programacion; el disparo manual no tiene
+  proceso; la Ola 5 podra apuntar un `ImportProcess` al flujo sin remodelar). El rechazo de JS sin firma
+  ya lo garantiza el agente (fail-closed, verificado en olas del Navegador); aqui se cubrio con tests el
+  que la firma cubra el JS sustituido+ligado al corr. Verificado en Chrome el disparo, el guard sin
+  agente y el camino offline ("esperando al agente"); el E2E con filas reales aterrizando exige la
+  colmena on-prem conectada (WebView2), fuera del entorno de dev, y queda cubierto por los tests del
+  compilador/parseo + el `IRowIngestService` ya probado. Paso de IA -> Ola 4.
 
 ## Ola 4 - Paso de IA
 
