@@ -94,3 +94,212 @@ tarea.
   de version textual, definir donde. P3.
 
 ---
+
+## 2026-07-17 - CONTACTO CLIENTE (FRM-00005) CONSTRUIDO en prod
+
+Con D1-D4 ya desplegados en prod (redeploy desde `fase-0/clon-backbone`), la sesion de diseno armo el
+formulario CONTACTO CLIENTE en SOLDARCO. Se hizo por SQL directo (13 preguntas + config transaccional +
+regla), copiando las formas EXACTAS que produce el motor (verificadas en codigo: `FormGridCalculator`,
+`BloquearCampoPorCondicionVerb`, `SaveFormQuestionRequest`). Estado: los 13 campos, la transaccionalidad
+y la regla quedaron verificados en BD. Falta la verificacion VISUAL en el navegador (ver nota de login abajo).
+
+Lo construido:
+- Definicion **transaccional** (`is_transactional=true`, `identity_mode=Sequence`): el consecutivo lo emite
+  el motor al confirmar (`FRM-00005-000001`, auto-crea la `tenant_sequence`).
+- 13 campos: fecha (Date, default Hoy), **hora (Time, usa D1)**, asesor_comercial (Text, default usuario
+  actual), nombre/codigo/nit (Text), perfil y estado_comercial (Select), sec_contactos (Heading),
+  **contactos (GridDetail con columnas tipadas: 3 text + 2 select con opciones, usa D3)**, detalle_general
+  (TextArea), concreto_venta (Select Si/No), valor (Number, formato moneda).
+- **Regla D4**: `BLOQUEAR_CAMPO_XCONDICION` con `effect=show`, `operator=equals`, `value=si`,
+  `sourceField=concreto_venta`, `targetField=valor`. El verbo es de DOBLE VIA (si cumple Show, si no Hide),
+  asi que una sola regla basta. Se creo el 1er `rule_document` de SOLDARCO (RUL-001).
+
+### Hallazgo nuevo para desarrollo
+
+**D5 [ ] P3 - Reglas de campo NO se evaluan al CARGAR el formulario.**
+El renderer (`DynamicFormRenderer.razor`) solo dispara `DispatchFieldRulesAsync` en el `OnFieldChanged`
+(no hay pase inicial). Ademas la visibilidad es un OR: `_ruleUiState.IsHidden(fc) || q.IsHidden || rolHide`
+(linea ~463), asi que un `is_hidden` estatico NO se puede revelar por regla. Consecuencia: el campo "valor"
+arranca VISIBLE y solo se oculta cuando el usuario elige concreto_venta != "si". No queda oculto de entrada.
+- Mejora deseable: evaluar las reglas de campo una vez al montar el formulario (con los valores por
+  defecto) para fijar el estado inicial de UI. Asi "valor" nace oculto hasta que haya venta.
+
+**Nota de QA - login por automatizacion: RESUELTO (causa raiz + como).**
+Sintoma: por automatizacion (Chrome MCP) los clics/teclas sobre el login NO hacian submit (sin error).
+CAUSA RAIZ: el login NO es un handler interactivo de Blazor; es un **POST HTTP nativo** (`<form
+action="/auth/login" method="post">`), porque la cookie de auth debe fijarse en una respuesta HTTP real,
+no por el circuito SignalR. Por eso clicar el boton sobre el circuito no envia nada. Ademas los inputs se
+llenan con `@bind` (onchange), asi que setear `.value` por JS sin evento no vale.
+SOLUCION que funciona (verificado, se entro como administracion@soldarco.com): fijar los valores con el
+setter nativo + `dispatchEvent(new Event('change',{bubbles:true}))` y luego **`form.requestSubmit()`** sobre
+el form de `/auth/login`. Tras el POST la sesion queda activa y el resto de la app (interactiva) va normal.
+Para el plan de pruebas E2E: encapsular esto en un helper de login (o exponer un endpoint de sesion de test).
+Nota aparte: el CONSTRUCTOR de formularios es una pagina Blazor Server PESADA; bajo automatizacion el
+renderer se congela al capturar screenshot (no es bug funcional, es peso de pagina). Verificacion via texto
+(get_page_text) o por BD es mas fiable en esa pantalla.
+
+**Verificacion de FRM-00005 en la UI (2026-07-17):** con el login ya resuelto, el modulo Formularios de
+SOLDARCO muestra la tarjeta CONTACTO CLIENTE (FORX-FRM-00005) con **13 campos** y **1 regla**, y el KPI
+"1 Con reglas". Confirma que lo construido por SQL quedo bien y el motor lo reconoce.
+
+---
+
+## 2026-07-17 - SIMULADOR DE COTIZACIONES (SKY SYSTEM, codigo `COT`)
+
+Origen: Excel `048. SKy System/Cotizador Formulario.xlsx`, hoja **SIMULADOR** (+ hojas BASE_PRODUCTOS
+~1019 productos, BASE_CLIENTES ~38 clientes, SEGUIMIENTO_COTIZACIONES, FORMATO_COTIZACION).
+FASE 1 (hecha): **diseno/estructura**. FASE 2 (pendiente): las formulas.
+
+Construido en prod (definition `59a91ffe-01ef-4e28-9b3e-2b4ae9935612`): formulario **transaccional**
+(consecutivo `COT-000001`, equivale al N. COT del Excel), 18 campos:
+encabezado (fecha, cliente, IVA%), parametros del cliente (pasaje, horas parq., parq. x hora,
+total parq. **calculado**, margen Sky), la **tabla `items` con 18 columnas**, los 5 totales
+(alimentados por **rollup** desde la tabla) y observaciones.
+
+### Que formulas del Excel YA funcionan y cuales NO
+
+El motor de calculo (`FormExpressionEvaluator`) es un **sandbox estricto**: solo numeros, referencias
+`{campo}` y `+ - * /` con parentesis y menos unario. **NO tiene funciones** (decision de diseno para
+evitar el RCE del legacy). Resultado:
+
+YA CONFIGURADAS (aritmetica pura, quedaron activas en el formulario):
+- `precio_base = {costo}/{margen}`
+- `subtotal = {cantidad}*{p_unitario}`
+- `descuento = {subtotal}*{desc_pct}`
+- `subt_desc = {subtotal}-{descuento}`
+- `total = {subt_desc}+{iva}`
+- `total_parq = {horas_parq}*{parq_hora}` (encabezado)
+- Totales por `agg:"Sum"` + `rollup` a los campos del encabezado.
+
+### Necesidades de desarrollo (fase 2 del simulador)
+
+**D6 [ ] P1 - Lookup/autollenado en COLUMNA de tabla (el VLOOKUP del Excel).**
+El corazon del simulador: se escribe el CODIGO y se autollenan producto, detalle, marca, proveedor,
+costo y stock desde BASE_PRODUCTOS. Hoy `FormGridColumn.Kind` solo admite `text` o `select`; el lookup
+con autollenado existe **solo a nivel de CAMPO** (`SourceKind` + `AutofillMapJson`), no de columna.
+Sin esto el usuario teclea a mano las 6 columnas por fila.
+
+**D7 [ ] P1 - Funciones en el motor de calculo.**
+El Excel usa `IF`, `IFERROR`, `CEILING(x,1000)`, `ISNUMBER`, `SUMIF`, `TEXT`, `CHAR`. Minimo viable
+para el simulador: **IF (condicional)** y **CEILING/ROUND a multiplo** (el P.UNITARIO redondea a miles).
+Mantener el sandbox: agregar una allow-list de funciones puras, sin acceso al host.
+Casos concretos que hoy no se pueden expresar:
+- `p_unitario = CEILING(precio_base + pasaje + total_parq + mano_obra, 1000)`
+- `subtotal = IF(cantidad > stock, "SIN STOCK", cantidad * p_unitario)`
+- `iva = IF(producto_exento, 0, subt_desc * iva_pct)`
+
+**D8 [ ] P2 - Una columna calculada no puede referenciar campos del ENCABEZADO.**
+`FormGridCalculator.Recompute(rows, cols)` calcula **por fila**, con las columnas de esa fila. El
+simulador necesita que la fila use el `iva_pct`, `pasaje` y `total_parq` del encabezado. Workaround
+actual: el IVA de la columna quedo con el literal `0.19` (si cambian el IVA del encabezado, la columna
+no se entera).
+
+**D9 [ ] P2 - Agregado condicional (SUMIF).** El total del Excel excluye las filas "SIN STOCK"
+(`SUMIF(N5:N24,"<>SIN STOCK",...)`). Hoy `agg` solo suma todo.
+
+**D10 [ ] P3 - Generacion de texto/plantilla.** El Excel arma un mensaje de WhatsApp concatenando los
+items y totales. Seria un "campo texto por plantilla" con placeholders.
+
+**DATOS (no es codigo, es ETL):** los maestros NO van a contenedores genericos (correccion del usuario):
+los **clientes van al Directorio General (Terceros)** y los **productos a Items de inventario**. El motor
+ya soporta ambos como fuente (`FormSourceKind.Tercero` / `.Item`) con sus campos dinamicos. El lookup del
+CLIENTE en el encabezado es configurable HOY (sin codigo) en cuanto existan los terceros.
+
+### Decisiones de diseno cerradas con el usuario (2026-07-17, revision campo por campo)
+
+1. **Costo**: el simulador usa el **COSTO SIN IVA** (col 8 de la base), no el costo con IVA. Es
+   intencional; el precio base se calcula sobre ese.
+2. **Columnas del lookup EDITABLES**: producto/detalle/marca/proveedor/costo/stock se autollenan como
+   **snapshot** y el asesor puede ajustarlas en una cotizacion puntual (no es vinculo vivo).
+3. **PASAJE: una sola vez por cotizacion**, NO por fila. El Excel lo sumaba dentro del precio unitario
+   de cada item (5 productos = 5 pasajes): era un error. Consecuencia buena: la formula de la fila ya
+   no necesita leer el encabezado para el pasaje/parqueadero.
+4. **MARGEN en %**: se captura 20 (no el divisor 0,8). Formula activa
+   `precio_base = {costo}/(1-{margen}/100)`. Idem el descuento: `{subtotal}*{desc_pct}/100`.
+   OJO: en BASE_CLIENTES la columna MARGEN SKY esta **vacia en los 38 clientes** (y MANO DE OBRA
+   tambien), asi que hoy el margen es un valor por defecto, no un dato del cliente.
+5. **Datos faltantes del cliente = 0** (5 clientes sin TIPO PARQ, 2 sin pasaje): nunca bloquea.
+6. **PARQ $ es de doble uso**: en clientes FIJO es el valor fijo; en X HORA es la tarifa por hora.
+   Resuelto SIN codigo: regla condicional (muestra "Horas" solo si es X HORA) + horas=1 por defecto,
+   de modo que `total_parq = horas * valor` sirve para ambos casos.
+7. **SIN STOCK**: el renglon se **marca y NO suma** (como el Excel). Implementado como marca numerica
+   `sin_stock = SI(cantidad > stock; 1; 0)` + agregado condicional, en vez del hack del Excel de meter
+   el texto "SIN STOCK" en una columna numerica.
+8. **IVA editable por cotizacion** (campo `iva_pct` del encabezado) -> exige que una formula de columna
+   pueda leer el encabezado.
+9. **Redondeo con multiplo como PARAMETRO** (`REDONDEAR.SUPERIOR(valor; multiplo)`), no fijo a 1000.
+10. Fuera de alcance de la primera tanda: la plantilla del mensaje de WhatsApp.
+
+### Estado del formulario COT (lo que YA calcula vs lo que espera codigo)
+
+Activas hoy: `precio_base`, `subtotal`, `descuento`, `subt_desc`, `total`, `total_parq` y
+`total_cotizacion = {tot_total}+{pasaje}+{total_parq}`, mas los 5 totales por rollup.
+Se dejaron a proposito las versiones que FUNCIONAN de `p_unitario` (`{precio_base}+{mano_obra}`) e
+`iva` (`{subt_desc}*0.19`): poner ya las formulas objetivo devolveria null y tumbaria toda la cadena.
+La sesion de codigo debe cambiarlas al cerrar C2/C3:
+```
+p_unitario = REDONDEAR.SUPERIOR({precio_base}+{mano_obra}; 1000)
+iva        = SI({exento_iva}=1; 0; {subt_desc}*{#iva_pct}/100)
+```
+
+### Capacidades a implementar (prompt entregado al usuario para la sesion de codigo)
+- **C1** = D6 lookup/autollenado en columna de tabla (fuente Item; generico para Tercero/Contenedor).
+- **C2** = D7 funciones en el sandbox: `SI`, comparaciones, `REDONDEAR.SUPERIOR/INFERIOR/REDONDEAR`
+  con multiplo parametrico, y `MIN`/`MAX` deseables.
+- **C3** = D8 una formula de columna puede leer un campo del ENCABEZADO (sintaxis propuesta `{#campo}`).
+- **C4** = D9 agregado condicional (`aggWhen`) para excluir filas marcadas de los totales.
+- **C5** = D11 **valor por defecto por columna** de tabla (cantidad=1, margen=20, desc=0). Hoy al
+  añadir fila todas las celdas nacen vacias.
+
+### ESTADO REAL tras revisar el codigo desplegado (2026-07-27)
+- **C2 HECHO**: `FormExpressionEvaluator` es ahora un sandbox con funciones `SI`, `REDONDEAR`,
+  `REDONDEAR.SUPERIOR`, `REDONDEAR.INFERIOR`, `MIN`, `MAX`, comparadores `> < >= <= = <>`, `SI` perezosa.
+  Multiplo del redondeo como PARAMETRO. Allow-list cerrada, sandbox intacto.
+- **C3 HECHO**: referencias al encabezado `{#campo}`; `FormGridCalculator.Compute/Recompute` reciben
+  `headerValues`.
+- **C4 HECHO**: `FormGridColumn.AggWhen` + `Compute` devuelve `ExcludedRowIndexes`. Ademas se agrego
+  ancho por columna (`width`) como bonus.
+- **C1 HECHO** (codigo, 2026-07-27): lookup por COLUMNA en `FormGridColumnLookup.cs`
+  (`FormGridLookupConfig`+`FormGridColumnExtras`+parser), en paralelo a `FormGridCalculator`. JSON de
+  columna: `"lookup":{"source":"Item","valueField":"sku","displayField":"name","autofill":{campoFuente:
+  idColumnaDestino}}`. La celda guarda el `valueField` (SKU legible), no el id. Reusa `IFormLookupService`.
+- **C5 HECHO**: `"default":"1"` por columna (`FormGridColumnExtras`), + `"stockCheck":{"against":"cantidad"}`.
+- **DATOS (2026-07-27, sesion de datos - HECHO):** SKY SYSTEM tiene 43 terceros (clientes, OK) y el
+  catalogo de items del cotizador ya quedo LISTO para el lookup. OJO: BASE_PRODUCTOS **tiene 11
+  productos, no ~1019** (el "1019" es max_row-4; 1009 filas vacias). Los 11 items estan remapeados a lo
+  que el simulador espera: `Price`=COSTO SIN IVA, campo `costo_con_iva`=COSTO, `exento_iva`="0"/"1"
+  (Text), `proveedor`, marca (FK Brand) y stock en Bodega Central. Basura E2E limpia (0/0).
+  (El catalogo es de 11 productos reales, no 1019: las demas filas del Excel estan vacias. Esta completo.)
+- **Simulador COT `59a91ffe` TERMINADO por diseno (2026-07-27):** formulas objetivo activas (p_unitario
+  con REDONDEAR.SUPERIOR, iva con SI + {#iva_pct}, aggWhen {sin_stock}=0 en los 5 totales); columna
+  `codigo` con lookup a Item ya CONFIGURADO (valueField=sku, displayField=name; autofill:
+  name->producto, description->detalle, price->costo, stock->stock, proveedor->proveedor,
+  exento_iva->exento_iva); defaults cantidad=1/margen=20/desc=0; `card_layout`=Completo (~1600px).
+  Verificado en BD. PENDIENTE MENOR: la columna `marca` NO se autollena porque
+  `ItemLookupSource.DescribeFieldsAsync` no expone la Brand (FK nativa); publica id/sku/name/description/
+  price/active/stock + dinamicos. Para autollenar marca: exponer `brand` en el adaptador [codigo] o
+  guardarla como campo dinamico [datos]. No es calculo (solo se muestra); no bloquea.
+
+---
+
+### Extension del lookup de COLUMNA: marca + contenedor + presentacion (2026-07-27, sesion de CODIGO - HECHO)
+Desplegado a prod (`fase-0/clon-backbone` @ `064ec36`, backup `ecorex-2026-07-27-1519.sql.gz`, sin migracion).
+
+- **P2 Marca HECHO:** `ItemLookupSource` resuelve `Item.Brand.Name` y publica el campo **`brand`**
+  ("Marca") en `DescribeFieldsAsync`, `ToItem`, la query y el `Row`. Con esto el simulador YA puede
+  mapear `brand -> marca` en el autollenado (resuelve el "pendiente menor" de arriba).
+- **P1 Lookup desde CONTENEDOR y las 3 fuentes HECHO:** el editor de columna del GridDetail
+  (`FormDesigner`) ahora tiene el tipo "Lookup" con Fuente (Inventario/Directorio/Contenedor); al elegir
+  Contenedor se escoge CUAL contenedor (sourceRef) y sus campos salen de `DescribeFieldsAsync`. Reusa
+  `IFormLookupService` (Item/Tercero/DataContainer), sin logica duplicada. Campo clave, campo a mostrar
+  y el mapa de autollenado se pueblan con los campos descritos.
+- **P1 Presentacion lista/auto/modal HECHO:** `FormGridLookupConfig.Presentation` (JSON
+  `"presentation":"list"|"autocomplete"|"modal"`, default autocomplete). `RenderGridLookupCell` pinta
+  `<select>` con el catalogo en modo Lista y el type-ahead en Autocompletar. Fuente inaccesible o
+  catalogo vacio -> cae a texto plano, no rompe. Selector de presentacion en el editor de columna.
+- **P1 Editable HECHO:** la celda y las columnas autollenadas quedan editables (snapshot) en las 3
+  fuentes y en modo Lista; la configuracion completa se edita desde el disenador sin tocar codigo.
+- **Bug corregido:** `SaveGridColumnsAsync` del disenador ahora es LOSSLESS (preservaba solo los campos
+  de `FormGridColumn`, borraria `lookup`/`default`/`stockCheck` al guardar una columna).
+- **Tests:** `FormGridColumnLookupTests` (presentacion list/auto/modal, fuente Contenedor + sourceRef,
+  mapeo `brand->marca`, autollenado por fila, default por columna) + `FormGridXlsxSmokeTests`. 15/15 verdes.
