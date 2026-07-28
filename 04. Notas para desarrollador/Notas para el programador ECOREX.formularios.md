@@ -303,3 +303,38 @@ Desplegado a prod (`fase-0/clon-backbone` @ `064ec36`, backup `ecorex-2026-07-27
   de `FormGridColumn`, borraria `lookup`/`default`/`stockCheck` al guardar una columna).
 - **Tests:** `FormGridColumnLookupTests` (presentacion list/auto/modal, fuente Contenedor + sourceRef,
   mapeo `brand->marca`, autollenado por fila, default por columna) + `FormGridXlsxSmokeTests`. 15/15 verdes.
+
+---
+
+## 2026-07-27 - Alineacion de cajas en una fila (polish de render)
+
+**DA1 [ ] P3 - Reservar la linea del SUBTITULO/caption aunque este vacia.**
+Sintoma: en una fila con varios campos, si unos tienen `caption` (subtitulo) y otros no, las etiquetas
+de los que SI lo tienen ocupan una linea mas y sus `<input>` quedan mas abajo -> las cajas de la fila no
+se alinean (visto por el usuario en el SIMULADOR, seccion "Parametros del cliente").
+- Workaround de DISENO aplicado (sin codigo): darle un caption corto a todos los campos de la fila para
+  que todos midan igual. Es fragil (si el usuario quita un caption vuelve a desalinear) y manual por form.
+- Arreglo REAL (renderer, `DynamicFormRenderer.razor` + su CSS): que el bloque etiqueta+subtitulo tenga
+  altura consistente aunque el caption sea null (reservar la 2a linea, o alinear los inputs al fondo de la
+  celda con `align-items:end` en la fila). Asi TODOS los formularios se alinean solos sin importar que
+  captions ponga el usuario -> respeta la norma "el usuario ajusta el diseno" sin que se rompa la
+  alineacion. Aplica a la vista de llenar (/f, /m y vista previa).
+
+### Formato numerico por columna + nombre/clave (SKU) en resultados del lookup (2026-07-27, sesion de CODIGO - HECHO)
+Desplegado a prod (`fase-0/clon-backbone` @ `67e4d3d`, backup `ecorex-2026-07-27-1902.sql.gz`, sin migracion).
+
+- **Formato numerico por columna del GridDetail (configurable):** `FormGridColumn.Format`
+  (currency/integer/decimal/percent) en `options_json`, reusando `FormatValue`. Selector "Formato
+  numerico" en el editor de columna. Se aplica a celdas calculadas, editables (muestra formateado y al
+  salir guarda el numero CRUDO, asi el calculo no se rompe) y la fila de totales. `format` entra en
+  `GridCoreKeys` para el guardado lossless. Estilo InvariantCulture ($ 1,234), como el resto de la app.
+- **Nombre + clave (SKU) en los resultados del lookup (campo y columna, 3 fuentes):** cada resultado
+  muestra el Display + la clave atenuada (monospace) a la derecha, ej. "IMPRESORA HP · IMP1". No se
+  repite si esta vacia, si es el id crudo o si coincide con el Display. La clave sale del valueField
+  (`KeyOf` en columna); se asegura que el valueField viaje siempre en `Fields` (LookupFields del campo
+  y `FormGridLookupConfig.Fields`). Nuevo `subLabel` opcional por columna para elegir el campo
+  secundario (default: la clave), editable en el disenador. No se toco la busqueda (`ItemLookupSource`).
+- **Fix previo (mismo dia):** el panel de autocompletado de la celda-lookup se portaba mal dentro del
+  modal (position:fixed anclado a un ancestro con backdrop-filter/transform) y lo recortaba el scroller;
+  se PORTA a <body> y se ancla al input por id (data-lkanchor). Commit `4b0b4fc`.
+- Tests: formato por columna (`FormGridCalculatorTests`) y `subLabel` (`FormGridColumnLookupTests`). 32 en total, verdes.
