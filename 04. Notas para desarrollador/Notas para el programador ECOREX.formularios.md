@@ -338,3 +338,23 @@ Desplegado a prod (`fase-0/clon-backbone` @ `67e4d3d`, backup `ecorex-2026-07-27
   modal (position:fixed anclado a un ancestro con backdrop-filter/transform) y lo recortaba el scroller;
   se PORTA a <body> y se ancla al input por id (data-lkanchor). Commit `4b0b4fc`.
 - Tests: formato por columna (`FormGridCalculatorTests`) y `subLabel` (`FormGridColumnLookupTests`). 32 en total, verdes.
+
+### Objeto Boton + accion "Imprimir plantilla" (2026-07-27, sesion de CODIGO - HECHO)
+Desplegado a prod (`fase-0/clon-backbone` @ `021f254`, backup `ecorex-2026-07-27-2045.sql.gz`, sin migracion).
+
+Nuevo control Boton en los formularios con una accion de funcionalidad: imprime una PLANTILLA (modulo
+Plantillas / QuoteTemplate) rellenada con los datos del REGISTRO; no imprime el formulario.
+
+- **Motor de merge** (`FormTemplateMerge` / `FormTemplateRenderService`): marcadores `{{campo.codigo}}`
+  (con formato), bloque repetible de tabla `{{#tabla.items}}...{{col.idColumna}}...{{fila}}...{{/tabla.items}}`
+  (line items), y sistema `{{empresa}}`/`{{fecha}}`/`{{numero}}`. Escapa valores; marcador inexistente = vacio.
+  Corre sin sesion (lo invoca el render de PDF por URL); acota por el TenantId del registro.
+- **Endpoints** (Program.cs, patron /cotizacion, AllowAnonymous + loopback interno):
+  `/formularios/plantilla/{responseId}?templateId=&print=1` (HTML auto-imprime), `.../pdf`, `.../img`.
+  Reusan `IQuotePdfRenderer` (Chromium headless).
+- **Renderer + disenador**: control Button renderizable; al hacer clic abre un dialogo que PREGUNTA
+  plantilla + formato (Imprimir/PDF/Imagen); al generar guarda el registro (persiste lo capturado) y abre
+  el endpoint. Paleta "Boton" en el disenador + registro del tipo. Requiere registro guardado (modo llenado).
+- Decisiones (con el usuario): reusar QuoteTemplate; SI repetir filas de tabla; imprimir desde el registro
+  guardado. Marcadores usan los CODIGOS internos de campos/columnas.
+- Tests: `FormTemplateMergeTests` (campos, bloque de tabla, sistema, formato, escape). 35 tests de forms verdes.
