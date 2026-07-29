@@ -97,3 +97,18 @@ la configuracion. La spec del modulo legacy se movio dentro de esta subcarpeta c
 - [[03 - Runtime - el sub-agente Navegador ejecuta el flujo]]
 - [[04 - Plan de trabajo por olas (Extraccion)]]
 - [[NEWFRONT_web_scraping - Spec para reconstruir]] (prior-art del modulo legacy)
+
+## Capitulo nuevo (2026-07-29) - Motor de Reportes y BI
+
+Proyecto NUEVO (no reconstruccion): un motor de reportes y BI **dentro del producto** (.NET 10 /
+Blazor) que cubre imprimibles (facturas/ordenes/PDF), dashboards interactivos (estilo tablero de
+KPIs) y reportes ad-hoc que la IA crea por instruccion, sobre tablas nativas Y contenedores. Stack
+DECIDIDO con el usuario: **Syncfusion Essential Studio (Blazor) + Bold Reports** (editor visual para
+usuarios finales, formato RDL) + **Apache ECharts** (dashboards), con acceso a datos SIEMPRE via un
+datasource tenant-safe (nunca cadena de conexion). Se construye en una sesion nueva en worktree;
+gate #1 = validar elegibilidad Community License. Ver subcarpeta `Motor de Reportes y BI/`:
+
+- [[00 - INDICE - Motor de Reportes y BI|Indice del proyecto]]
+- [[01 - Vision, decision de stack y gates de licencia]]
+- [[02 - Arquitectura - capa de definicion, catalogo semantico y datasource tenant-safe]]
+- [[03 - Plan de trabajo por olas (para sub-agente)]]
