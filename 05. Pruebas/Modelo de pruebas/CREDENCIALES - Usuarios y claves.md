@@ -25,18 +25,17 @@ aviso_seguridad: REPO PUBLICO - aqui NO van secretos reales; solo defaults demo 
 ---
 
 ## 1. PlatformAdmin (consola de plataforma - operador del SaaS)
-
 Rol maximo, fuera de cualquier tenant. Se siembra en Development (`SeedIfEmptyAsync`,
 ver [[HOJA DE RUTA DESARROLLO]] seccion 3.3). Consola separada con MFA (ver
 [[Seguridad y Autenticacion multi-tenant]]).
 
-| Campo | Valor |
-|---|---|
-| **Consola** | `http://localhost:<puerto Web.Platform>` -> `/login` |
-| **Email** | `admin@ecorex.local` |
-| **Clave** | `Admin123*` (demo Development; MFA obligatorio en real) |
-| Rol | `PlatformAdmin` (platform_role) |
-| Tenant | ninguno (cross-tenant auditado) |
+| Campo       | Valor                                                   |
+| ----------- | ------------------------------------------------------- |
+| **Consola** | `http://localhost:<puerto Web.Platform>` -> `/login`    |
+| **Email**   | `admin@ecorex.local`                                    |
+| **Clave**   | `Admin123*` (demo Development; MFA obligatorio en real) |
+| Rol         | `PlatformAdmin` (platform_role)                         |
+| Tenant      | ninguno (cross-tenant auditado)                         |
 
 ## 2. Administrador del tenant demo
 
@@ -56,13 +55,13 @@ sistema actual (ver [[Conexion a la BD del sistema actual (db3dev)]]).
 Un usuario por rol para probar policies y aislamiento. Todos con clave demo
 `Demo123*`, en el tenant SKY SYSTEM.
 
-| Rol (tenant_role) | Email login | Ve |
-|---|---|---|
-| `Owner` | `owner@sky-system.local` | Todo el tenant |
-| `Admin` | `admin@sky-system.local` | Casi todo (sin borrar ni roles) |
-| `Operator` | `operator@sky-system.local` | Operacion diaria (tareas, tableros) |
-| `Viewer` | `viewer@sky-system.local` | Solo lectura |
-| `IA` | (interno, sin login humano) | Rol que usan los agentes de IA |
+| Rol (tenant_role) | Email login                 | Ve                                  |
+| ----------------- | --------------------------- | ----------------------------------- |
+| `Owner`           | `owner@sky-system.local`    | Todo el tenant                      |
+| `Admin`           | `admin@sky-system.local`    | Casi todo (sin borrar ni roles)     |
+| `Operator`        | `operator@sky-system.local` | Operacion diaria (tareas, tableros) |
+| `Viewer`          | `viewer@sky-system.local`   | Solo lectura                        |
+| `IA`              | (interno, sin login humano) | Rol que usan los agentes de IA      |
 
 > Los roles se derivan de los grupos del legacy (`SUCURSAL_GRUPOS*` +
 > `PermissionsManager`) a **policies .NET**. Ver [[Gestion de Empresas - Admin multi-tenant]].
@@ -175,6 +174,7 @@ Un usuario **validado** por tenant (los demas del tenant siguen la misma regla):
 | BITCODE       | `acuartas@bitcode.com.co`          | `80001976`     | Owner |
 | SKY SYSTEM    | `adriana.borrero@skysystem.com.co` | `51888215`     | Owner |
 | agrometalicas | `calidad@agrometalicas.com`        | `1116243150`   | Owner |
+|               |                                    |                |       |
 
 Super Admin de plataforma (prod): `admin@ecorex.local` (la clave es el secreto
 `ECOREX_SEED_ADMIN_PASSWORD` del `.env` del server, **NO** se documenta aqui).
