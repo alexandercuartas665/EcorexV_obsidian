@@ -18,3 +18,9 @@ desktop.ini
 
 # Directorio de usuarios con CEDULAS reales (clave) - NUNCA al repo publico
 05. Pruebas/Modelo de pruebas/CREDENCIALES-PRIVADO-no-subir.md
+
+# Notas con credenciales / datos sensibles - NUNCA al repo publico (patrones defensivos)
+# Cubre cualquier archivo de credenciales, notas PRIVADAS e inventarios de host de prod.
+CREDENCIALES*.md
+*PRIVADO*
+Host de produccion*
