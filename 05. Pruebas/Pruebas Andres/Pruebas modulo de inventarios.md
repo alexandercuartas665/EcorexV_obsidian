@@ -1,0 +1,1 @@
+![[Pasted image 20260729234303.png]] en donde se crea ese modalno deberia tener un scroll deberiamos encontrar la manera de que no tenga scroll

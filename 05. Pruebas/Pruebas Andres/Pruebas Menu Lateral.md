@@ -1,0 +1,1 @@
+![[Pasted image 20260729233716.png]] el menu deberia tener una opcion como en el modal donde se crea para expandir y contraer todo en un nivel solo los padres y en otro nivel los hijos de los padres si el menu es a tres y tiene nietos

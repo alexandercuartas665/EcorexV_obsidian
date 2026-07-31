@@ -1,1 +1,2 @@
+- [ ] ![[Pasted image 20260730131856.png]] Aquí por ejemplo el tipo de identificación es nit, identificación , correo, telefono, no se identifica,. cuando selecciono e inserto algunas de las identificaciones y se cmabia de campoo entre iudentificacion el campo de entrada deberia actualizarse a su correspondiente campo, en vista de que correo es un identificacion y telefono el usuario si selecciona nit en el formulario deberiamos agregar correo pero ya no de manera obligatoria si no como información opcional por que depende la identificacion del nit asi mismo para 
 - [ ] 
