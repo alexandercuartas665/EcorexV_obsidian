@@ -2,7 +2,7 @@
 - Por parte de Guadalupe se le solicito que revisara el formulario de cotizacion que cumple con 
 - lo que necesitan.
 - ![[Pasted image 20260730195733.png]]En el directorio no importa cual identificador escoja, pero el formulario debe tener todos los otros campos restantes disponibles dentro de la sesión es decir, en el ejemplo esta seleccionado nit y pero no se pueden llenar el de correo y teléfono por que esta como identificación, el formulario de abajo debe contener los otras campos de identificación pero no deben ser obligatorios pero si vinculantes con los campos de identificación por lo tando cuando cambie a los otros campos siempre debe poner ingresar el los otros pero noson obligatorios.
-- Se Solicita una explicacion mas profunda de lo que significa un proyecto dentro de las actividades y como se usa
+- ~~Se Solicita una explicacion mas profunda de lo que significa un proyecto dentro de las actividades y como se usa
 - Al momento de crear actividades la parte en donde se adjuntan los archivos no esta funcionando adecuadamente revisar 
 - Implementar un reporte que le indique el valor total de cotizaciones actual por periodo(esto no esta dentro del alcanza definir si se debe cotizar)
 - Revisar los filtros de inventarios en varias ocasiones en la reunion se quedaron pegados y toco actualizar la pagina

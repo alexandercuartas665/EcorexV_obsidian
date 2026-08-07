@@ -1,0 +1,1 @@
+- [ ] La distribución de la gestio![[Pasted image 20260805025720.png]]
