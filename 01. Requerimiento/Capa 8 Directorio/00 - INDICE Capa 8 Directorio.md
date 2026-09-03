@@ -31,6 +31,13 @@ auditado: si (3 subagentes de exploracion sobre el codigo real)
 | 04 | [[Conexion con Cargador de contactos (Documental)]] | Como el Cargador (000740) reusa Tercero, ITerceroService y TerceroModal; la frontera de entidades; acciones (Bolsa, Oportunidades, Llamada IA) |
 | 05 | [[Reglas de codigo para el refactor]] | El contrato del proyecto: tope de 2000 lineas por archivo, capa de backend compartida, como partir, checklist para recibir cambios sin perder contexto |
 
+### Segundo motor de contactos (version AVANZADA, seleccionable)
+
+| # | Documento | Que cubre |
+| - | --------- | --------- |
+| 06 | [[Directorio Modular avanzado - prototipo y modelo (Spec)]] | Spec del 2do motor: secciones + categorias componibles, visibilidad por rol/area, naturaleza deducida, homologacion fiscal (RUT), 11 tipos de campo, modelo de datos y mapeo a persistencia; fuente = prototipo en `020. Soldarco/09.Directorio modular` |
+| 07 | [[Plan de homologacion e implementacion por olas]] | Contrato de la sesion dedicada: variante seleccionable, misma tabla Tercero con marca de motor, quirurgico (no romper el motor actual), MVP visual primero, olas (columnas -> nucleo -> fiscal -> migracion + interoperabilidad con el Gestor de contactos) |
+
 ## Mapa de una linea (el sistema de un vistazo)
 
 ```
